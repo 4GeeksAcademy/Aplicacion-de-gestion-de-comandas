@@ -6,7 +6,7 @@ from flask import Flask, request, jsonify, url_for, send_from_directory
 from flask_migrate import Migrate
 from flask_swagger import swagger
 from api.utils import APIException, generate_sitemap
-from api.models import db
+from api.models import db,  User, EstadoComanda, EstadoMesa, Categorias , Platos, Mesas, Comandas, Comandas_Platos
 from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
@@ -64,6 +64,20 @@ def serve_any_other_file(path):
     response = send_from_directory(static_file_dir, path)
     response.cache_control.max_age = 0  # avoid cache memory
     return response
+
+#---------------------------------GET TODOS LOS USUARIOS-----------------
+@app.route('/users', methods=['GET'])
+def get_users():
+    users= User.query.all()
+    print (users)
+    user_serialized = []
+    for user in users:
+        user_serialized.append(user.serialize())
+    return jsonify({'msg': 'ok', 'results' : user_serialized}), 200
+
+
+#----------------------------------GET COMANDAS--------------------------
+
 
 
 # this only runs if `$ python src/main.py` is executed

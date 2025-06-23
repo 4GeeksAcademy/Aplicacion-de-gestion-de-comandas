@@ -158,3 +158,6 @@ class Comandas_Platos(db.Model):
         }
 
 
+#pipenv shell
+#pipenv install
+#pipenv run diagram para generar el diagrama con python y comprobar las relaciones 
