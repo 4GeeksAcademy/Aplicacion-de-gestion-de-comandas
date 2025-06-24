@@ -6,18 +6,36 @@ from flask import Flask, request, jsonify, url_for, send_from_directory
 from flask_migrate import Migrate
 from flask_swagger import swagger
 from api.utils import APIException, generate_sitemap
-from api.models import db,  User, EstadoComanda, EstadoMesa, Categorias , Platos, Mesas, Comandas, Comandas_Platos
+from api.models import db,  User, EstadoComanda, EstadoMesa, Categories , Plates, Tables, Orders, Orders_Plates
 from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
 
-# from models import Person
+#from src.api.models import db
+#from flask import Flask
+#importaciones adicionales para credenciales
+from flask_jwt_extended import create_access_token
+from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import jwt_required
+from flask_jwt_extended import JWTManager
+#from flask_bcrypt import Bcrypt
+from flask_cors import CORS
+
+
 
 ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
 static_file_dir = os.path.join(os.path.dirname(
     os.path.realpath(__file__)), '../dist/')
+
+
 app = Flask(__name__)
 app.url_map.strict_slashes = False
+#bcrypt = Bcrypt(app) #para encriptar
+
+
+app.url_map.strict_slashes = False
+app.config["JWT_SECRET_KEY"] = os.getenv('JWT_KEY') #para tener la llave fuera del codigo
+jwt = JWTManager(app)
 
 # database condiguration
 db_url = os.getenv("DATABASE_URL")
@@ -30,6 +48,7 @@ else:
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 MIGRATE = Migrate(app, db, compare_type=True)
 db.init_app(app)
+CORS(app)
 
 # add the admin
 setup_admin(app)

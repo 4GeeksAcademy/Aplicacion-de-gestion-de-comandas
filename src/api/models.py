@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import String, Boolean, Integer, ForeignKey, DateTime, Enum
+from sqlalchemy import String, Boolean, Integer, ForeignKey, DateTime, Enum, Numeric 
 from sqlalchemy.orm import Mapped, mapped_column , relationship
 from typing import List
 from datetime import datetime
@@ -10,7 +10,7 @@ db = SQLAlchemy()
 
 class EstadoComanda(enum.Enum):
     pendiente = "pendiente"
-    en_cocina = "en_cocina"
+    en_cocina = "en_preparacion"
     servida = "servida"
     cancelada = "cancelada"
 
@@ -20,17 +20,23 @@ class EstadoMesa(enum.Enum):
     reservada = "reservada"
     cerrada = "cerrada"
 
-class Categorias(db.Model):
-     __tablename__= 'categorias'
+class EstadoRol(enum.Enum):
+    camarero = "camarero"
+    cocinero = "cocinero"
+    barman = "barman"
+    admin = "admin"
+
+class Categories(db.Model):
+     __tablename__= 'categories'
      id: Mapped[int] = mapped_column(primary_key=True)
      name: Mapped[str] = mapped_column(String(50), nullable=False)
 
-     platos :  Mapped[List["Platos"]] = relationship(
+     platos :  Mapped[List["Plates"]] = relationship(
         back_populates= 'categorias') 
 
 
      def __str__(self):
-        return f'Categoria del plato: {self.name}'
+        return f' Categoria {self.name}'
      
      def serialize(self):
         return {
@@ -40,22 +46,22 @@ class Categorias(db.Model):
         }
      
     
-class Platos(db.Model):
-    __tablename__= 'platos'
+class Plates(db.Model):
+    __tablename__= 'plates'
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(50), nullable=False)
-    description:  Mapped[str] = mapped_column(nullable=False)
-    price: Mapped[float] = mapped_column(nullable=False)
-    guest_notes: Mapped[str] = mapped_column(String(120),nullable= True)
-    category_id: Mapped[int] = mapped_column(ForeignKey('categorias.id'))
+    description:  Mapped[str] = mapped_column(String(200), nullable=True)
+    price: Mapped[float] = mapped_column(Numeric, nullable=False)
+    available: Mapped[bool] =mapped_column(Boolean, nullable= True)
+    category_id: Mapped[int] = mapped_column(ForeignKey('categories.id'))
 
-    categorias: Mapped["Categorias"] = relationship(
+    categorias: Mapped["Categories"] = relationship(
         back_populates= 'platos') 
-    comanda_platos: Mapped[List["Comandas_Platos"]] = relationship(
+    comanda_platos: Mapped[List["Orders_Plates"]] = relationship(
         back_populates= 'plato') 
 
     def __str__(self):
-        return f'Plato {self.name}'
+        return f' {self.name}'
     
     def serialize(self):
         return {
@@ -63,22 +69,27 @@ class Platos(db.Model):
             "name": self.name,
             "description": self.description,
             "price": self.price,
-            "guest_notes": self.guest_notes
+            "available": self.available,
+            "category": self.categorias.name,
+            #"category_id": self.category_id
             # do not serialize the password, its a security breach
-        }
-    
+        }  
 
-class Mesas(db.Model):
-     __tablename__= 'mesas'
+class Tables(db.Model):
+     __tablename__= 'tables'
      id: Mapped[int] = mapped_column(primary_key=True)
      seats: Mapped[int] = mapped_column(nullable=True)
      state: Mapped[EstadoMesa] = mapped_column(Enum(EstadoMesa), nullable=False)
+     user_id: Mapped[int]= mapped_column(ForeignKey('user.id'))
 
-     comandas: Mapped[List["Comandas"]] = relationship(
+     comandas: Mapped[List["Orders"]] = relationship(
         back_populates= 'mesas') 
+     usuario: Mapped["User"] = relationship(
+         back_populates= 'mesas'
+     )
      
      def __str__(self):
-        return f'Mesa {self.id} con estado {self.state}'
+        return f'Mesa {self.id} esta {self.state}'
      
      def serialize(self):
         return {
@@ -88,17 +99,18 @@ class Mesas(db.Model):
         }
 
 class User(db.Model):
-    __tablename__= 'usuarios'
+    __tablename__= 'user'
     id: Mapped[int] = mapped_column(primary_key=True)
-    email: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
+    email: Mapped[str] = mapped_column(String(120), unique=True, nullable=False) #ondelete="SET NULL"
     password: Mapped[str] = mapped_column(nullable=False)
     name: Mapped[str] = mapped_column(nullable=False)
-    rol: Mapped[str] = mapped_column(nullable=False)
+    rol: Mapped[EstadoRol] = mapped_column(Enum(EstadoRol), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean(), nullable=False)
 
-    comandas: Mapped[List["Comandas"]] = relationship(
+    comandas: Mapped[List["Orders"]] = relationship(
         back_populates= 'usuarios')  #entre comillas porque la clase Comandas no se ha definido aun
-
+    mesas: Mapped[List["Tables"]] = relationship(
+        back_populates= 'usuario')
     def __str__(self):
         return f'Usuario {self.email}'
 
@@ -106,23 +118,29 @@ class User(db.Model):
         return {
             "id": self.id,
             "email": self.email,
+            "rol": self.rol
             # do not serialize the password, its a security breach
         }
     
-class Comandas(db.Model):
-     __tablename__= 'comandas'
+class Orders(db.Model):
+     __tablename__= 'orders'
      id: Mapped[int] = mapped_column(primary_key=True)
-     mesa_id: Mapped[int] = mapped_column(ForeignKey('mesas.id'))
-     usuario_id:Mapped[int] = mapped_column(ForeignKey('usuarios.id'))
+     mesa_id: Mapped[int] = mapped_column(ForeignKey('tables.id'))
+     usuario_id:Mapped[int] = mapped_column(ForeignKey('user.id'))
+     #ticket_id: Mapped[float]= mapped_column(ForeignKey('ticket.id'))
      date: Mapped[datetime] = mapped_column( DateTime, nullable=False)
      state:  Mapped[EstadoComanda] = mapped_column(Enum(EstadoComanda), nullable=False)
-     total_price: Mapped[float] = mapped_column(nullable=False)
+    # total_price: Mapped[float] = mapped_column(Numeric, nullable=True)
+     guest_notes: Mapped[str]= mapped_column(String, nullable=True)
+     
 
      usuarios: Mapped[User] = relationship(
         back_populates= 'comandas') 
-     mesas: Mapped[Mesas] = relationship(
+     mesas: Mapped[Tables] = relationship(
         back_populates= 'comandas') 
-     comanda_plato: Mapped[List["Comandas_Platos"]] = relationship(
+     comanda_platos: Mapped[List["Orders_Plates"]] = relationship(
+        back_populates= 'comanda')
+     ticket: Mapped["Ticket"] = relationship(
         back_populates= 'comanda') 
      
      def __str__(self):
@@ -134,28 +152,58 @@ class Comandas(db.Model):
             "mesa_id": self.mesa_id,
             "usuario_id": self.usuario_id,
             "state": self.state.value,
-            "total_price": self.total_price
+            "total_price": self.ticket.total_price
+           
             # do not serialize the password, its a security breach
         }
 
 
-class Comandas_Platos(db.Model):
-    __tablename__= 'comandas_platos'
+class Orders_Plates(db.Model):
+    __tablename__= 'orders_plates'
     id: Mapped[int] = mapped_column(Integer, primary_key= True)
-    plato_id:  Mapped[int] = mapped_column(ForeignKey('platos.id'))
-    comanda_id:  Mapped[int] = mapped_column(ForeignKey('comandas.id'))
+    plate_id:  Mapped[int] = mapped_column(ForeignKey('plates.id'))
+    order_id:  Mapped[int] = mapped_column(ForeignKey('orders.id'))
+    count_plat: Mapped[int]= mapped_column(Integer, nullable=True)
 
-    comanda: Mapped[Comandas] = relationship(
+    comanda: Mapped[Orders] = relationship(
         back_populates= 'comanda_platos') 
-    plato: Mapped[Platos] = relationship(
+    plato: Mapped[Plates] = relationship(
         back_populates= 'comanda_platos') 
     
+    def __str__(self):
+        return f'comanda {self.order_id} tiene {self.count_plat}   {self.plato.name}'
     
     def serialize(self):
         return {
-            "plato_id": self.plato_id,
-            "comanda_id": self.comanda_id
+            "id": self.id,
+            "plato_id": self.plate_id,
+            "comanda_id": self.order_id,
+            "cantidad": self.count_plat
         }
+    
+class Ticket(db.Model):
+    id: Mapped[int]= mapped_column(Integer, primary_key=True)
+    total_price : Mapped[Numeric]= mapped_column(Numeric, nullable=True)
+    order_id: Mapped[int] = mapped_column(ForeignKey('orders.id'))
+
+    comanda:  Mapped["Orders"] = relationship(
+        back_populates= 'ticket')
+
+    def __str__(self):
+        return f'Total a pagar {self.total_price}'
+    
+    def serialize(self):
+        return {
+            "id": self.id,
+            "total_price": self.total_price,
+           
+        }
+
+
+
+#pipenv run migrate
+#pipenv run upgrade
+#pipenv run start
 
 
 #pipenv shell

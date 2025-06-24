@@ -1,34 +1,38 @@
   
 import os
 from flask_admin import Admin
-from .models import db, User, EstadoComanda, EstadoMesa, Categorias , Platos, Mesas, Comandas, Comandas_Platos
+from .models import db, User, EstadoComanda, EstadoMesa, Categories , Plates, Tables, Orders, Orders_Plates, Ticket
 from flask_admin.contrib.sqla import ModelView
 
 
 
 class UserModelView(ModelView):
     column_auto_selected_related =True
-    column_list= ['id', 'email', 'password', 'is_active', 'name', 'rol']
+    column_list= ['id', 'email', 'password', 'is_active', 'name', 'rol', 'comandas', 'mesas']
 
-class CategoriasModelView(ModelView):
+class CategoriesModelView(ModelView):
     column_auto_selected_related =True
-    column_list= ['id', 'name']
+    column_list= ['id', 'name', 'platos']
 
-class PlatosModelView(ModelView):
+class PlatesModelView(ModelView):
     column_auto_selected_related =True
-    column_list= ['id', 'name', 'description', 'price', 'guest_notes', 'category_id']
+    column_list= ['id', 'name', 'description', 'price', 'available', 'category_id', 'categorias', 'comanda_platos']
 
-class MesasModelView(ModelView):
+class TablesModelView(ModelView):
     column_auto_selected_related =True
-    column_list= ['id', 'seats', 'state']
+    column_list= ['id', 'seats', 'state', 'orders']
 
-class ComandasModelView(ModelView):
+class OrdersModelView(ModelView):
     column_auto_selected_related =True
-    column_list= ['id', 'mesa_id', 'usuario_id', 'date', 'state', 'total_price']
+    column_list= ['id', 'mesa_id', 'usuario_id', 'date', 'guest_notes', 'state', 'count_plat', 'total_price', 'usuarios', 'mesas', 'comanda_platos']
 
-class Comandas_PlatosModelView(ModelView):
+class Orders_PlatesModelView(ModelView):
     column_auto_selected_related =True
-    column_list= ['id', 'plato_id', 'comanda_id']
+    column_list= ['id', 'plato_id', 'comanda_id', 'comanda', 'plato']
+
+class TicketModelView(ModelView):
+    column_auto_selected_related =True
+    column_list= ['id', 'total_price', 'order_id', 'comanda']
 
 
 def setup_admin(app):
@@ -40,11 +44,12 @@ def setup_admin(app):
     # Add your models here, for example this is how we add a the User model to the admin
     
     admin.add_view(UserModelView(User, db.session))
-    admin.add_view(CategoriasModelView(Categorias, db.session))
-    admin.add_view(PlatosModelView(Platos, db.session))
-    admin.add_view(MesasModelView(Mesas, db.session))
-    admin.add_view(ComandasModelView(Comandas, db.session))
-    admin.add_view(Comandas_PlatosModelView(Comandas_Platos, db.session))
+    admin.add_view(CategoriesModelView(Categories, db.session))
+    admin.add_view(PlatesModelView(Plates, db.session))
+    admin.add_view(TablesModelView(Tables, db.session))
+    admin.add_view(OrdersModelView(Orders, db.session))
+    admin.add_view(Orders_PlatesModelView(Orders_Plates, db.session))
+    admin.add_view(TicketModelView(Ticket, db.session))
 
     # You can duplicate that line to add mew models
     # admin.add_view(ModelView(YourModelName, db.session))
