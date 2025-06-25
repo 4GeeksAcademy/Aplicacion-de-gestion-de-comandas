@@ -12,7 +12,7 @@ class UserModelView(ModelView):
 
 class PlatesModelView(ModelView):
     column_auto_selected_related =True
-    column_list= ['id', 'name', 'description', 'price', 'available',  'categorias', 'comanda_platos']
+    column_list= ['id', 'name', 'description', 'price', 'available', 'categories', 'comanda_platos']
 
 class TablesModelView(ModelView):
     column_auto_selected_related =True

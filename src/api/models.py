@@ -189,9 +189,6 @@ class Orders_Plates(db.Model):
             "comanda_id": self.order_id,
             "cantidad": self.count_plat
         }
-    
-           
-        
 
 
 
