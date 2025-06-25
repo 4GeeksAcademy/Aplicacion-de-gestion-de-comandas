@@ -78,7 +78,7 @@ class Plates(db.Model):
             "description": self.description,
             "price": self.price,
             "available": self.available,
-            "category": self.categories,
+            "category": self.categories.value
             #"category_id": self.category_id
            
         }  

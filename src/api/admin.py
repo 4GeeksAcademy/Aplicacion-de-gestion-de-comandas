@@ -1,7 +1,7 @@
   
 import os
 from flask_admin import Admin
-from .models import db, User, EstadoComanda, EstadoMesa , Plates, Tables, Orders, Orders_Plates, Ticket
+from .models import db, User, EstadoComanda, EstadoMesa , EstadoCategorias, Plates, Tables, Orders, Orders_Plates, Ticket
 from flask_admin.contrib.sqla import ModelView
 
 
