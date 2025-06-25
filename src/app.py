@@ -6,18 +6,36 @@ from flask import Flask, request, jsonify, url_for, send_from_directory
 from flask_migrate import Migrate
 from flask_swagger import swagger
 from api.utils import APIException, generate_sitemap
-from api.models import db
+from api.models import db,  User, EstadoComanda, EstadoMesa , Plates, Tables, Orders, Orders_Plates
 from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
 
-# from models import Person
+#from src.api.models import db
+#from flask import Flask
+#importaciones adicionales para credenciales
+from flask_jwt_extended import create_access_token
+from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import jwt_required
+from flask_jwt_extended import JWTManager
+#from flask_bcrypt import Bcrypt
+from flask_cors import CORS
+
+
 
 ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
 static_file_dir = os.path.join(os.path.dirname(
     os.path.realpath(__file__)), '../dist/')
+
+
 app = Flask(__name__)
 app.url_map.strict_slashes = False
+#bcrypt = Bcrypt(app) #para encriptar
+
+
+app.url_map.strict_slashes = False
+app.config["JWT_SECRET_KEY"] = os.getenv('JWT_KEY') #para tener la llave fuera del codigo
+jwt = JWTManager(app)
 
 # database condiguration
 db_url = os.getenv("DATABASE_URL")
@@ -30,6 +48,7 @@ else:
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 MIGRATE = Migrate(app, db, compare_type=True)
 db.init_app(app)
+CORS(app)
 
 # add the admin
 setup_admin(app)
@@ -48,8 +67,6 @@ def handle_invalid_usage(error):
     return jsonify(error.to_dict()), error.status_code
 
 # generate sitemap with all your endpoints
-
-
 @app.route('/')
 def sitemap():
     if ENV == "development":
@@ -64,6 +81,46 @@ def serve_any_other_file(path):
     response = send_from_directory(static_file_dir, path)
     response.cache_control.max_age = 0  # avoid cache memory
     return response
+
+#---------------------------------GET TODOS LOS USUARIOS-----------------
+@app.route('/users', methods=['GET'])
+def get_users():
+    users= User.query.all()
+    print (users)
+    user_serialized = []
+    for user in users:
+        user_serialized.append(user.serialize())
+    return jsonify({'msg': 'ok', 'results' : user_serialized}), 200
+
+#--------------------------------GET UN USUARIO POR SU id ----------------
+@app.route('/users/<int:id>', methods=['GET'])
+def get_user_by_id(id):
+    user= User.query.get(id)# query.get solo funciona para devolver primary key. para devolver otro campo usar query.filter_by
+    print (user)
+    if user is None:
+        return jsonify ({'msg': 'Usuario no encontrado'}), 404
+    return jsonify({'msg': 'ok', 'result': user.serialize()}), 200
+
+
+#----------------------------------GET TODAS LAS COMANDAS--------------------------
+@app.route('/orders', methods=['GET'])
+def get_orders():
+    orders= Orders.query.all()
+    print (orders)
+    user_serialized = []
+    for order in orders:
+        user_serialized.append(order.serialize())
+    return jsonify({'msg': 'ok', 'results' : user_serialized}), 200
+
+#-------------------------------GET DE UNA COMANDA --------------------------------
+@app.route('/orders/<int:id>', methods=['GET'])
+def get_order_by_id(id):
+    order= Orders.query.get(id)# query.get solo funciona para devolver primary key. para devolver otro campo usar query.filter_by
+    print (order)
+    if order is None:
+        return jsonify ({'msg': 'Comanda no encontrada'}), 404
+    return jsonify({'msg': 'ok', 'result':order.serialize()}), 200
+
 
 
 # this only runs if `$ python src/main.py` is executed
