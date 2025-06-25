@@ -1,7 +1,7 @@
   
 import os
 from flask_admin import Admin
-from .models import db, User, EstadoComanda, EstadoMesa , EstadoCategorias, Plates, Tables, Orders, Orders_Plates, Ticket
+from .models import db, User, EstadoComanda, EstadoMesa , EstadoCategorias, Plates, Tables, Orders, Orders_Plates
 from flask_admin.contrib.sqla import ModelView
 
 
@@ -26,10 +26,6 @@ class Orders_PlatesModelView(ModelView):
     column_auto_selected_related =True
     column_list= ['id',  'comanda', 'plato', 'count_plat']
 
-class TicketModelView(ModelView):
-    column_auto_selected_related =True
-    column_list= ['id', 'total_price', 'comanda']
-
 
 def setup_admin(app):
     app.secret_key = os.environ.get('FLASK_APP_KEY', 'sample key')
@@ -45,7 +41,7 @@ def setup_admin(app):
     admin.add_view(TablesModelView(Tables, db.session))
     admin.add_view(OrdersModelView(Orders, db.session))
     admin.add_view(Orders_PlatesModelView(Orders_Plates, db.session))
-    admin.add_view(TicketModelView(Ticket, db.session))
+    #admin.add_view(TicketModelView(Ticket, db.session))
 
     # You can duplicate that line to add mew models
     # admin.add_view(ModelView(YourModelName, db.session))

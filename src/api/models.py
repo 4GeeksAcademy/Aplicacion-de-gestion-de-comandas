@@ -78,7 +78,7 @@ class Plates(db.Model):
             "description": self.description,
             "price": self.price,
             "available": self.available,
-            "category": self.categories.value
+            "categories": self.categories.value
             #"category_id": self.category_id
            
         }  
@@ -148,8 +148,8 @@ class Orders(db.Model):
         back_populates= 'comandas') 
      comanda_platos: Mapped[List["Orders_Plates"]] = relationship(
         back_populates= 'comanda')
-     ticket: Mapped["Ticket"] = relationship(
-        back_populates= 'comanda') 
+     #ticket: Mapped["Ticket"] = relationship(
+      #  back_populates= 'comanda') 
      
      def __str__(self):
         return f'Comanda {self.id}'
@@ -190,23 +190,8 @@ class Orders_Plates(db.Model):
             "cantidad": self.count_plat
         }
     
-class Ticket(db.Model):
-    id: Mapped[int]= mapped_column(Integer, primary_key=True)
-    total_price : Mapped[Numeric]= mapped_column(Numeric, nullable=True)
-    order_id: Mapped[int] = mapped_column(ForeignKey('orders.id'))
-
-    comanda:  Mapped["Orders"] = relationship(
-        back_populates= 'ticket')
-
-    def __str__(self):
-        return f'Total a pagar {self.total_price}'
-    
-    def serialize(self):
-        return {
-            "id": self.id,
-            "total_price": self.total_price,
            
-        }
+        
 
 
 
