@@ -93,7 +93,6 @@ def get_users():
     return jsonify({'msg': 'ok', 'results' : user_serialized}), 200
 
 #--------------------------------GET UN USUARIO POR SU id ----------------
-
 @app.route('/users/<int:id>', methods=['GET'])
 def get_user_by_id(id):
     user= User.query.get(id)# query.get solo funciona para devolver primary key. para devolver otro campo usar query.filter_by
@@ -103,7 +102,24 @@ def get_user_by_id(id):
     return jsonify({'msg': 'ok', 'result': user.serialize()}), 200
 
 
-#----------------------------------GET COMANDAS--------------------------
+#----------------------------------GET TODAS LAS COMANDAS--------------------------
+@app.route('/orders', methods=['GET'])
+def get_orders():
+    orders= Orders.query.all()
+    print (orders)
+    user_serialized = []
+    for order in orders:
+        user_serialized.append(order.serialize())
+    return jsonify({'msg': 'ok', 'results' : user_serialized}), 200
+
+#-------------------------------GET DE UNA COMANDA --------------------------------
+@app.route('/orders/<int:id>', methods=['GET'])
+def get_order_by_id(id):
+    order= Orders.query.get(id)# query.get solo funciona para devolver primary key. para devolver otro campo usar query.filter_by
+    print (order)
+    if order is None:
+        return jsonify ({'msg': 'Comanda no encontrada'}), 404
+    return jsonify({'msg': 'ok', 'result':order.serialize()}), 200
 
 
 

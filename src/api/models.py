@@ -127,14 +127,13 @@ class Orders(db.Model):
      id: Mapped[int] = mapped_column(primary_key=True)
      mesa_id: Mapped[int] = mapped_column(ForeignKey('tables.id'))
      usuario_id:Mapped[int] = mapped_column(ForeignKey('user.id'))
-     #ticket_id: Mapped[float]= mapped_column(ForeignKey('ticket.id'))
      date: Mapped[datetime] = mapped_column( DateTime, nullable=False)
      state:  Mapped[EstadoComanda] = mapped_column(Enum(EstadoComanda), nullable=False)
-    # total_price: Mapped[float] = mapped_column(Numeric, nullable=True)
+     total_price: Mapped[float] = mapped_column(Numeric, nullable=True)
      guest_notes: Mapped[str]= mapped_column(String, nullable=True)
      
 
-     usuarios: Mapped[User] = relationship(
+     usuarios: Mapped[List[User]] = relationship(
         back_populates= 'comandas') 
      mesas: Mapped[Tables] = relationship(
         back_populates= 'comandas') 
@@ -152,10 +151,10 @@ class Orders(db.Model):
             "mesa_id": self.mesa_id,
             "usuario_id": self.usuario_id,
             "state": self.state.value,
-            "total_price": self.ticket.total_price
-           
-            # do not serialize the password, its a security breach
-        }
+            "total_price": self.total_price,
+            "guest_notes": self.guest_notes
+
+          }
 
 
 class Orders_Plates(db.Model):
