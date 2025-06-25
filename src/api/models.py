@@ -8,6 +8,12 @@ import enum
 
 db = SQLAlchemy()
 
+class EstadoCategorias(enum.Enum):
+    primer_plato = "primer_plato"
+    segundo_plato = "segundo_plato"
+    postres = "postres"  
+    bebidas = "bebidas" 
+
 class EstadoComanda(enum.Enum):
     pendiente = "pendiente"
     en_cocina = "en_preparacion"
@@ -26,24 +32,25 @@ class EstadoRol(enum.Enum):
     barman = "barman"
     admin = "admin"
 
-class Categories(db.Model):
-     __tablename__= 'categories'
-     id: Mapped[int] = mapped_column(primary_key=True)
-     name: Mapped[str] = mapped_column(String(50), nullable=False)
+#class Categories(db.Model):
+    # __tablename__= 'categories'
+    # id: Mapped[int] = mapped_column(primary_key=True)
+    # name: Mapped[str] = mapped_column(String(50), nullable=False)
+    
 
-     platos :  Mapped[List["Plates"]] = relationship(
-        back_populates= 'categorias') 
+    # platos :  Mapped[List["Plates"]] = relationship(
+     #   back_populates= 'categorias') 
 
 
-     def __str__(self):
-        return f' Categoria {self.name}'
+    # def __str__(self):
+     #   return f' Categoria {self.name}'
      
-     def serialize(self):
-        return {
-            "id": self.id,
-            "name": self.name,
+     #def serialize(self):
+        #return {
+         #   "id": self.id,
+        #    "name": self.name,
             # do not serialize the password, its a security breach
-        }
+      #  }
      
     
 class Plates(db.Model):
@@ -53,10 +60,11 @@ class Plates(db.Model):
     description:  Mapped[str] = mapped_column(String(200), nullable=True)
     price: Mapped[float] = mapped_column(Numeric, nullable=False)
     available: Mapped[bool] =mapped_column(Boolean, nullable= True)
-    category_id: Mapped[int] = mapped_column(ForeignKey('categories.id'))
+    categories: Mapped[EstadoCategorias] = mapped_column(Enum(EstadoCategorias), nullable=False)
+    #category_id: Mapped[int] = mapped_column(ForeignKey('categories.id'))
 
-    categorias: Mapped["Categories"] = relationship(
-        back_populates= 'platos') 
+   # categorias: Mapped["Categories"] = relationship(
+      #  back_populates= 'platos') 
     comanda_platos: Mapped[List["Orders_Plates"]] = relationship(
         back_populates= 'plato') 
 
@@ -70,9 +78,9 @@ class Plates(db.Model):
             "description": self.description,
             "price": self.price,
             "available": self.available,
-            "category": self.categorias.name,
+            "category": self.categories,
             #"category_id": self.category_id
-            # do not serialize the password, its a security breach
+           
         }  
 
 class Tables(db.Model):
@@ -95,7 +103,8 @@ class Tables(db.Model):
         return {
             "id": self.id,
             "seats": self.seats,
-            "state": self.state.value, #es un diccionario
+            "state": self.state.value, #es un diccionario,
+            "user_id": self.user_id,
         }
 
 class User(db.Model):
@@ -133,7 +142,7 @@ class Orders(db.Model):
      guest_notes: Mapped[str]= mapped_column(String, nullable=True)
      
 
-     usuarios: Mapped[List[User]] = relationship(
+     usuarios: Mapped[User] = relationship(
         back_populates= 'comandas') 
      mesas: Mapped[Tables] = relationship(
         back_populates= 'comandas') 
@@ -152,7 +161,8 @@ class Orders(db.Model):
             "usuario_id": self.usuario_id,
             "state": self.state.value,
             "total_price": self.total_price,
-            "guest_notes": self.guest_notes
+            "guest_notes": self.guest_notes,
+            "date":self.date
 
           }
 
