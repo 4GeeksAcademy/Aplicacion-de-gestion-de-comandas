@@ -67,8 +67,6 @@ def handle_invalid_usage(error):
     return jsonify(error.to_dict()), error.status_code
 
 # generate sitemap with all your endpoints
-
-
 @app.route('/')
 def sitemap():
     if ENV == "development":
@@ -93,6 +91,16 @@ def get_users():
     for user in users:
         user_serialized.append(user.serialize())
     return jsonify({'msg': 'ok', 'results' : user_serialized}), 200
+
+#--------------------------------GET UN USUARIO POR SU id ----------------
+
+@app.route('/users/<int:id>', methods=['GET'])
+def get_user_by_id(id):
+    user= User.query.get(id)# query.get solo funciona para devolver primary key. para devolver otro campo usar query.filter_by
+    print (user)
+    if user is None:
+        return jsonify ({'msg': 'Usuario no encontrado'}), 404
+    return jsonify({'msg': 'ok', 'result': user.serialize()}), 200
 
 
 #----------------------------------GET COMANDAS--------------------------

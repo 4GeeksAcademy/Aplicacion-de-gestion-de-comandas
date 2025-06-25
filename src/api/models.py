@@ -118,7 +118,7 @@ class User(db.Model):
         return {
             "id": self.id,
             "email": self.email,
-            "rol": self.rol
+            "rol": self.rol.value # es un diccionario 
             # do not serialize the password, its a security breach
         }
     
