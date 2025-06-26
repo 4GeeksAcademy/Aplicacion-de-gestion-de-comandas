@@ -31,40 +31,19 @@ class EstadoRol(enum.Enum):
     cocinero = "cocinero"
     barman = "barman"
     admin = "admin"
-
-#class Categories(db.Model):
-    # __tablename__= 'categories'
-    # id: Mapped[int] = mapped_column(primary_key=True)
-    # name: Mapped[str] = mapped_column(String(50), nullable=False)
-    
-
-    # platos :  Mapped[List["Plates"]] = relationship(
-     #   back_populates= 'categorias') 
-
-
-    # def __str__(self):
-     #   return f' Categoria {self.name}'
-     
-     #def serialize(self):
-        #return {
-         #   "id": self.id,
-        #    "name": self.name,
-            # do not serialize the password, its a security breach
-      #  }
      
     
 class Plates(db.Model):
     __tablename__= 'plates'
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(Integer,primary_key=True)
     name: Mapped[str] = mapped_column(String(50), nullable=False)
     description:  Mapped[str] = mapped_column(String(200), nullable=True)
     price: Mapped[float] = mapped_column(Numeric, nullable=False)
     available: Mapped[bool] =mapped_column(Boolean, nullable= True)
     categories: Mapped[EstadoCategorias] = mapped_column(Enum(EstadoCategorias), nullable=False)
-    #category_id: Mapped[int] = mapped_column(ForeignKey('categories.id'))
+    
 
-   # categorias: Mapped["Categories"] = relationship(
-      #  back_populates= 'platos') 
+   
     comanda_platos: Mapped[List["Orders_Plates"]] = relationship(
         back_populates= 'plato') 
 
@@ -85,8 +64,8 @@ class Plates(db.Model):
 
 class Tables(db.Model):
      __tablename__= 'tables'
-     id: Mapped[int] = mapped_column(primary_key=True)
-     seats: Mapped[int] = mapped_column(nullable=True)
+     id: Mapped[int] = mapped_column(Integer,primary_key=True)
+     seats: Mapped[int] = mapped_column(Integer, nullable=True)
      state: Mapped[EstadoMesa] = mapped_column(Enum(EstadoMesa), nullable=False)
      user_id: Mapped[int]= mapped_column(ForeignKey('user.id'))
 
@@ -109,10 +88,10 @@ class Tables(db.Model):
 
 class User(db.Model):
     __tablename__= 'user'
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
     email: Mapped[str] = mapped_column(String(120), unique=True, nullable=False) #ondelete="SET NULL"
-    password: Mapped[str] = mapped_column(nullable=False)
-    name: Mapped[str] = mapped_column(nullable=False)
+    password: Mapped[str] = mapped_column(String(100), nullable=False)
+    name: Mapped[str] = mapped_column(String(50), nullable=False)
     rol: Mapped[EstadoRol] = mapped_column(Enum(EstadoRol), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean(), nullable=False)
 
@@ -133,7 +112,7 @@ class User(db.Model):
     
 class Orders(db.Model):
      __tablename__= 'orders'
-     id: Mapped[int] = mapped_column(primary_key=True)
+     id: Mapped[int] = mapped_column(Integer, primary_key=True)
      mesa_id: Mapped[int] = mapped_column(ForeignKey('tables.id'))
      usuario_id:Mapped[int] = mapped_column(ForeignKey('user.id'))
      date: Mapped[datetime] = mapped_column( DateTime, nullable=False)
@@ -164,7 +143,7 @@ class Orders(db.Model):
             "guest_notes": self.guest_notes,
             "date":self.date
 
-          }
+        }
 
 
 class Orders_Plates(db.Model):
