@@ -10,6 +10,7 @@ from api.models import db,  User, EstadoComanda, EstadoMesa , Plates, Tables, Or
 from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
+from datetime import datetime
 
 #from src.api.models import db
 #from flask import Flask
@@ -120,6 +121,119 @@ def get_order_by_id(id):
     if order is None:
         return jsonify ({'msg': 'Comanda no encontrada'}), 404
     return jsonify({'msg': 'ok', 'result':order.serialize()}), 200
+
+#-------------------------------POST DE COMANDAS ----------------------------------
+@app.route('/orders', methods=['POST'])
+def crear_comanda():
+    body= request.get_json(silent=True)
+    if body is None:
+        return jsonify ({'msg': 'Debes enviar informacion'}), 404
+    if 'date' not in body:
+        return jsonify ({'msg': 'Debe introducir la fecha y hora'}), 404
+    if 'mesa_id' not in body: 
+        return jsonify ({'msg': 'Debes introducir el numero de la mesa'}), 404
+    if 'usuario_id' not in body: 
+        return jsonify ({'msg': 'Debes introducir el usuario que atiende la comanda '}), 404
+    
+    
+    #required_fields = ['mesa_id', 'usuario_id', 'date', 'state', 'platos']
+    #for field in required_fields:
+       # if field not in body:
+        #    return jsonify({'msg': f'Falta el campo obligatorio: {field}'}), 400
+    
+    new_order = Orders() # nuevo_comanda es una instancia de la clase 
+    new_order.date =datetime.fromisoformat(body['date'])
+    new_order.mesa_id= body['mesa_id']
+    new_order.guest_notes= body['guest_notes']
+    new_order.state= EstadoComanda['pendiente']
+    new_order.total_price= 0
+      
+    db.session.add(new_order)
+    db.session.flush()  # para obtener el ID sin hacer commit aún
+    total=0
+
+    for item in body['platos']:
+        plato_id = item.get('plate_id')
+        cantidad = item.get('cantidad', 1)
+        if plato_id is None:
+                continue
+
+        plato = Plates.query.get(plato_id) #instancio platos 
+        if not plato:
+                continue  # o podrías hacer return con error
+
+            # Crear relación Orders_Plates
+        new_order_plate = Orders_Plates() #instancio Order_Plates
+        new_order_plate.plate_id=plato_id,
+        new_order_plate.order_id=new_order.id,
+        new_order_plate.count_plat=cantidad
+            
+        db.session.add(new_order_plate)
+
+            # Calcular precio total
+        total += float(plato.price) * cantidad
+
+        new_order_plate.total_price = total
+        db.session.commit()
+
+        return jsonify({'msg': 'Comanda creada exitosamente', 'result': new_order.serialize()}), 201
+
+    db.session.commit()
+    return jsonify({'msg': 'ok', 'result': new_order.serialize()}), 200
+
+
+# -------------------------------GET DE UNA TABLES --------------------------------
+@app.route('/tables', methods=['GET'])
+def get_tables():
+    tables = Tables.query.all()
+    print(tables)
+    tables_serialized = []
+    for table in tables:
+        tables_serialized.append(table.serialize())
+    return jsonify({'msg': 'OK', 'result': tables_serialized})
+
+
+# -------------------------------GET DE UNA TABLES ID --------------------------------
+@app.route('/tables/<int:table_id>', methods=['GET'])
+def get_table_by_id(table_id):
+    table = Tables.query.filter_by(id=table_id).first()
+    print(table)
+    if table is None:
+        return jsonify({'msg': ' Tabla no encontrada o inexistente!!'}), 404
+    return jsonify({'msg': 'OK', 'result': table.serialize()})
+
+
+# -------------------------------PUT DE UNA TABLES ID --------------------------------
+@app.route('/tables/<int:table_id>', methods=['PUT'])
+def update_tables(table_id):
+    body = request.get_json(silent=True)
+    table = Tables.query.get(table_id)
+    if body is None: #***decia table
+        return jsonify({'msg': 'Mesa no encontrada!'}), 404
+    if 'state' in body:
+        try:
+            table.state = EstadoMesa(body['state'])
+        except ValueError:
+            return jsonify({'msg': f'Estado no válido!!'}), 404
+    if 'seats' in body:
+        table.seats = body['seats'] #****decia table.state
+    if 'user_id' in body:
+        user = User.query.get(body['user_id'])
+        if user is None:
+            return jsonify({'msg':'Usuario inexistente!!'}),404
+        table.user_id = body['user_id']
+    try:
+        db.session.commit()
+        return jsonify({'msg': 'Mesa actualizada correctamente!', 'result': table.serialize()}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'msg': 'Error al actualizar la mesa', 'error': str(e)}), 500
+
+
+
+
+
+
 
 
 
