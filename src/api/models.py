@@ -3,6 +3,7 @@ from sqlalchemy import String, Boolean, Integer, ForeignKey, DateTime, Enum, Num
 from sqlalchemy.orm import Mapped, mapped_column , relationship
 from typing import List
 from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
 
 import enum
 
@@ -117,9 +118,9 @@ class User(db.Model):
     rol: Mapped[EstadoRol] = mapped_column(Enum(EstadoRol), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean(), nullable=False)
 
-    comandas: Mapped[List["Orders"]] = relationship(
+    comandas: Mapped[List['Orders']] = relationship(
         back_populates= 'usuarios')  #entre comillas porque la clase Comandas no se ha definido aun
-    mesas: Mapped[List["Tables"]] = relationship(
+    mesas: Mapped[List['Tables']] = relationship(
         back_populates= 'usuario')
     def __str__(self):
         return f'Usuario {self.email}'
@@ -137,7 +138,7 @@ class Orders(db.Model):
      id: Mapped[int] = mapped_column(primary_key=True)
      mesa_id: Mapped[int] = mapped_column(ForeignKey('tables.id'))
      usuario_id:Mapped[int] = mapped_column(ForeignKey('user.id'))
-     date: Mapped[datetime] = mapped_column( DateTime, nullable=False, default= datetime.now(timezone.utc))
+     date: Mapped[datetime] = mapped_column( DateTime, nullable=False, default= datetime.now(ZoneInfo("Europe/Madrid")))
      state:  Mapped[EstadoComanda] = mapped_column(Enum(EstadoComanda), nullable=False)
      total_price: Mapped[float] = mapped_column(Numeric, nullable=True)
      guest_notes: Mapped[str]= mapped_column(String, nullable=True)
@@ -148,7 +149,10 @@ class Orders(db.Model):
      mesas: Mapped[Tables] = relationship(
         back_populates= 'comandas') 
      comanda_platos: Mapped[List["Orders_Plates"]] = relationship(
-        back_populates= 'comanda')
+        back_populates= 'comanda', 
+        
+        cascade="all, delete-orphan",
+        passive_deletes=True)
     
      
      def __str__(self):
@@ -172,7 +176,7 @@ class Orders_Plates(db.Model):
     __tablename__= 'orders_plates'
     id: Mapped[int] = mapped_column(Integer, primary_key= True)
     plate_id:  Mapped[int] = mapped_column(ForeignKey('plates.id'))
-    order_id:  Mapped[int] = mapped_column(ForeignKey('orders.id'))
+    order_id:  Mapped[int] = mapped_column(ForeignKey('orders.id', ondelete='CASCADE'))
     count_plat: Mapped[int]= mapped_column(Integer, nullable=True)
 
     comanda: Mapped[Orders] = relationship(

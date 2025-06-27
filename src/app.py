@@ -87,9 +87,9 @@ def serve_any_other_file(path):
     response.cache_control.max_age = 0  # avoid cache memory
     return response
 
-# ---------------------------------USUARIOS-----------------
 
-# ---------GET OK----------------------------------------------
+
+# ---------GET USERS ---OK----------------------------------------------
 
 @app.route('/users', methods=['GET'])
 def get_users():
@@ -101,7 +101,7 @@ def get_users():
     return jsonify({'msg': 'ok', 'results': user_serialized}), 200
 
 
-#---------GET by id OK ---------------------------------------
+#---------GET by id USERS ---OK ---------------------------------------
 
 @app.route('/users/<int:id>', methods=['GET'])
 def get_user_by_id(id):
@@ -112,7 +112,7 @@ def get_user_by_id(id):
     return jsonify({'msg': 'ok', 'result': user.serialize()}), 200
 
 
-# ---------POST USERS OK----------------------------------------------
+# ---------POST USERS ---OK----------------------------------------------
 
 @app.route('/users', methods=['POST'])
 def post_user():
@@ -141,7 +141,7 @@ def post_user():
     return jsonify({'msg': 'Usuario creado correctamente', 'user': new_user.serialize()}), 201
 
 
-#----------------------------------GET TODAS LAS COMANDAS--------------------------
+#----------------------------------GET TODAS LAS COMANDAS ---OK--------------------------
 @app.route('/orders', methods=['GET'])
 def get_orders():
     orders= Orders.query.all()
@@ -151,7 +151,7 @@ def get_orders():
         user_serialized.append(order.serialize())
     return jsonify({'msg': 'ok', 'results' : user_serialized}), 200
 
-#-------------------------------GET DE UNA COMANDA --------------------------------
+#-------------------------------GET DE UNA COMANDA ---OK--------------------------------
 @app.route('/orders/<int:id>', methods=['GET'])
 def get_order_by_id(id):
     order= Orders.query.get(id)# query.get solo funciona para devolver primary key. para devolver otro campo usar query.filter_by
@@ -160,7 +160,7 @@ def get_order_by_id(id):
         return jsonify ({'msg': 'Comanda no encontrada'}), 404
     return jsonify({'msg': 'ok', 'result':order.serialize()}), 200
 
-#-------------------------------POST DE COMANDAS ---------------------------------- faltta terminar 
+#-------------------------------POST DE COMANDAS ---OK------------------------------------ 
 @app.route('/orders', methods=['POST'])
 def crear_comanda():
     body= request.get_json(silent=True)
@@ -172,9 +172,7 @@ def crear_comanda():
         return jsonify ({'msg': 'Debes introducir el numero de la mesa en el campo "mesa_id"'}), 404
     if 'usuario_id' not in body: 
         return jsonify ({'msg': 'Debes introducir el usuario que atiende la comanda en el campo "usuario_id" '}), 404
-    if 'guest_notes' not in body:
-        return jsonify ({'msg': 'Debes introducir un mesnaje en el campo guest_notes ' }), 404
-    
+        
     #required_fields = ['mesa_id', 'usuario_id', 'date', 'state', 'platos']
     #for field in required_fields:
        # if field not in body:
@@ -185,10 +183,10 @@ def crear_comanda():
          new_order = Orders() # nuevo_comanda es una instancia de la clase 
          new_order.mesa_id= body['mesa_id']
          new_order.usuario_id= body['usuario_id']
-         new_order.guest_notes= body['guest_notes']
-         new_order.state= EstadoComanda['pendiente']
+         new_order.state= EstadoComanda['pendiente'] #por defecto la inicializo en pendiente 
          new_order.total_price= 0
-
+         if 'guest_notes' in body:
+             new_order.guest_notes= body['guest_notes']
          db.session.add(new_order)
          db.session.flush()  # para obtener el ID sin hacer commit aún
          
@@ -199,7 +197,6 @@ def crear_comanda():
             cantidad = item.get('cantidad', 1)
             if plato_id is None:
                 continue
-
             plato = Plates.query.get(plato_id) #instancio platos 
 
             # Crear relación Orders_Plates
@@ -222,9 +219,21 @@ def crear_comanda():
         db.session.rollback()
         return jsonify({'msg': f'Error al crear la comanda: {str(e)}'}), 500
     
+#--------------------ELIMINAR UNA COMANDA CON EL ID ----OK------
+#DELETE quiero hacerla por mesa id tambien 
+
+@app.route('/orders/<int:order_id>', methods = ['DELETE'])
+def eliminar_comanda_por_id(order_id):
+    order= Orders.query.get(order_id) # duda , aqui solo obtengo el id o toda la instancia 
+    if order is None :
+        return jsonify({'msg': f'no existe la comanda con id {order_id}'}), 400
+    db.session.delete(order)
+    db.session.commit()
+    return jsonify({'msg':'ok', 'results': f'La comanda con id {order_id} perteneciente a la mesa {order.mesa_id} ha sido borrado dela lista de comandas'}), 200
+    
 
 
-#-------------------------------GET PLATOS ----------------------------------------
+#-------------------------------GET PLATOS ---OK----------------------------------------
 @app.route('/plates', methods=['GET'])
 def get_plates():
     plates= Plates.query.all()
@@ -234,7 +243,7 @@ def get_plates():
         plates_serialized.append(plates.serialize())
     return jsonify({'msg': 'ok', 'results' : plates_serialized}), 200
 
-#--------------------------------GET UN PLATO POR  id -----------------------------
+#-----------------------------GET UN PLATO POR id ---OK-----------------------------
 @app.route('/plates/<int:id>', methods=['GET'])
 def get_plate_by_id(id):
     plates= Plates.query.get(id)
@@ -243,20 +252,8 @@ def get_plate_by_id(id):
         return jsonify ({'msg': 'Plato no encontrado'}), 404
     return jsonify({'msg': 'ok', 'result': plates.serialize()}), 200
 
-#------------------------------ELIMINAR UNA COMANDA CON EL ID DE LA MESA----------??????
-#DELETE 
-'''
-@app.route('/orders/<int:order_id>', methods = ['DELETE'])
-def eliminar_comanda_por_id(order_id):
-    order= Orders.query.get(order_id) # duda , aqui solo obtengo el id o toda la instancia 
-    if order is None :
-        return jsonify({'msg': f'no existe la comanda con id {order_id}'}), 400
-    db.session.delete(order)
-    db.session.commit()
-    return jsonify({'msg':'ok', 'results': f'el comanda con id {order_id} perteneciente a la mesa {mesa_id} ha sido borrado dela lista de comandas'}), 200
-    
-'''
-# -------------------------------GET DE UNA TABLES OK --------------------------------
+
+# -------------------------------GET DE TABLES ---OK --------------------------------
 @app.route('/tables', methods=['GET'])
 def get_tables():
     tables = Tables.query.all()
@@ -267,7 +264,7 @@ def get_tables():
     return jsonify({'msg': 'OK', 'result': tables_serialized})
 
 
-# -------------------------------GET DE UNA TABLES ID OK--------------------------------
+# -------------------------------GET DE UNA TABLE ID ---OK--------------------------------
 @app.route('/tables/<int:table_id>', methods=['GET'])
 def get_table_by_id(table_id):
     table = Tables.query.filter_by(id=table_id).first()
@@ -277,7 +274,7 @@ def get_table_by_id(table_id):
     return jsonify({'msg': 'OK', 'result': table.serialize()})
 
 
-# -------------------------------PUT DE UNA TABLES ID OK--------------------------------
+# -------------------------------PUT DE UNA TABLES ID ---OK--------------------------------
 @app.route('/tables/<int:table_id>', methods=['PUT'])
 def update_tables(table_id):
     body = request.get_json(silent=True)
@@ -302,12 +299,6 @@ def update_tables(table_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'msg': 'Error al actualizar la mesa', 'error': str(e)}), 500
-
-
-
-
-
-
 
 
 
