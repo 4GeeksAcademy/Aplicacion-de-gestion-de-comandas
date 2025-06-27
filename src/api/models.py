@@ -2,7 +2,8 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import String, Boolean, Integer, ForeignKey, DateTime, Enum, Numeric 
 from sqlalchemy.orm import Mapped, mapped_column , relationship
 from typing import List
-from datetime import datetime
+from datetime import datetime, timezone
+
 import enum
 
 
@@ -136,7 +137,7 @@ class Orders(db.Model):
      id: Mapped[int] = mapped_column(primary_key=True)
      mesa_id: Mapped[int] = mapped_column(ForeignKey('tables.id'))
      usuario_id:Mapped[int] = mapped_column(ForeignKey('user.id'))
-     date: Mapped[datetime] = mapped_column( DateTime, nullable=False)
+     date: Mapped[datetime] = mapped_column( DateTime, nullable=False, default= datetime.now(timezone.utc))
      state:  Mapped[EstadoComanda] = mapped_column(Enum(EstadoComanda), nullable=False)
      total_price: Mapped[float] = mapped_column(Numeric, nullable=True)
      guest_notes: Mapped[str]= mapped_column(String, nullable=True)
@@ -148,8 +149,7 @@ class Orders(db.Model):
         back_populates= 'comandas') 
      comanda_platos: Mapped[List["Orders_Plates"]] = relationship(
         back_populates= 'comanda')
-     #ticket: Mapped["Ticket"] = relationship(
-      #  back_populates= 'comanda') 
+    
      
      def __str__(self):
         return f'Comanda {self.id}'
@@ -162,7 +162,7 @@ class Orders(db.Model):
             "state": self.state.value,
             "total_price": self.total_price,
             "guest_notes": self.guest_notes,
-            "date":self.isoformat(),
+            
             "total_price": float(self.total_price) if self.total_price is not None else 0.0,
             "platos": [op.serialize() for op in self.comanda_platos]
           }

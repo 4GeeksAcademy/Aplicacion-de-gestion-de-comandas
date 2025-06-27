@@ -6,7 +6,7 @@ from flask import Flask, request, jsonify, url_for, send_from_directory
 from flask_migrate import Migrate
 from flask_swagger import swagger
 from api.utils import APIException, generate_sitemap
-from api.models import db,  User, EstadoComanda, EstadoMesa, Plates, Tables, Orders, Orders_Plates
+from api.models import db,  User, EstadoRol, EstadoComanda, EstadoMesa, Plates, Tables, Orders, Orders_Plates
 from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
@@ -89,7 +89,7 @@ def serve_any_other_file(path):
 
 # ---------------------------------USUARIOS-----------------
 
-# ---------GET----------------------------------------------
+# ---------GET OK----------------------------------------------
 
 @app.route('/users', methods=['GET'])
 def get_users():
@@ -101,7 +101,7 @@ def get_users():
     return jsonify({'msg': 'ok', 'results': user_serialized}), 200
 
 
-#---------GET by id ---------------------------------------
+#---------GET by id OK ---------------------------------------
 
 @app.route('/users/<int:id>', methods=['GET'])
 def get_user_by_id(id):
@@ -112,18 +112,18 @@ def get_user_by_id(id):
     return jsonify({'msg': 'ok', 'result': user.serialize()}), 200
 
 
-# ---------POST----------------------------------------------
+# ---------POST USERS OK----------------------------------------------
 
 @app.route('/users', methods=['POST'])
 def post_user():
-    body = request.get_jason(silent=True)
+    body = request.get_json(silent=True)
 
-    required_fields= ['id' 'email', 'password', 'name', 'rol', 'is_active']
+    required_fields= [ 'email', 'password', 'name', 'rol', 'is_active']
     if not all(field in body for field in required_fields):
         return jsonify({'msg': 'Some fields are missing to fill'}), 400
 
     try:
-        rol_enum = EstadoRol[body['state']]
+        rol_enum = EstadoRol[body['rol']]
     except KeyError:
         return jsonify({'msg': f"Rol '{body['rol']}' no válido"}), 400
 
@@ -160,6 +160,70 @@ def get_order_by_id(id):
         return jsonify ({'msg': 'Comanda no encontrada'}), 404
     return jsonify({'msg': 'ok', 'result':order.serialize()}), 200
 
+#-------------------------------POST DE COMANDAS ---------------------------------- faltta terminar 
+@app.route('/orders', methods=['POST'])
+def crear_comanda():
+    body= request.get_json(silent=True)
+   
+                    
+    if body is None:
+        return jsonify ({'msg': 'Debes enviar informacion'}), 404
+    if 'mesa_id' not in body: 
+        return jsonify ({'msg': 'Debes introducir el numero de la mesa en el campo "mesa_id"'}), 404
+    if 'usuario_id' not in body: 
+        return jsonify ({'msg': 'Debes introducir el usuario que atiende la comanda en el campo "usuario_id" '}), 404
+    if 'guest_notes' not in body:
+        return jsonify ({'msg': 'Debes introducir un mesnaje en el campo guest_notes ' }), 404
+    
+    #required_fields = ['mesa_id', 'usuario_id', 'date', 'state', 'platos']
+    #for field in required_fields:
+       # if field not in body:
+        #    return jsonify({'msg': f'Falta el campo obligatorio: {field}'}), 400
+
+    try:
+    
+         new_order = Orders() # nuevo_comanda es una instancia de la clase 
+         new_order.mesa_id= body['mesa_id']
+         new_order.usuario_id= body['usuario_id']
+         new_order.guest_notes= body['guest_notes']
+         new_order.state= EstadoComanda['pendiente']
+         new_order.total_price= 0
+
+         db.session.add(new_order)
+         db.session.flush()  # para obtener el ID sin hacer commit aún
+         
+         total=0
+         print(body['platos'])
+         for item in body['platos']:
+            plato_id = item.get('plate_id')
+            cantidad = item.get('cantidad', 1)
+            if plato_id is None:
+                continue
+
+            plato = Plates.query.get(plato_id) #instancio platos 
+
+            # Crear relación Orders_Plates
+            new_order_plate = Orders_Plates() #instancio Order_Plates
+            new_order_plate.plate_id=plato_id
+            new_order_plate.order_id=new_order.id
+            new_order_plate.count_plat=cantidad
+            
+            db.session.add(new_order_plate)
+
+            # Calcular precio total
+            total += float(plato.price) * cantidad
+
+         new_order.total_price = total
+         db.session.commit()
+
+         return jsonify({'msg': 'Comanda creada exitosamente', 'result': new_order.serialize()}), 201
+    
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'msg': f'Error al crear la comanda: {str(e)}'}), 500
+    
+
+
 #-------------------------------GET PLATOS ----------------------------------------
 @app.route('/plates', methods=['GET'])
 def get_plates():
@@ -181,6 +245,7 @@ def get_plate_by_id(id):
 
 #------------------------------ELIMINAR UNA COMANDA CON EL ID DE LA MESA----------??????
 #DELETE 
+'''
 @app.route('/orders/<int:order_id>', methods = ['DELETE'])
 def eliminar_comanda_por_id(order_id):
     order= Orders.query.get(order_id) # duda , aqui solo obtengo el id o toda la instancia 
@@ -190,8 +255,8 @@ def eliminar_comanda_por_id(order_id):
     db.session.commit()
     return jsonify({'msg':'ok', 'results': f'el comanda con id {order_id} perteneciente a la mesa {mesa_id} ha sido borrado dela lista de comandas'}), 200
     
-
-# -------------------------------GET DE UNA TABLES --------------------------------
+'''
+# -------------------------------GET DE UNA TABLES OK --------------------------------
 @app.route('/tables', methods=['GET'])
 def get_tables():
     tables = Tables.query.all()
@@ -202,7 +267,7 @@ def get_tables():
     return jsonify({'msg': 'OK', 'result': tables_serialized})
 
 
-# -------------------------------GET DE UNA TABLES ID --------------------------------
+# -------------------------------GET DE UNA TABLES ID OK--------------------------------
 @app.route('/tables/<int:table_id>', methods=['GET'])
 def get_table_by_id(table_id):
     table = Tables.query.filter_by(id=table_id).first()
@@ -212,7 +277,7 @@ def get_table_by_id(table_id):
     return jsonify({'msg': 'OK', 'result': table.serialize()})
 
 
-# -------------------------------PUT DE UNA TABLES ID --------------------------------
+# -------------------------------PUT DE UNA TABLES ID OK--------------------------------
 @app.route('/tables/<int:table_id>', methods=['PUT'])
 def update_tables(table_id):
     body = request.get_json(silent=True)
@@ -237,69 +302,6 @@ def update_tables(table_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'msg': 'Error al actualizar la mesa', 'error': str(e)}), 500
-
-
-    
-#------------------------------ELIMINAR UNA COMANDA CON EL ID DE LA MESA----------??????
-#DELETE 
-@app.route('/orders/<int:order_id>', methods = ['DELETE'])
-def eliminar_comanda_por_id(order_id):
-    order= Orders.query.get(order_id) # duda , aqui solo obtengo el id o toda la instancia 
-    if order is None :
-        return jsonify({'msg': f'no existe la comanda con id {order_id}'}), 400
-    db.session.delete(order)
-    db.session.commit()
-    return jsonify({'msg':'ok', 'results': f'el comanda con id {order_id} perteneciente a la mesa {mesa_id} ha sido borrado dela lista de comandas'}), 200
-    
-
-# -------------------------------GET DE UNA TABLES --------------------------------
-@app.route('/tables', methods=['GET'])
-def get_tables():
-    tables = Tables.query.all()
-    print(tables)
-    tables_serialized = []
-    for table in tables:
-        tables_serialized.append(table.serialize())
-    return jsonify({'msg': 'OK', 'result': tables_serialized})
-
-
-# -------------------------------GET DE UNA TABLES ID --------------------------------
-@app.route('/tables/<int:table_id>', methods=['GET'])
-def get_table_by_id(table_id):
-    table = Tables.query.filter_by(id=table_id).first()
-    print(table)
-    if table is None:
-        return jsonify({'msg': ' Tabla no encontrada o inexistente!!'}), 404
-    return jsonify({'msg': 'OK', 'result': table.serialize()})
-
-
-# -------------------------------PUT DE UNA TABLES ID --------------------------------
-@app.route('/tables/<int:table_id>', methods=['PUT'])
-def update_tables(table_id):
-    body = request.get_json(silent=True)
-    table = Tables.query.get(table_id)
-    if body is None: #***decia table
-        return jsonify({'msg': 'Mesa no encontrada!'}), 404
-    if 'state' in body:
-        try:
-            table.state = EstadoMesa(body['state'])
-        except ValueError:
-            return jsonify({'msg': f'Estado no válido!!'}), 404
-    if 'seats' in body:
-        table.seats = body['seats'] #****decia table.state
-    if 'user_id' in body:
-        user = User.query.get(body['user_id'])
-        if user is None:
-            return jsonify({'msg':'Usuario inexistente!!'}),404
-        table.user_id = body['user_id']
-    try:
-        db.session.commit()
-        return jsonify({'msg': 'Mesa actualizada correctamente!', 'result': table.serialize()}), 200
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({'msg': 'Error al actualizar la mesa', 'error': str(e)}), 500
-
-
 
 
 
