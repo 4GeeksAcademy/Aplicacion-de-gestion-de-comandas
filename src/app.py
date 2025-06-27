@@ -121,7 +121,24 @@ def get_order_by_id(id):
         return jsonify ({'msg': 'Comanda no encontrada'}), 404
     return jsonify({'msg': 'ok', 'result':order.serialize()}), 200
 
+#-------------------------------GET PLATOS ----------------------------------------
+@app.route('/plates', methods=['GET'])
+def get_plates():
+    plates= Plates.query.all()
+    print (plates)
+    plates_serialized = []
+    for plates in plates:
+        plates_serialized.append(plates.serialize())
+    return jsonify({'msg': 'ok', 'results' : plates_serialized}), 200
 
+#--------------------------------GET UN PLATO POR  id -----------------------------
+@app.route('/plates/<int:id>', methods=['GET'])
+def get_plate_by_id(id):
+    plates= Plates.query.get(id)
+    print (plates)
+    if plates is None:
+        return jsonify ({'msg': 'Plato no encontrado'}), 404
+    return jsonify({'msg': 'ok', 'result': plates.serialize()}), 200
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
