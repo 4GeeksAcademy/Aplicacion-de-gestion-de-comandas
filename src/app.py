@@ -6,22 +6,21 @@ from flask import Flask, request, jsonify, url_for, send_from_directory
 from flask_migrate import Migrate
 from flask_swagger import swagger
 from api.utils import APIException, generate_sitemap
-from api.models import db,  User, EstadoComanda, EstadoMesa , Plates, Tables, Orders, Orders_Plates
+from api.models import db,  User, EstadoComanda, EstadoMesa, Plates, Tables, Orders, Orders_Plates
 from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
 from datetime import datetime
 
-#from src.api.models import db
-#from flask import Flask
-#importaciones adicionales para credenciales
+# from src.api.models import db
+# from flask import Flask
+# importaciones adicionales para credenciales
 from flask_jwt_extended import create_access_token
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
 from flask_jwt_extended import JWTManager
-#from flask_bcrypt import Bcrypt
+# from flask_bcrypt import Bcrypt
 from flask_cors import CORS
-
 
 
 ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
@@ -31,11 +30,12 @@ static_file_dir = os.path.join(os.path.dirname(
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
-#bcrypt = Bcrypt(app) #para encriptar
+# bcrypt = Bcrypt(app) #para encriptar
 
 
 app.url_map.strict_slashes = False
-app.config["JWT_SECRET_KEY"] = os.getenv('JWT_KEY') #para tener la llave fuera del codigo
+# para tener la llave fuera del codigo
+app.config["JWT_SECRET_KEY"] = os.getenv('JWT_KEY')
 jwt = JWTManager(app)
 
 # database condiguration
@@ -68,6 +68,8 @@ def handle_invalid_usage(error):
     return jsonify(error.to_dict()), error.status_code
 
 # generate sitemap with all your endpoints
+
+
 @app.route('/')
 def sitemap():
     if ENV == "development":
@@ -75,6 +77,8 @@ def sitemap():
     return send_from_directory(static_file_dir, 'index.html')
 
 # any other endpoint will try to serve it like a static file
+
+
 @app.route('/<path:path>', methods=['GET'])
 def serve_any_other_file(path):
     if not os.path.isfile(os.path.join(static_file_dir, path)):
@@ -83,17 +87,22 @@ def serve_any_other_file(path):
     response.cache_control.max_age = 0  # avoid cache memory
     return response
 
-#---------------------------------GET TODOS LOS USUARIOS-----------------
+# ---------------------------------USUARIOS-----------------
+
+# ---------GET----------------------------------------------
+
 @app.route('/users', methods=['GET'])
 def get_users():
-    users= User.query.all()
-    print (users)
+    users = User.query.all()
+    print(users)
     user_serialized = []
     for user in users:
         user_serialized.append(user.serialize())
-    return jsonify({'msg': 'ok', 'results' : user_serialized}), 200
+    return jsonify({'msg': 'ok', 'results': user_serialized}), 200
 
-#--------------------------------GET UN USUARIO POR SU id ----------------
+
+#---------GET by id ---------------------------------------
+
 @app.route('/users/<int:id>', methods=['GET'])
 def get_user_by_id(id):
     user= User.query.get(id)# query.get solo funciona para devolver primary key. para devolver otro campo usar query.filter_by
@@ -101,6 +110,35 @@ def get_user_by_id(id):
     if user is None:
         return jsonify ({'msg': 'Usuario no encontrado'}), 404
     return jsonify({'msg': 'ok', 'result': user.serialize()}), 200
+
+
+# ---------POST----------------------------------------------
+
+@app.route('/users', methods=['POST'])
+def post_user():
+    body = request.get_jason(silent=True)
+
+    required_fields= ['id' 'email', 'password', 'name', 'rol', 'is_active']
+    if not all(field in body for field in required_fields):
+        return jsonify({'msg': 'Some fields are missing to fill'}), 400
+
+    try:
+        rol_enum = EstadoRol[body['state']]
+    except KeyError:
+        return jsonify({'msg': f"Rol '{body['rol']}' no válido"}), 400
+
+    new_user = User(
+        email=body['email'],
+        password=body['password'],
+        name=body['name'],
+        rol=rol_enum,
+        is_active=body['is_active']
+    )
+
+    db.session.add(new_user)
+    db.session.commit()
+
+    return jsonify({'msg': 'Usuario creado correctamente', 'user': new_user.serialize()}), 201
 
 
 #----------------------------------GET TODAS LAS COMANDAS--------------------------
@@ -182,6 +220,8 @@ def update_tables(table_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'msg': 'Error al actualizar la mesa', 'error': str(e)}), 500
+
+
 
 
 
