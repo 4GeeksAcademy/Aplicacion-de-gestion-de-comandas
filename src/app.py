@@ -88,6 +88,7 @@ def serve_any_other_file(path):
 
 # ---------------------------------USUARIOS-----------------
 
+# ---------GET----------------------------------------------
 
 @app.route('/users', methods=['GET'])
 def get_users():
@@ -99,34 +100,8 @@ def get_users():
     return jsonify({'msg': 'ok', 'results': user_serialized}), 200
 
 
-@app.route('/users, method=['POST'])
-def post_user():
-    body = request.get_jason()
+#---------GET by id ---------------------------------------
 
-    required_fields= ['email', 'password', 'name', 'rol', 'is_active']
-    if not all(field in data for field in required_fields):
-        return jsonify({'msg'. 'Some fields missing.'}), 400
-
-
-    try:
-        rol_enum = EstadoRol[data['rol']]
-    except KeyError:
-        return jsonify({'msg': f"Rol '{data['rol']}' no válido"}), 400
-
-    new_user = User(
-        email=data['email'],
-        password=data['password'],
-        name=data['name'],
-        rol=rol_enum,
-        is_active=data['is_active']
-    )
-
-    db.session.add(new_user)
-    db.session.commit()
-
-    return jsonify({'msg': 'Usuario creado correctamente', 'user': new_user.serialize()}), 201
-
-#--------------------------------GET UN USUARIO POR SU id ----------------
 @app.route('/users/<int:id>', methods=['GET'])
 def get_user_by_id(id):
     user= User.query.get(id)# query.get solo funciona para devolver primary key. para devolver otro campo usar query.filter_by
@@ -134,6 +109,35 @@ def get_user_by_id(id):
     if user is None:
         return jsonify ({'msg': 'Usuario no encontrado'}), 404
     return jsonify({'msg': 'ok', 'result': user.serialize()}), 200
+
+
+# ---------POST----------------------------------------------
+
+@app.route('/users', methods=['POST'])
+def post_user():
+    body = request.get_jason(silent=True)
+
+    required_fields= ['id' 'email', 'password', 'name', 'rol', 'is_active']
+    if not all(field in body for field in required_fields):
+        return jsonify({'msg': 'Some fields are missing to fill'}), 400
+
+    try:
+        rol_enum = EstadoRol[body['state']]
+    except KeyError:
+        return jsonify({'msg': f"Rol '{body['rol']}' no válido"}), 400
+
+    new_user = User(
+        email=body['email'],
+        password=body['password'],
+        name=body['name'],
+        rol=rol_enum,
+        is_active=body['is_active']
+    )
+
+    db.session.add(new_user)
+    db.session.commit()
+
+    return jsonify({'msg': 'Usuario creado correctamente', 'user': new_user.serialize()}), 201
 
 
 #----------------------------------GET TODAS LAS COMANDAS--------------------------
