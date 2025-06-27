@@ -122,65 +122,19 @@ def get_order_by_id(id):
         return jsonify ({'msg': 'Comanda no encontrada'}), 404
     return jsonify({'msg': 'ok', 'result':order.serialize()}), 200
 
-#-------------------------------POST DE COMANDAS ----------------------------------
-@app.route('/orders', methods=['POST'])
-def crear_comanda():
-    body= request.get_json(silent=True)
-    if body is None:
-        return jsonify ({'msg': 'Debes enviar informacion'}), 404
-    if 'date' not in body:
-        return jsonify ({'msg': 'Debe introducir la fecha y hora'}), 404
-    if 'mesa_id' not in body: 
-        return jsonify ({'msg': 'Debes introducir el numero de la mesa'}), 404
-    if 'usuario_id' not in body: 
-        return jsonify ({'msg': 'Debes introducir el usuario que atiende la comanda '}), 404
+
     
-    
-    #required_fields = ['mesa_id', 'usuario_id', 'date', 'state', 'platos']
-    #for field in required_fields:
-       # if field not in body:
-        #    return jsonify({'msg': f'Falta el campo obligatorio: {field}'}), 400
-    
-    new_order = Orders() # nuevo_comanda es una instancia de la clase 
-    new_order.date =datetime.fromisoformat(body['date'])
-    new_order.mesa_id= body['mesa_id']
-    new_order.guest_notes= body['guest_notes']
-    new_order.state= EstadoComanda['pendiente']
-    new_order.total_price= 0
-      
-    db.session.add(new_order)
-    db.session.flush()  # para obtener el ID sin hacer commit aún
-    total=0
-
-    for item in body['platos']:
-        plato_id = item.get('plate_id')
-        cantidad = item.get('cantidad', 1)
-        if plato_id is None:
-                continue
-
-        plato = Plates.query.get(plato_id) #instancio platos 
-        if not plato:
-                continue  # o podrías hacer return con error
-
-            # Crear relación Orders_Plates
-        new_order_plate = Orders_Plates() #instancio Order_Plates
-        new_order_plate.plate_id=plato_id,
-        new_order_plate.order_id=new_order.id,
-        new_order_plate.count_plat=cantidad
-            
-        db.session.add(new_order_plate)
-
-            # Calcular precio total
-        total += float(plato.price) * cantidad
-
-        new_order_plate.total_price = total
-        db.session.commit()
-
-        return jsonify({'msg': 'Comanda creada exitosamente', 'result': new_order.serialize()}), 201
-
+#------------------------------ELIMINAR UNA COMANDA CON EL ID DE LA MESA----------??????
+#DELETE 
+@app.route('/orders/<int:order_id>', methods = ['DELETE'])
+def eliminar_comanda_por_id(order_id):
+    order= Orders.query.get(order_id) # duda , aqui solo obtengo el id o toda la instancia 
+    if order is None :
+        return jsonify({'msg': f'no existe la comanda con id {order_id}'}), 400
+    db.session.delete(order)
     db.session.commit()
-    return jsonify({'msg': 'ok', 'result': new_order.serialize()}), 200
-
+    return jsonify({'msg':'ok', 'results': f'el comanda con id {order_id} perteneciente a la mesa {mesa_id} ha sido borrado dela lista de comandas'}), 200
+    
 
 # -------------------------------GET DE UNA TABLES --------------------------------
 @app.route('/tables', methods=['GET'])

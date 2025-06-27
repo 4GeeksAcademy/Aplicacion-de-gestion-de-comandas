@@ -193,9 +193,6 @@ class Orders_Plates(db.Model):
             "subtotal": float(self.plato.price) * self.count_plat if self.plato else 0.0
     }
         
-
-
-
 #pipenv run migrate
 #pipenv run upgrade
 #pipenv run start
