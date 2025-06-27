@@ -10,6 +10,7 @@ from api.models import db,  User, EstadoComanda, EstadoMesa , Plates, Tables, Or
 from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
+from datetime import datetime
 
 #from src.api.models import db
 #from flask import Flask
@@ -120,6 +121,73 @@ def get_order_by_id(id):
     if order is None:
         return jsonify ({'msg': 'Comanda no encontrada'}), 404
     return jsonify({'msg': 'ok', 'result':order.serialize()}), 200
+
+
+    
+#------------------------------ELIMINAR UNA COMANDA CON EL ID DE LA MESA----------??????
+#DELETE 
+@app.route('/orders/<int:order_id>', methods = ['DELETE'])
+def eliminar_comanda_por_id(order_id):
+    order= Orders.query.get(order_id) # duda , aqui solo obtengo el id o toda la instancia 
+    if order is None :
+        return jsonify({'msg': f'no existe la comanda con id {order_id}'}), 400
+    db.session.delete(order)
+    db.session.commit()
+    return jsonify({'msg':'ok', 'results': f'el comanda con id {order_id} perteneciente a la mesa {mesa_id} ha sido borrado dela lista de comandas'}), 200
+    
+
+# -------------------------------GET DE UNA TABLES --------------------------------
+@app.route('/tables', methods=['GET'])
+def get_tables():
+    tables = Tables.query.all()
+    print(tables)
+    tables_serialized = []
+    for table in tables:
+        tables_serialized.append(table.serialize())
+    return jsonify({'msg': 'OK', 'result': tables_serialized})
+
+
+# -------------------------------GET DE UNA TABLES ID --------------------------------
+@app.route('/tables/<int:table_id>', methods=['GET'])
+def get_table_by_id(table_id):
+    table = Tables.query.filter_by(id=table_id).first()
+    print(table)
+    if table is None:
+        return jsonify({'msg': ' Tabla no encontrada o inexistente!!'}), 404
+    return jsonify({'msg': 'OK', 'result': table.serialize()})
+
+
+# -------------------------------PUT DE UNA TABLES ID --------------------------------
+@app.route('/tables/<int:table_id>', methods=['PUT'])
+def update_tables(table_id):
+    body = request.get_json(silent=True)
+    table = Tables.query.get(table_id)
+    if body is None: #***decia table
+        return jsonify({'msg': 'Mesa no encontrada!'}), 404
+    if 'state' in body:
+        try:
+            table.state = EstadoMesa(body['state'])
+        except ValueError:
+            return jsonify({'msg': f'Estado no válido!!'}), 404
+    if 'seats' in body:
+        table.seats = body['seats'] #****decia table.state
+    if 'user_id' in body:
+        user = User.query.get(body['user_id'])
+        if user is None:
+            return jsonify({'msg':'Usuario inexistente!!'}),404
+        table.user_id = body['user_id']
+    try:
+        db.session.commit()
+        return jsonify({'msg': 'Mesa actualizada correctamente!', 'result': table.serialize()}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'msg': 'Error al actualizar la mesa', 'error': str(e)}), 500
+
+
+
+
+
+
 
 
 
