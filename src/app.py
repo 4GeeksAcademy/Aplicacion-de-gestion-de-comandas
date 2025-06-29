@@ -173,11 +173,6 @@ def crear_comanda():
     if 'usuario_id' not in body: 
         return jsonify ({'msg': 'Debes introducir el usuario que atiende la comanda en el campo "usuario_id" '}), 404
         
-    #required_fields = ['mesa_id', 'usuario_id', 'date', 'state', 'platos']
-    #for field in required_fields:
-       # if field not in body:
-        #    return jsonify({'msg': f'Falta el campo obligatorio: {field}'}), 400
-
     try:
     
          new_order = Orders() # nuevo_comanda es una instancia de la clase 
@@ -219,6 +214,77 @@ def crear_comanda():
         db.session.rollback()
         return jsonify({'msg': f'Error al crear la comanda: {str(e)}'}), 500
     
+#-----------------------------PUT DE COMANDA -------------------OJOOO--------------------------------------
+#falta actualizar sin borrar los anteriores platos 
+@app.route('/orders/<int:order_id>', methods=['PUT'])
+def update_orders(order_id):
+    body = request.get_json(silent=True)
+    update_order = Orders.query.get(order_id)
+    if body is None: 
+        return jsonify({'msg': 'Debe introducir los elementos de la comanda a modifiar!'}), 404
+    
+    if 'state' in body:
+        try:
+            update_order.state = EstadoComanda(body['state'])
+        except ValueError:
+            return jsonify({'msg': f'Estado no válido!!'}), 404
+        
+    if 'mesa_id' in body:
+        mesa = Tables.query.get(body['mesa_id'])
+        if mesa is None:
+            return jsonify({'msg':'Mesa no existe!!'}),404
+        update_order.mesa_id = body['mesa_id'] 
+
+    if 'usuario_id' in body:
+        user = User.query.get(body['usuario_id'])
+        if user is None:
+            return jsonify({'msg':'Usuario inexistente!!'}),404
+        update_order.usuario_id = body['user_id']
+
+    if 'guest_notes' in body:
+        update_order.guest_notes= body['guest_notes']
+
+    print(body['platos'])
+    if 'platos' in body:
+        try:
+            # Eliminar platos anteriores de esa comanda
+            #Orders_Plates.query.filter_by(order_id=update_order.id).delete()
+            Orders_Plates.query.filter_by(order_id=update_order.id)
+            total = 0
+            for item in body['platos']:
+                 plato_id = item.get('plate_id')
+                 cantidad = item.get('cantidad', 1)
+                 if plato_id is None:
+                    continue
+
+                 plato = Plates.query.get(plato_id)
+                 if not plato:
+                    continue
+
+                 new_order_plate = Orders_Plates()
+                 new_order_plate.plate_id=plato_id
+                 new_order_plate.order_id=update_order.id,
+                 new_order_plate.count_plat=cantidad
+
+                 db.session.add(new_order_plate)
+                 total += float(plato.price) * cantidad
+ 
+            update_order.total_price = total
+                   
+
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'msg': 'Error al actualizar los platos de la comanda', 'error': str(e)}), 500
+
+    # Guardar cambios
+    try:
+        db.session.commit()
+        return jsonify({'msg': 'Comanda actualizada correctamente!', 'result': update_order.serialize()}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'msg': 'Error al actualizar la comanda', 'error': str(e)}), 500
+  
+    
 #--------------------ELIMINAR UNA COMANDA CON EL ID ----OK------
 @app.route('/orders/<int:order_id>', methods = ['DELETE'])
 def eliminar_comanda_por_id(order_id):
@@ -250,68 +316,7 @@ def eliminar_comanda_por_mesa_id(mesa_id):
         db.session.rollback()
         return jsonify({'msg': f'Error eliminando las comandas: {str(e)}'}), 500   
     
-#-----------------------------PUT DE COMANDA -----------------no esta funcionando para platos la actualizac
-@app.route('/orders/<int:order_id>', methods=['PUT'])
-def update_orders(order_id):
-    body = request.get_json(silent=True)
-    order = Orders.query.get(order_id)
-    if body is None: 
-        return jsonify({'msg': 'Debe introducir los elementos de la comanda a modifiar!'}), 404
-    if 'state' in body:
-        try:
-            order.state = EstadoComanda(body['state'])
-        except ValueError:
-            return jsonify({'msg': f'Estado no válido!!'}), 404
-    if 'mesa_id' in body:
-        mesa = Tables.query.get(body['mesa_id'])
-        if mesa is None:
-            return jsonify({'msg':'Mesa no existe!!'}),404
-        order.mesa_id = body['mesa_id'] 
-    if 'usuario_id' in body:
-        user = User.query.get(body['usuario_id'])
-        if user is None:
-            return jsonify({'msg':'Usuario inexistente!!'}),404
-        order.usuario_id = body['user_id']
-    if 'guest_notes' in body:
-        order.guest_notes= body['guest_notes']
 
-    if 'platos' in body:
-        try:
-            # Eliminar platos anteriores de esa comanda
-            #Orders_Plates.query.filter_by(order_id=order.id).delete()
-            total = 0
-            for item in body['platos']:
-                plato_id = item.get('plate_id')
-                cantidad = item.get('cantidad', 1)
-                if plato_id is None:
-                    continue
-
-                plato = Plates.query.get(plato_id)
-                if not plato:
-                    continue
-
-                new_order_plate = Orders_Plates(
-                    plate_id=plato_id,
-                    order_id=order.id,
-                    count_plat=cantidad
-                )
-                db.session.add(new_order_plate)
-                total += float(plato.price) * cantidad
-
-            order.total_price = total
-
-        except Exception as e:
-            db.session.rollback()
-            return jsonify({'msg': 'Error al actualizar los platos de la comanda', 'error': str(e)}), 500
-
-    # Guardar cambios
-    try:
-        db.session.commit()
-        return jsonify({'msg': 'Comanda actualizada correctamente!', 'result': order.serialize()}), 200
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({'msg': 'Error al actualizar la comanda', 'error': str(e)}), 500
-  
 
 
 #-------------------------------GET PLATOS ---OK----------------------------------------

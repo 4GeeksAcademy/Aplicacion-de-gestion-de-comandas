@@ -169,6 +169,7 @@ class Orders(db.Model):
             
             "total_price": float(self.total_price) if self.total_price is not None else 0.0,
             "platos": [op.serialize() for op in self.comanda_platos]
+         
           }
 
 
@@ -194,6 +195,7 @@ class Orders_Plates(db.Model):
             "nombre_plato": self.plato.name, #plato es la relatioship a Plates que deja coger el campo name 
             "comanda_id": self.order_id,
             "cantidad": self.count_plat,
+            
             "subtotal": float(self.plato.price) * self.count_plat if self.plato else 0.0
     }
         
