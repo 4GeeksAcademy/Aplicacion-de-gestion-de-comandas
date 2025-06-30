@@ -121,6 +121,22 @@ def get_order_by_id(id):
         return jsonify ({'msg': 'Comanda no encontrada'}), 404
     return jsonify({'msg': 'ok', 'result':order.serialize()}), 200
 
+    
+#-------------------------------PUT DE PLATOS --------------------------------
+@app.routes('/plates/<int:table:id>', methods=['PUT'])
+def update_plates(plate_id):
+    body = request.get_json()
+
+    plate= Plates.query.get(plate_id)
+    if plate is None:
+        return jsonify({'msg': 'Plato no encontrado!'}), 404
+    
+    try:
+        db.session.commit()
+        return jsonify({'msg': 'Plato actualizado correctamente!', 'result': plate.serializa()}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify ({'msg': 'Error al actualizar la mesa'})
 
 
 # this only runs if `$ python src/main.py` is executed
