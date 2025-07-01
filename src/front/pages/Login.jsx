@@ -45,7 +45,7 @@ const Login = () => {
           },
           
         }).then(() => {
-          navigate("/private"); // Re-dirige después de cerrar el modal
+          navigate("/private"); // Re-dirige después de cerrar el modal a la pagin /private o la principal. decidiremos el nombre 
         });
       } else {
         // ❌ Mostrar modal de error
