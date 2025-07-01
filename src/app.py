@@ -6,7 +6,7 @@ from flask import Flask, request, jsonify, url_for, send_from_directory
 from flask_migrate import Migrate
 from flask_swagger import swagger
 from api.utils import APIException, generate_sitemap
-from api.models import db,  User, EstadoRol, EstadoComanda, EstadoMesa, Plates, Tables, Orders, Orders_Plates
+from api.models import db,  User, EstadoRol, EstadoComanda, EstadoMesa, EstadoCategorias, Plates, Tables, Orders, Orders_Plates
 from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
@@ -214,8 +214,7 @@ def crear_comanda():
         db.session.rollback()
         return jsonify({'msg': f'Error al crear la comanda: {str(e)}'}), 500
     
-#-----------------------------PUT DE COMANDA -------------------OJOOO--------------------------------------
-#falta actualizar sin borrar los anteriores platos 
+#-----------------------------PUT DE COMANDA ----OK----------------------------------------------------
 @app.route('/orders/<int:order_id>', methods=['PUT'])
 def update_orders(order_id):
     body = request.get_json(silent=True)
@@ -307,7 +306,7 @@ def update_orders(order_id):
         return jsonify({'msg': 'Error al actualizar la comanda', 'error': str(e)}), 500
   
 
-#--------------------ELIMINAR UNA COMANDA CON EL ID ----OK------
+#--------------------ELIMINAR UNA COMANDA CON EL ID ----OK-------------------------------------------------------
 @app.route('/orders/<int:order_id>', methods = ['DELETE'])
 def eliminar_comanda_por_id(order_id):
     order= Orders.query.get(order_id) # duda , aqui solo obtengo el id o toda la instancia 
@@ -408,9 +407,49 @@ def update_tables(table_id):
         db.session.rollback()
         return jsonify({'msg': 'Error al actualizar la mesa', 'error': str(e)}), 500
     
-#---------------------------------------------------
+#--------------- PUT DE PLATOS DE EDU ---OK ---------------------------------
 
+@app.route('/plates/<int:plate_id>', methods=['PUT'])  # <- RUTA CORREGIDA
+def update_plates(plate_id):
 
+    body = request.get_json(silent=True)
+    if body is None:
+        return jsonify({'msg': 'Petición inválida, se requiere un cuerpo JSON'}), 400
+
+    plate = Plates.query.get(plate_id)
+    if plate is None:
+        return jsonify({'msg': 'Plato no encontrado!'}), 404
+
+    if 'name' in body:
+        plate.name = body['name']
+        
+
+    if 'description' in body:
+        plate.description = body['description']
+
+    if 'price' in body:
+        plate.price = body['price']
+
+    if 'available' in body:
+        plate.available = body['available']
+
+    if 'categories' in body:
+        try:
+
+            plate.categories = EstadoCategorias(body['categories'])
+        except ValueError:
+            return jsonify({'msg': f"Categoría '{body['categories']}' no es válida."}), 400
+
+    try:
+        db.session.commit()
+        # Se llama a serialize(), no serializa()
+        return jsonify({'msg': 'Plato actualizado correctamente!', 'result': plate.serialize()}), 200
+    except Exception as e:
+        db.session.rollback()
+        # Mensaje de error mejorado con código de estado 500
+        return jsonify({'msg': 'Error al actualizar el plato', 'error': str(e)}), 500
+
+#---------------------------------------------------------
 
 
 
