@@ -227,91 +227,14 @@ def crear_comanda():
         return jsonify({'msg': f'Error al crear la comanda: {str(e)}'}), 500
 
 # -----------------------------PUT DE COMANDA -------------------OJOOO--------------------------------------
-# falta actualizar sin borrar los anteriores platos
+# esta en la rama de heidy
 
 
-@app.route('/orders/<int:order_id>', methods=['PUT'])
-@jwt_required()
-def update_orders(order_id):
-    body = request.get_json(silent=True)
-    update_order = Orders.query.get(order_id)
-    if body is None:
-        return jsonify({'msg': 'Debe introducir los elementos de la comanda a modifiar!'}), 404
-
-    if 'state' in body:
-        try:
-            update_order.state = EstadoComanda(body['state'])
-        except ValueError:
-            return jsonify({'msg': f'Estado no válido!!'}), 404
-
-    if 'mesa_id' in body:
-        mesa = Tables.query.get(body['mesa_id'])
-        if mesa is None:
-            return jsonify({'msg': 'Mesa no existe!!'}), 404
-        update_order.mesa_id = body['mesa_id']
-
-    if 'usuario_id' in body:
-        user = User.query.get(body['usuario_id'])
-        if user is None:
-            return jsonify({'msg': 'Usuario inexistente!!'}), 404
-        update_order.usuario_id = body['user_id']
-
-    if 'guest_notes' in body:
-        update_order.guest_notes = body['guest_notes']
-
-    print(body['platos'])
-    if 'platos' in body:
-        try:
-            # Eliminar platos anteriores de esa comanda
-            # Orders_Plates.query.filter_by(order_id=update_order.id).delete()
-            # Orders_Plates.query.filter_by(order_id=update_order.id)
-
-            total = 0
-            for item in body['platos']:
-                plato_id = item.get('plate_id')
-                cantidad = item.get('cantidad', 1)
-                if plato_id is None:
-                    continue
-
-                plato = Plates.query.get(plato_id)
-                if not plato:
-                    continue
-
-                # Verificamos que exista el plato en la comanda
-                plato_existente = Orders_Plates.query.filter_by(
-                    order_id=update_order.id, plate_id=plato_id).first()
-
-                if plato_existente:
-                    plato_existente.count_plat = cantidad
-                    print(plato_existente)
-                else:
-                    new_order_plate = Orders_Plates()
-                    new_order_plate.plate_id = plato_id
-                    new_order_plate.order_id = update_order.id
-                    new_order_plate.count_plat = cantidad
-                    db.session.add(new_order_plate)
-                    db.session.commit()
-
-                total += float(plato.price) * cantidad
-
-# ELIMINAR DE LA TABLA SI LA CANTIDAD LLEGA A 0! (ACORDARSE, DE COCINA TAMPOCO DEBERÍA VERSE)
-# ALERTAR AL USUARIO SI DESEA ELIMINARLO 
 
 
-            update_order.total_price = total
-
-        except Exception as e:
-            db.session.rollback()
-            return jsonify({'msg': 'Error al actualizar los platos de la comanda', 'error': str(e)}), 500
-
-    # Guardar cambios
-    try:
-        db.session.commit()
-        return jsonify({'msg': 'Comanda actualizada correctamente!', 'result': update_order.serialize()}), 200
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({'msg': 'Error al actualizar la comanda', 'error': str(e)}), 500
-
+          
+            
+     
 
 # --------------------ELIMINAR UNA COMANDA CON EL ID ----OK------
 @app.route('/orders/<int:order_id>', methods=['DELETE'])
