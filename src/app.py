@@ -12,14 +12,14 @@ from api.admin import setup_admin
 from api.commands import setup_commands
 from datetime import datetime
 
-# from src.api.models import db
-# from flask import Flask
+#from src.api.models import db
+from flask import Flask
 # importaciones adicionales para credenciales
 from flask_jwt_extended import create_access_token
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
 from flask_jwt_extended import JWTManager
-# from flask_bcrypt import Bcrypt
+#from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 
 
@@ -220,6 +220,7 @@ def crear_comanda():
 def update_orders(order_id):
     body = request.get_json(silent=True)
     update_order = Orders.query.get(order_id)
+    
     if body is None: 
         return jsonify({'msg': 'Debe introducir los elementos de la comanda a modifiar!'}), 404
     
@@ -249,24 +250,45 @@ def update_orders(order_id):
         try:
             # Eliminar platos anteriores de esa comanda
             #Orders_Plates.query.filter_by(order_id=update_order.id).delete()
-            Orders_Plates.query.filter_by(order_id=update_order.id)
+            # Orders_Plates.query.filter_by(order_id=update_order.id)
+
             total = 0
+            platos_actuales = Orders_Plates.query.filter_by(order_id=update_order.id).all()
+            print (platos_actuales)
+            platos_actuales_dict = {p.plate_id: p for p in platos_actuales}
+
             for item in body['platos']:
                  plato_id = item.get('plate_id')
-                 cantidad = item.get('cantidad', 1)
+                 cantidad = item.get('cantidad', 1)   
+
                  if plato_id is None:
-                    continue
+                   continue                 
 
                  plato = Plates.query.get(plato_id)
+                 print (plato) #plato que se va a modificar su cantidad
                  if not plato:
                     continue
+                 if cantidad == 0:
+                    if plato_id in platos_actuales_dict:
+                     db.session.delete(platos_actuales_dict[plato_id]) #borro el plato
+                    
+                    continue
+                 
+                 if plato_id in platos_actuales_dict:
+                  #Ya existe: modificar cantidad
+                     plato_existente = platos_actuales_dict[plato_id]
+                     plato_existente.count_plat = cantidad
+                     db.session.add(plato_existente)
 
-                 new_order_plate = Orders_Plates()
-                 new_order_plate.plate_id=plato_id
-                 new_order_plate.order_id=update_order.id,
-                 new_order_plate.count_plat=cantidad
-
-                 db.session.add(new_order_plate)
+                 else:
+                  #No existe: crear nuevo registro
+                    plato = Orders_Plates()
+                    plato.order_id=update_order.id,
+                    plato.plate_id=plato_id,
+                    plato.count_plat=cantidad
+                                
+                    db.session.add(nuevo_plato)
+                 #db.session.commit()
                  total += float(plato.price) * cantidad
  
             update_order.total_price = total
@@ -284,7 +306,7 @@ def update_orders(order_id):
         db.session.rollback()
         return jsonify({'msg': 'Error al actualizar la comanda', 'error': str(e)}), 500
   
-    
+
 #--------------------ELIMINAR UNA COMANDA CON EL ID ----OK------
 @app.route('/orders/<int:order_id>', methods = ['DELETE'])
 def eliminar_comanda_por_id(order_id):
@@ -385,6 +407,16 @@ def update_tables(table_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'msg': 'Error al actualizar la mesa', 'error': str(e)}), 500
+    
+#---------------------------------------------------
+
+
+
+
+
+
+
+
 
 
 
