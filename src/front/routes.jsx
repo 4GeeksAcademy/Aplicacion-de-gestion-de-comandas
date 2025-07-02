@@ -11,8 +11,9 @@ import { Single } from "./pages/Single";
 import { Demo } from "./pages/Demo";
 import Login from "./pages/Login";  //si se export default, el componente no se pone entre llaves aqui
 import Private from "./pages/Private";
-import Signup from "./pages/Signup";
-import { ResetPassword } from "./pages/ResetPassword";
+import Signup from "./pages/Register";
+import ResetPassword from "./pages/ResetPassword";
+
 
 
 export const router = createBrowserRouter(
