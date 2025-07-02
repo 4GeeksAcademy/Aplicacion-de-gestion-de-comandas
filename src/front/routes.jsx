@@ -11,7 +11,7 @@ import { Single } from "./pages/Single";
 import { Demo } from "./pages/Demo";
 import  Login  from "./pages/Login";  //si se export default, el componente no se pone entre llaves aqui
 import  Private  from "./pages/Private";
-import Signup from "./pages/Signup";
+import Register from "./pages/Register";
 
 
 export const router = createBrowserRouter(
@@ -31,7 +31,7 @@ export const router = createBrowserRouter(
         <Route path="/demo" element={<Demo />} />
         <Route path="/login" element={<Login />} />
         <Route path="/private" element={<Private />} />
-        <Route path="/signup" element={<Signup />} />
+        <Route path="/register" element={<Register />} />
       </Route>
     )
 );

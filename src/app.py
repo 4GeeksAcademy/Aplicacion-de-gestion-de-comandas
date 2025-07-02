@@ -6,21 +6,25 @@ from flask import Flask, request, jsonify, url_for, send_from_directory
 from flask_migrate import Migrate
 from flask_swagger import swagger
 from api.utils import APIException, generate_sitemap
-from api.models import db,  User, EstadoRol, EstadoComanda, EstadoMesa, Plates, Tables, Orders, Orders_Plates
+from api.models import db,  User, EstadoRol, EstadoComanda, EstadoMesa, EstadoCategorias, Plates, Tables, Orders, Orders_Plates
 from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
 from datetime import datetime
 from functools import wraps
 
-# from src.api.models import db
-# from flask import Flask
+#from src.api.models import db
+from flask import Flask
 # importaciones adicionales para credenciales
 from flask_jwt_extended import create_access_token
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
 from flask_jwt_extended import JWTManager
+
 from flask_bcrypt import Bcrypt
+
+#from flask_bcrypt import Bcrypt
+
 from flask_cors import CORS
 
 
@@ -226,19 +230,82 @@ def crear_comanda():
         db.session.rollback()
         return jsonify({'msg': f'Error al crear la comanda: {str(e)}'}), 500
 
+
+    
+#-----------------------------PUT DE COMANDA ----OK----------------------------------------------------
+
+
 # -----------------------------PUT DE COMANDA -------------------OJOOO--------------------------------------
 # esta en la rama de heidy
-
-
-
-
-          
-            
-     
 
 # --------------------ELIMINAR UNA COMANDA CON EL ID ----OK------
 @app.route('/orders/<int:order_id>', methods=['DELETE'])
 @jwt_required()
+=======
+    print(body['platos'])
+    if 'platos' in body:
+        try:
+            # Eliminar platos anteriores de esa comanda
+            #Orders_Plates.query.filter_by(order_id=update_order.id).delete()
+            # Orders_Plates.query.filter_by(order_id=update_order.id)
+
+            total = 0
+            platos_actuales = Orders_Plates.query.filter_by(order_id=update_order.id).all()
+            print (platos_actuales)
+            platos_actuales_dict = {p.plate_id: p for p in platos_actuales}
+
+            for item in body['platos']:
+                 plato_id = item.get('plate_id')
+                 cantidad = item.get('cantidad', 1)   
+
+                 if plato_id is None:
+                   continue                 
+
+                 plato = Plates.query.get(plato_id)
+                 print (plato) #plato que se va a modificar su cantidad
+                 if not plato:
+                    continue
+                 if cantidad == 0:
+                    if plato_id in platos_actuales_dict:
+                     db.session.delete(platos_actuales_dict[plato_id]) #borro el plato
+                    
+                    continue
+                 
+                 if plato_id in platos_actuales_dict:
+                  #Ya existe: modificar cantidad
+                     plato_existente = platos_actuales_dict[plato_id]
+                     plato_existente.count_plat = cantidad
+                     db.session.add(plato_existente)
+
+                 else:
+                  #No existe: crear nuevo registro
+                    plato = Orders_Plates()
+                    plato.order_id=update_order.id,
+                    plato.plate_id=plato_id,
+                    plato.count_plat=cantidad
+                                
+                    db.session.add(nuevo_plato)
+                 #db.session.commit()
+                 total += float(plato.price) * cantidad
+ 
+            update_order.total_price = total
+                   
+
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'msg': 'Error al actualizar los platos de la comanda', 'error': str(e)}), 500
+
+    # Guardar cambios
+    try:
+        db.session.commit()
+        return jsonify({'msg': 'Comanda actualizada correctamente!', 'result': update_order.serialize()}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'msg': 'Error al actualizar la comanda', 'error': str(e)}), 500
+  
+
+#--------------------ELIMINAR UNA COMANDA CON EL ID ----OK-------------------------------------------------------
+@app.route('/orders/<int:order_id>', methods = ['DELETE']
 def eliminar_comanda_por_id(order_id):
     # duda , aqui solo obtengo el id o toda la instancia
     order = Orders.query.get(order_id)
@@ -344,6 +411,56 @@ def update_tables(table_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'msg': 'Error al actualizar la mesa', 'error': str(e)}), 500
+    
+#--------------- PUT DE PLATOS DE EDU ---OK ---------------------------------
+
+@app.route('/plates/<int:plate_id>', methods=['PUT'])  # <- RUTA CORREGIDA
+def update_plates(plate_id):
+
+    body = request.get_json(silent=True)
+    if body is None:
+        return jsonify({'msg': 'Petición inválida, se requiere un cuerpo JSON'}), 400
+
+    plate = Plates.query.get(plate_id)
+    if plate is None:
+        return jsonify({'msg': 'Plato no encontrado!'}), 404
+
+    if 'name' in body:
+        plate.name = body['name']
+        
+
+    if 'description' in body:
+        plate.description = body['description']
+
+    if 'price' in body:
+        plate.price = body['price']
+
+    if 'available' in body:
+        plate.available = body['available']
+
+    if 'categories' in body:
+        try:
+
+            plate.categories = EstadoCategorias(body['categories'])
+        except ValueError:
+            return jsonify({'msg': f"Categoría '{body['categories']}' no es válida."}), 400
+
+    try:
+        db.session.commit()
+        # Se llama a serialize(), no serializa()
+        return jsonify({'msg': 'Plato actualizado correctamente!', 'result': plate.serialize()}), 200
+    except Exception as e:
+        db.session.rollback()
+        # Mensaje de error mejorado con código de estado 500
+        return jsonify({'msg': 'Error al actualizar el plato', 'error': str(e)}), 500
+
+#---------------------------------------------------------
+
+
+
+
+
+
 
 # -------------------------------REGISTER ---OK--------------------------------
 
