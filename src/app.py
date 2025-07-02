@@ -94,60 +94,8 @@ def serve_any_other_file(path):
     return response
 
 
-# ---------GET USERS ---OK----------------------------------------------
 
-@app.route('/users', methods=['GET'])
-@jwt_required()
-def get_users():
-    users = User.query.all()
-    print(users)
-    user_serialized = []
-    for user in users:
-        user_serialized.append(user.serialize())
-    return jsonify({'msg': 'ok', 'results': user_serialized}), 200
-
-
-# ---------GET by id USERS ---OK ---------------------------------------
-
-@app.route('/users/<int:id>', methods=['GET'])
-@jwt_required()
-def get_user_by_id(id):
-    # query.get solo funciona para devolver primary key. para devolver otro campo usar query.filter_by
-    user = User.query.get(id)
-    print(user)
-    if user is None:
-        return jsonify({'msg': 'Usuario no encontrado'}), 404
-    return jsonify({'msg': 'ok', 'result': user.serialize()}), 200
-
-
-# ---------POST USERS ---OK----------------------------------------------
-
-@app.route('/users', methods=['POST'])
-@jwt_required()
-def post_user():
-    body = request.get_json(silent=True)
-
-    required_fields = ['email', 'password', 'name', 'rol', 'is_active']
-    if not all(field in body for field in required_fields):
-        return jsonify({'msg': 'Some fields are missing to fill'}), 400
-
-    try:
-        rol_enum = EstadoRol[body['rol']]
-    except KeyError:
-        return jsonify({'msg': f"Rol '{body['rol']}' no válido"}), 400
-
-    new_user = User(
-        email=body['email'],
-        password=body['password'],
-        name=body['name'],
-        rol=rol_enum,
-        is_active=body['is_active']
-    )
-
-    db.session.add(new_user)
-    db.session.commit()
-
-    return jsonify({'msg': 'Usuario creado correctamente', 'user': new_user.serialize()}), 201
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 # ----------------------------------GET TODAS LAS COMANDAS ---OK--------------------------
@@ -361,6 +309,67 @@ def eliminar_comanda_por_mesa_id(mesa_id):
         return jsonify({'msg': f'Error eliminando las comandas: {str(e)}'}), 500
 
 
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+# ---------GET USERS ---OK----------------------------------------------
+
+@app.route('/users', methods=['GET'])
+@jwt_required()
+def get_users():
+    users = User.query.all()
+    print(users)
+    user_serialized = []
+    for user in users:
+        user_serialized.append(user.serialize())
+    return jsonify({'msg': 'ok', 'results': user_serialized}), 200
+
+
+# ---------GET by id USERS ---OK ---------------------------------------
+
+@app.route('/users/<int:id>', methods=['GET'])
+@jwt_required()
+def get_user_by_id(id):
+    # query.get solo funciona para devolver primary key. para devolver otro campo usar query.filter_by
+    user = User.query.get(id)
+    print(user)
+    if user is None:
+        return jsonify({'msg': 'Usuario no encontrado'}), 404
+    return jsonify({'msg': 'ok', 'result': user.serialize()}), 200
+
+
+# ---------POST USERS ---OK----------------------------------------------
+
+@app.route('/users', methods=['POST'])
+@jwt_required()
+def post_user():
+    body = request.get_json(silent=True)
+
+    required_fields = ['email', 'password', 'name', 'rol', 'is_active']
+    if not all(field in body for field in required_fields):
+        return jsonify({'msg': 'Some fields are missing to fill'}), 400
+
+    try:
+        rol_enum = EstadoRol[body['rol']]
+    except KeyError:
+        return jsonify({'msg': f"Rol '{body['rol']}' no válido"}), 400
+
+    new_user = User(
+        email=body['email'],
+        password=body['password'],
+        name=body['name'],
+        rol=rol_enum,
+        is_active=body['is_active']
+    )
+
+    db.session.add(new_user)
+    db.session.commit()
+
+    return jsonify({'msg': 'Usuario creado correctamente', 'user': new_user.serialize()}), 201
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
 # -------------------------------GET PLATOS ---OK----------------------------------------
 @app.route('/plates', methods=['GET'])
 @jwt_required()
@@ -383,6 +392,53 @@ def get_plate_by_id(id):
     if plates is None:
         return jsonify({'msg': 'Plato no encontrado'}), 404
     return jsonify({'msg': 'ok', 'result': plates.serialize()}), 200
+
+
+
+# --------------- PUT DE PLATOS DE EDU ---OK ---------------------------------
+
+
+@app.route('/plates/<int:plate_id>', methods=['PUT'])  # <- RUTA CORREGIDA
+def update_plates(plate_id):
+
+    body = request.get_json(silent=True)
+    if body is None:
+        return jsonify({'msg': 'Petición inválida, se requiere un cuerpo JSON'}), 400
+
+    plate = Plates.query.get(plate_id)
+    if plate is None:
+        return jsonify({'msg': 'Plato no encontrado!'}), 404
+
+    if 'name' in body:
+        plate.name = body['name']
+
+    if 'description' in body:
+        plate.description = body['description']
+
+    if 'price' in body:
+        plate.price = body['price']
+
+    if 'available' in body:
+        plate.available = body['available']
+
+    if 'categories' in body:
+        try:
+
+            plate.categories = EstadoCategorias(body['categories'])
+        except ValueError:
+            return jsonify({'msg': f"Categoría '{body['categories']}' no es válida."}), 400
+
+    try:
+        db.session.commit()
+        # Se llama a serialize(), no serializa()
+        return jsonify({'msg': 'Plato actualizado correctamente!', 'result': plate.serialize()}), 200
+    except Exception as e:
+        db.session.rollback()
+        # Mensaje de error mejorado con código de estado 500
+        return jsonify({'msg': 'Error al actualizar el plato', 'error': str(e)}), 500
+
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 # -------------------------------GET DE TABLES ---OK --------------------------------
@@ -433,48 +489,6 @@ def update_tables(table_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'msg': 'Error al actualizar la mesa', 'error': str(e)}), 500
-
-# --------------- PUT DE PLATOS DE EDU ---OK ---------------------------------
-
-
-@app.route('/plates/<int:plate_id>', methods=['PUT'])  # <- RUTA CORREGIDA
-def update_plates(plate_id):
-
-    body = request.get_json(silent=True)
-    if body is None:
-        return jsonify({'msg': 'Petición inválida, se requiere un cuerpo JSON'}), 400
-
-    plate = Plates.query.get(plate_id)
-    if plate is None:
-        return jsonify({'msg': 'Plato no encontrado!'}), 404
-
-    if 'name' in body:
-        plate.name = body['name']
-
-    if 'description' in body:
-        plate.description = body['description']
-
-    if 'price' in body:
-        plate.price = body['price']
-
-    if 'available' in body:
-        plate.available = body['available']
-
-    if 'categories' in body:
-        try:
-
-            plate.categories = EstadoCategorias(body['categories'])
-        except ValueError:
-            return jsonify({'msg': f"Categoría '{body['categories']}' no es válida."}), 400
-
-    try:
-        db.session.commit()
-        # Se llama a serialize(), no serializa()
-        return jsonify({'msg': 'Plato actualizado correctamente!', 'result': plate.serialize()}), 200
-    except Exception as e:
-        db.session.rollback()
-        # Mensaje de error mejorado con código de estado 500
-        return jsonify({'msg': 'Error al actualizar el plato', 'error': str(e)}), 500
 
 
 # -------------------------------REGISTER ---OK--------------------------------
