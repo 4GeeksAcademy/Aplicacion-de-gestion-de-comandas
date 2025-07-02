@@ -11,6 +11,8 @@ from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
 from datetime import datetime
+from sqlalchemy.orm import load_only
+
 
 # from src.api.models import db
 # from flask import Flask
@@ -394,6 +396,8 @@ def update_tables(table_id):
         db.session.rollback()
         return jsonify({'msg': 'Error al actualizar la mesa', 'error': str(e)}), 500
 
+# -------------------------------RESET PASSWORD --------------------------------
+
 
 @app.route('/reset-password', methods=['POST'])
 def reset_password():
@@ -402,11 +406,13 @@ def reset_password():
     if not body or 'email' not in body or 'new_password' not in body:
         return jsonify({'msg': 'Faltan campos obligatorios: email y new_password'}), 400
 
-    user = User.query.filter_by(email=body['email']).first()
+    user = User.query.options(load_only(
+        'id', 'email', 'password', 'rol', 'is_active')).filter_by(email=body['email']).first()
 
     if user is None:
         return jsonify({'msg': 'Usuario no encontrado'}), 404
 
+    # se puede hashear la contraseña para mayor seguridad
     user.password = body['new_password']
 
     try:
@@ -416,6 +422,8 @@ def reset_password():
         db.session.rollback()
         return jsonify({'msg': f'Error al actualizar contraseña: {str(e)}'}), 500
 
+
+# ---------------------------------------------------------
 
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3001))
