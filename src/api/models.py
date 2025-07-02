@@ -90,7 +90,7 @@ class Tables(db.Model):
      id: Mapped[int] = mapped_column(primary_key=True)
      seats: Mapped[int] = mapped_column(nullable=True)
      state: Mapped[EstadoMesa] = mapped_column(Enum(EstadoMesa), nullable=False)
-     user_id: Mapped[int]= mapped_column(ForeignKey('user.id'))
+     user_id: Mapped[int]= mapped_column(Integer, ForeignKey('user.id'), nullable = True)
 
      comandas: Mapped[List["Orders"]] = relationship(
         back_populates= 'mesas') 
@@ -137,7 +137,7 @@ class Orders(db.Model):
      __tablename__= 'orders'
      id: Mapped[int] = mapped_column(primary_key=True)
      mesa_id: Mapped[int] = mapped_column(ForeignKey('tables.id'))
-     usuario_id:Mapped[int] = mapped_column(ForeignKey('user.id'))
+     usuario_id:Mapped[int] = mapped_column(Integer, ForeignKey('user.id'), nullable=True)
      date: Mapped[datetime] = mapped_column( DateTime, nullable=False, default= datetime.now(ZoneInfo("Europe/Madrid")))
      state:  Mapped[EstadoComanda] = mapped_column(Enum(EstadoComanda), nullable=False)
      total_price: Mapped[float] = mapped_column(Numeric, nullable=True)
