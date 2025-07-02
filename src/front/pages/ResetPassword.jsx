@@ -1,7 +1,6 @@
-
 import React, { useState } from 'react';
 
-export const ResetPassword = () => {
+const ResetPassword = () => {
     const [email, setEmail] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -86,3 +85,5 @@ export const ResetPassword = () => {
         </div>
     );
 };
+
+export default ResetPassword;
