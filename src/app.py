@@ -6,14 +6,15 @@ from flask import Flask, request, jsonify, url_for, send_from_directory
 from flask_migrate import Migrate
 from flask_swagger import swagger
 from api.utils import APIException, generate_sitemap
-from api.models import db,  User, EstadoRol, EstadoComanda, EstadoMesa, EstadoCategorias, Plates, Tables, Orders, Orders_Plates
+from api.models import db,  User, EstadoRol, EstadoComanda, EstadoMesa, Plates, Tables, Orders, Orders_Plates
 from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
 from datetime import datetime
-from functools import wraps
+from sqlalchemy.orm import load_only
+from flask_cors import CORS
 
-#from src.api.models import db
+# from src.api.models import db
 from flask import Flask
 # importaciones adicionales para credenciales
 from flask_jwt_extended import create_access_token
@@ -23,7 +24,7 @@ from flask_jwt_extended import JWTManager
 
 from flask_bcrypt import Bcrypt
 
-#from flask_bcrypt import Bcrypt
+# from flask_bcrypt import Bcrypt
 
 from flask_cors import CORS
 
@@ -231,65 +232,86 @@ def crear_comanda():
         return jsonify({'msg': f'Error al crear la comanda: {str(e)}'}), 500
 
 
-    
-#-----------------------------PUT DE COMANDA ----OK----------------------------------------------------
+# -----------------------------PUT DE COMANDA ----OK----------------------------------------------------
 
+@app.route('/orders/<int:order_id>', methods=['PUT'])
+def update_orders(order_id):
+    body = request.get_json(silent=True)
+    update_order = Orders.query.get(order_id)
 
-# -----------------------------PUT DE COMANDA -------------------OJOOO--------------------------------------
-# esta en la rama de heidy
+    if body is None:
+        return jsonify({'msg': 'Debe introducir los elementos de la comanda a modifiar!'}), 404
 
-# --------------------ELIMINAR UNA COMANDA CON EL ID ----OK------
-@app.route('/orders/<int:order_id>', methods=['DELETE'])
-@jwt_required()
-=======
+    if 'state' in body:
+        try:
+            update_order.state = EstadoComanda(body['state'])
+        except ValueError:
+            return jsonify({'msg': f'Estado no válido!!'}), 404
+
+    if 'mesa_id' in body:
+        mesa = Tables.query.get(body['mesa_id'])
+        if mesa is None:
+            return jsonify({'msg': 'Mesa no existe!!'}), 404
+        update_order.mesa_id = body['mesa_id']
+
+    if 'usuario_id' in body:
+        user = User.query.get(body['usuario_id'])
+        if user is None:
+            return jsonify({'msg': 'Usuario inexistente!!'}), 404
+        update_order.usuario_id = body['user_id']
+
+    if 'guest_notes' in body:
+        update_order.guest_notes = body['guest_notes']
+
     print(body['platos'])
     if 'platos' in body:
         try:
             # Eliminar platos anteriores de esa comanda
-            #Orders_Plates.query.filter_by(order_id=update_order.id).delete()
+            # Orders_Plates.query.filter_by(order_id=update_order.id).delete()
             # Orders_Plates.query.filter_by(order_id=update_order.id)
 
             total = 0
-            platos_actuales = Orders_Plates.query.filter_by(order_id=update_order.id).all()
-            print (platos_actuales)
+            platos_actuales = Orders_Plates.query.filter_by(
+                order_id=update_order.id).all()
+            print(platos_actuales)
             platos_actuales_dict = {p.plate_id: p for p in platos_actuales}
 
             for item in body['platos']:
-                 plato_id = item.get('plate_id')
-                 cantidad = item.get('cantidad', 1)   
+                plato_id = item.get('plate_id')
+                cantidad = item.get('cantidad', 1)
 
-                 if plato_id is None:
-                   continue                 
-
-                 plato = Plates.query.get(plato_id)
-                 print (plato) #plato que se va a modificar su cantidad
-                 if not plato:
+                if plato_id is None:
                     continue
-                 if cantidad == 0:
+
+                plato = Plates.query.get(plato_id)
+                print(plato)  # plato que se va a modificar su cantidad
+                if not plato:
+                    continue
+                if cantidad == 0:
                     if plato_id in platos_actuales_dict:
-                     db.session.delete(platos_actuales_dict[plato_id]) #borro el plato
-                    
-                    continue
-                 
-                 if plato_id in platos_actuales_dict:
-                  #Ya existe: modificar cantidad
-                     plato_existente = platos_actuales_dict[plato_id]
-                     plato_existente.count_plat = cantidad
-                     db.session.add(plato_existente)
+                        # borro el plato
+                        db.session.delete(platos_actuales_dict[plato_id])
 
-                 else:
-                  #No existe: crear nuevo registro
+                    continue
+
+                if plato_id in platos_actuales_dict:
+                 # Ya existe: modificar cantidad
+                    plato_existente = platos_actuales_dict[plato_id]
+                    plato_existente.count_plat = cantidad
+                    db.session.add(plato_existente)
+
+                else:
+                 # No existe: crear nuevo registro
                     plato = Orders_Plates()
-                    plato.order_id=update_order.id,
-                    plato.plate_id=plato_id,
-                    plato.count_plat=cantidad
-                                
+                    plato.order_id = update_order.id,
+                    plato.plate_id = plato_id,
+                    plato.count_plat = cantidad
+
                     db.session.add(nuevo_plato)
-                 #db.session.commit()
-                 total += float(plato.price) * cantidad
- 
+                # db.session.commit()
+                total += float(plato.price) * cantidad
+
             update_order.total_price = total
-                   
 
         except Exception as e:
             db.session.rollback()
@@ -302,10 +324,10 @@ def crear_comanda():
     except Exception as e:
         db.session.rollback()
         return jsonify({'msg': 'Error al actualizar la comanda', 'error': str(e)}), 500
-  
 
-#--------------------ELIMINAR UNA COMANDA CON EL ID ----OK-------------------------------------------------------
-@app.route('/orders/<int:order_id>', methods = ['DELETE']
+
+# --------------------ELIMINAR UNA COMANDA CON EL ID ----OK-------------------------------------------------------
+@app.route('/orders/<int:order_id>', methods=['DELETE'])
 def eliminar_comanda_por_id(order_id):
     # duda , aqui solo obtengo el id o toda la instancia
     order = Orders.query.get(order_id)
@@ -411,8 +433,9 @@ def update_tables(table_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'msg': 'Error al actualizar la mesa', 'error': str(e)}), 500
-    
-#--------------- PUT DE PLATOS DE EDU ---OK ---------------------------------
+
+# --------------- PUT DE PLATOS DE EDU ---OK ---------------------------------
+
 
 @app.route('/plates/<int:plate_id>', methods=['PUT'])  # <- RUTA CORREGIDA
 def update_plates(plate_id):
@@ -427,7 +450,6 @@ def update_plates(plate_id):
 
     if 'name' in body:
         plate.name = body['name']
-        
 
     if 'description' in body:
         plate.description = body['description']
@@ -453,13 +475,6 @@ def update_plates(plate_id):
         db.session.rollback()
         # Mensaje de error mejorado con código de estado 500
         return jsonify({'msg': 'Error al actualizar el plato', 'error': str(e)}), 500
-
-#---------------------------------------------------------
-
-
-
-
-
 
 
 # -------------------------------REGISTER ---OK--------------------------------
@@ -503,23 +518,22 @@ def login():
         return jsonify({'msg': 'El campo email es obligatorio'}), 400
     if 'password' not in body:
         return jsonify({'msg': 'El campo password es obligatorio'}), 400
-    
+
     user = User.query.filter_by(email=body['email']).first()
 
     if user is None:
         return jsonify({'msg': 'Usuario o contraseña errónea'}), 400
-    
 
     print(user.password)
-    
+
     password_correct = bcrypt.check_password_hash(
         user.password, body['password'])  # returns True
-    
+
     if not password_correct:
         return jsonify({'msg': 'Usuario o contraseña errónea'}), 400
-    
+
     acces_token = create_access_token(identity=user.email)
-    return jsonify({'msg': 'OK', 'Token': acces_token}),200
+    return jsonify({'msg': 'OK', 'Token': acces_token}), 200
 
 # -------------------------------PROTECCIÓN ---OK--------------------------------
 
@@ -527,7 +541,8 @@ def login():
 @app.route('/protected', methods=['GET'])
 @jwt_required()
 def protected():
-    current_user_id = get_jwt_identity() # sabemos quien es el usuario que hace la petición
+    # sabemos quien es el usuario que hace la petición
+    current_user_id = get_jwt_identity()
     return jsonify({'msg': f'Acceso del usuario {current_user_id} ACEPTADO'}), 200
 
 
@@ -538,18 +553,40 @@ def role_required(*roles):
     def wrapper(fn):
         @wraps(fn)
         @jwt_required()
-        def decorator (*args, **kwargs):
+        def decorator(*args, **kwargs):
             current_user_email = get_jwt_identity()
-            user = User.query.filter_by(email = current_user_email).first()
+            user = User.query.filter_by(email=current_user_email).first()
             if not user or user.rol not in roles:
-                return jsonify({'msg':'Acceso denegado'}), 400
+                return jsonify({'msg': 'Acceso denegado'}), 400
             return fn(*args, *kwargs)
         return decorator
     return wrapper
 
 
+# -------------------------------RESET PASSWORD --------------------------------
 
 
+@app.route('/reset-password', methods=['POST'])
+def reset_password():
+    body = request.get_json(silent=True)
+
+    if not body or 'email' not in body or 'new_password' not in body:
+        return jsonify({'msg': 'Faltan campos obligatorios: email y new_password'}), 400
+
+    user = User.query.filter_by(email=body['email']).first()
+
+    if user is None:
+        return jsonify({'msg': 'Usuario no encontrado'}), 404
+
+    # se puede hashear la contraseña para mayor seguridad
+    user.password = body['new_password']
+
+    try:
+        db.session.commit()
+        return jsonify({'msg': 'Contraseña actualizada correctamente'}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'msg': f'Error al actualizar contraseña: {str(e)}'}), 500
 
 # ----------------------------------------------------------------------------------
 
