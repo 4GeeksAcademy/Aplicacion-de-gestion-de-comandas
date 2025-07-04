@@ -17,24 +17,16 @@ export const Navbar = () => {
 	};
 
 	return (
-		<nav className="navbar navbar-red bg-danger">
+		<nav className="navbar" style={{ backgroundColor: "#fa8072" }}>
 
 			<div className="container">
 				<div className="ms-auto d-flex align-items-center">
 					{!token ? (
 						<>
 							{location.pathname === "/login" && (
-								<Link to="/signup">
-									<button className="btn btn-outline-light me-2">
-										Registrarse
-									</button>
-								</Link>
+								<Link to="/register" className="btn btn-outline-light me-2">Sign Up</Link>
 							)}
-							<Link to="/login">
-								<button className="btn btn-outline-light me-2">
-									Iniciar sesión
-								</button>
-							</Link>
+							<Link to="/login" className="btn btn-outline-light me-2">Log in</Link>
 						</>
 					) : (
 						<>

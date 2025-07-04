@@ -1,0 +1,25 @@
+.register-background {
+  background-image: url('https://tse1.mm.bing.net/th/id/OIP.xLA00D4_8sOdxX133AcShAHaLH?r=0&w=1365&h=2048&rs=1&pid=ImgDetMain&o=7&rm=3');
+  width: 100vw;
+  height: 100vh;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  min-height: 100vh;
+  overflow: hidden; /* Evita scroll horizontal y vertical */
+}
+
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow-x: hidden;
+  font-family: 'Roboto', sans-serif;
+}
+
+
+
+
+
+/* https://thumbs.dreamstime.com/b/different-types-sushi-12073347.jpg */

@@ -85,7 +85,7 @@ const Login = () => {
       <div className="row w-100" style={{ maxWidth: "900px" }}>
         {/* Imagen */}
         <div className="col-md-6 d-none d-md-block">
-          <img
+          #<img src="/workspaces/Aplicacion-de-gestion-de-comandas/public/img.jpg.png"
             
             className="img-fluid rounded"
             style={{ height: "100%", objectFit: "cover" }}
@@ -95,7 +95,7 @@ const Login = () => {
 {/* Formulario */}
         <div className="col-md-6 d-flex align-items-start">
           <form onSubmit={handleLogin} className="w-100 p-4">
-            <h2 className="text-start mb-4">Iniciar Sesión</h2>
+            <h2 className="text-start mb-4">Log in </h2>
             <div className="mb-3">
               <input
                 type="email"
@@ -106,15 +106,15 @@ const Login = () => {
             <div className="mb-3">
               <input
                 type="password"
-                placeholder="Contraseña"
+                placeholder="Password"
                 value={password} onChange={(e) => setPassword(e.target.value)} required />
             </div>
 
-            <button type="submit" >Iniciar sesión</button>
+            <button type="submit" className="btn btn-danger">Log in </button>
             <div className="mt-3 text-start">
               <span>¿Aún no tienes cuenta? </span>
               <div>
-                <Link ClassName="text-red text-align-center" to="/register"> Register here</Link>
+                <Link ClassName="text-red text-align-center" to="/register"> Sign up for an account</Link>
               </div>
             </div>
           </form>

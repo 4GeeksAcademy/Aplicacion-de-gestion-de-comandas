@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Swal from 'sweetalert2'; //para los mensajes modales de alerta 
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2"; //para los mensajes modales de alerta
 
 // este componente es para REGISTRAR UN NUEVO USUARIO por primera vez en el aplicativo
 const Register = () => {
-
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [rol, setRol] = useState("");
@@ -26,25 +25,24 @@ const Register = () => {
         width: "200px",
         timer: 3000,
         customClass: {
-          title: 'fs-5',
-          popup: 'p-2',
-          confirmButton: 'btn btn-danger btn-sm',
-
+          title: "fs-5",
+          popup: "p-2",
+          confirmButton: "btn btn-danger btn-sm",
         },
       });
       return;
     }
-    console.log(BASE_URL + "/register")
+    console.log(BASE_URL + "/register");
     try {
       const res = await fetch(BASE_URL + "/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({name, email, rol, password }),
+        body: JSON.stringify({ name, email, rol, password }),
       });
       const data = await res.json();
-      console.log(data)
+      console.log(data);
 
       if (res.ok) {
         Swal.fire({
@@ -54,11 +52,10 @@ const Register = () => {
           width: "200px",
           timer: 3000,
           customClass: {
-            title: 'fs-5',
-            popup: 'p-2',
-            confirmButton: 'btn btn-danger btn-sm',
+            title: "fs-5",
+            popup: "p-2",
+            confirmButton: "btn btn-danger btn-sm",
           },
-          
         }).then(() => {
           setEmail("");
           setName("");
@@ -67,7 +64,6 @@ const Register = () => {
           setConfirmPassword("");
           navigate("/login");
         });
-
       } else {
         Swal.fire({
           icon: "error",
@@ -76,13 +72,12 @@ const Register = () => {
           width: "200px",
           timer: 3000,
           customClass: {
-            title: 'fs-5',
-            popup: 'p-3',
-            confirmButton: 'btn btn-danger btn-sm',
+            title: "fs-5",
+            popup: "p-3",
+            confirmButton: "btn btn-danger btn-sm",
           },
         });
       }
-
     } catch (err) {
       Swal.fire({
         icon: "error",
@@ -93,52 +88,95 @@ const Register = () => {
     }
   };
 
-
   return (
-    <form onSubmit={Registrarse}
-      className="container d-flex justify-content-center align-items-center vh-100">
+    <form
+      onSubmit={Registrarse}
+      className="register-background d-flex align-items-start justify-content-start w-100 vh-100 p-4"
+    >
+      <div
+        className="w-100 p-4"
+        style={{
+          maxWidth: "400px",
+          backgroundColor: "rgba(255, 255, 255, 0.8)",
+          borderRadius: "16px",
+          boxShadow: "0 4px 15px rgba(0, 0, 0, 0.1)",
+          backdropFilter: "blur(4px)" // Efecto glass suave
+        }}
+      >
+        <h2 className="mb-4 fw-bold">Create an Account</h2>
 
-      <div className="w-100" style={{ maxWidth: "400px" }}>
-        <h2>Registro</h2>
         <div className="mb-3">
           <input
+            className="form-control"
             type="email"
             placeholder="Email"
-            value={email} onChange={(e) => setEmail(e.target.value)} required
-          />
-        </div>
-        <div className="mb-3">
-          <input
-            type="name"
-            placeholder="Full name"
-            value={name} onChange={(e) => setName(e.target.value)} required
-          />
-        </div>
-        <div className="mb-3">
-          <input
-            type="rol"
-            placeholder="Rol del usuario"
-            value={rol} onChange={(e) => setRol(e.target.value)} required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
           />
         </div>
 
         <div className="mb-3">
           <input
+            className="form-control"
+            type="text"
+            placeholder="Full Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+        </div>
+
+        <div className="mb-3">
+          <input
+            className="form-control"
+            type="text"
+            placeholder="Role"
+            value={rol}
+            onChange={(e) => setRol(e.target.value)}
+            required
+          />
+        </div>
+
+        <div className="mb-3">
+          <input
+            className="form-control"
             type="password"
-            placeholder="Contraseña"
-            value={password} onChange={(e) => setPassword(e.target.value)} required
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
           />
         </div>
 
         <div className="mb-3">
           <input
+            className="form-control"
             type="password"
-            placeholder="Repetir Contraseña"
-            value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required
+            placeholder="Repeat Password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
           />
         </div>
 
-        <button type="submit">Registrar nuevo usuario</button>
+        <button
+          type="submit"
+          className="btn w-100"
+          style={{
+            backgroundColor: "#fa8072",
+            color: "white",
+            fontWeight: "bold",
+            border: "none",
+            fontWeight: "500",
+            transition: "background-color 0.3s"
+          }}
+          onMouseOver={(e) => (e.target.style.backgroundColor = "#e76b60")}
+          onMouseOut={(e) => (e.target.style.backgroundColor = "#fa8072")}
+        >
+          Register
+        </button>
+
         {message && (
           <div className={`alert alert-${messageType} mt-3`} role="alert">
             {message}
@@ -146,7 +184,11 @@ const Register = () => {
         )}
       </div>
     </form>
-  )
-}
+  );
+};
 
-export default Register
+export default Register;
+
+{
+  /* Imagen de este componente esta en css en la clase register-background*/
+}

@@ -522,7 +522,7 @@ def register():
     return jsonify({'msg': f'Usuario {new_user.name} CREADO'}), 201
 
 
-# -------------------------------LOGIN ---OK--------------------------------
+# -------------------------------LOGIN ---OK-OK-------------------------------
 
 
 @app.route('/login', methods=['POST'])
@@ -544,7 +544,7 @@ def login():
     print(user.password)
 
     password_correct = bcrypt.check_password_hash(
-        user.password, body['password'])  # returns True
+        user.password, body['password'])  # returns True. chequea si la contraseña recibida es la misma de la BD
 
     if not password_correct:
         return jsonify({'msg': 'Usuario o contraseña errónea'}), 400
