@@ -6,13 +6,13 @@ from flask import Flask, request, jsonify, url_for, send_from_directory
 from flask_migrate import Migrate
 from flask_swagger import swagger
 from api.utils import APIException, generate_sitemap
-from api.models import db,  User, EstadoRol, EstadoComanda, EstadoMesa, Plates, Tables, Orders, Orders_Plates
+from api.models import db,  User, EstadoRol, EstadoComanda, EstadoCategorias, EstadoMesa, Plates, Tables, Orders, Orders_Plates
 from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
 from datetime import datetime
 from sqlalchemy.orm import load_only
-from flask_cors import CORS
+
 
 # from src.api.models import db
 from flask import Flask
@@ -37,6 +37,7 @@ static_file_dir = os.path.join(os.path.dirname(
 app = Flask(__name__)
 app.url_map.strict_slashes = False
 bcrypt = Bcrypt(app)  # para encriptar
+CORS(app)
 
 
 app.url_map.strict_slashes = False
@@ -55,7 +56,7 @@ else:
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 MIGRATE = Migrate(app, db, compare_type=True)
 db.init_app(app)
-CORS(app)
+
 
 # add the admin
 setup_admin(app)
@@ -469,7 +470,7 @@ def get_table_by_id(table_id):
 def update_tables(table_id):
     body = request.get_json(silent=True)
     table = Tables.query.get(table_id)
-    if body is None:  # ***decia table
+    if body is None:  
         return jsonify({'msg': 'Mesa no encontrada!'}), 404
     if 'state' in body:
         try:
@@ -477,7 +478,7 @@ def update_tables(table_id):
         except ValueError:
             return jsonify({'msg': f'Estado no válido!!'}), 404
     if 'seats' in body:
-        table.seats = body['seats']  # ****decia table.state
+        table.seats = body['seats']  
     if 'user_id' in body:
         user = User.query.get(body['user_id'])
         if user is None:
@@ -491,7 +492,7 @@ def update_tables(table_id):
         return jsonify({'msg': 'Error al actualizar la mesa', 'error': str(e)}), 500
 
 
-# -------------------------------REGISTER ---OK--------------------------------
+# -------------------------------REGISTER ---OK-OK-------------------------------
 
 
 @app.route('/register', methods=['POST'])
@@ -500,19 +501,21 @@ def register():
     if body is None:
         return jsonify({'msg': 'Debes enviar informarmación en el body'}), 400
     if 'name' not in body:
-        return jsonify({'msg': 'El campo name es obligatorio'}), 400
-    if 'rol' not in body:
-        return jsonify({'msg': 'El campo rol es obligatorio'}), 400
+        return jsonify({'msg': 'El campo name es obligatorio'}), 400 
     if 'email' not in body:
         return jsonify({'msg': 'El campo email es obligatorio'}), 400
+    try:
+        rol_enum = EstadoRol[body['rol']]
+    except KeyError:
+        return jsonify({'msg': f"Rol '{body['rol']}' no válido"}), 400
     if 'password' not in body:
         return jsonify({'msg': 'El campo password es obligatorio'}), 400
     new_user = User()
     new_user.name = body['name']
-    new_user.rol = body['rol']
     new_user.email = body['email']
+    new_user.rol = rol_enum
     new_user.password = bcrypt.generate_password_hash(
-        body['password']).decode('utf-8')
+        body['password']).decode('utf-8')  #se guardo contraseña encriptada
     new_user.is_active = True
     db.session.add(new_user)
     db.session.commit()
@@ -527,7 +530,7 @@ def login():
 
     body = request.get_json(silent=True)
     if body is None:
-        return jsonify({'msg': 'Debes enviar informarmación en el body'}), 400
+        return jsonify({'msg': 'Debes enviar información en el body'}), 400
     if 'email' not in body:
         return jsonify({'msg': 'El campo email es obligatorio'}), 400
     if 'password' not in body:
@@ -546,8 +549,8 @@ def login():
     if not password_correct:
         return jsonify({'msg': 'Usuario o contraseña errónea'}), 400
 
-    acces_token = create_access_token(identity=user.email)
-    return jsonify({'msg': 'OK', 'Token': acces_token}), 200
+    acces_token = create_access_token(identity=user.email) #genero token 
+    return jsonify({'msg': 'OK', 'Token': acces_token, 'user': user.email}), 200
 
 # -------------------------------PROTECCIÓN ---OK--------------------------------
 

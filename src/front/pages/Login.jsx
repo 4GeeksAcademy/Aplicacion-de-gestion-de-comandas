@@ -7,7 +7,7 @@ import Swal from 'sweetalert2'; // <-- Importar SweetAlert2
 import useGlobalReducer from "../hooks/useGlobalReducer"; //sin llaves pues se exporto useGlobalReducer
 
 const Login = () => {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
   //  const { store, dispatch } = useGlobalReducer();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -114,7 +114,7 @@ const Login = () => {
             <div className="mt-3 text-start">
               <span>¿Aún no tienes cuenta? </span>
               <div>
-                <Link ClassName="text-red text-align-center" to="/signup"> Register here</Link>
+                <Link ClassName="text-red text-align-center" to="/register"> Register here</Link>
               </div>
             </div>
           </form>

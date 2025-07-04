@@ -6,6 +6,8 @@ import Swal from 'sweetalert2'; //para los mensajes modales de alerta
 const Register = () => {
 
   const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [rol, setRol] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
@@ -32,14 +34,14 @@ const Register = () => {
       });
       return;
     }
-
+    console.log(BASE_URL + "/register")
     try {
-      const res = await fetch(BASE_URL + "/signup", {
+      const res = await fetch(BASE_URL + "/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({name, email, rol, password }),
       });
       const data = await res.json();
       console.log(data)
@@ -59,6 +61,8 @@ const Register = () => {
           
         }).then(() => {
           setEmail("");
+          setName("");
+          setRol("");
           setPassword("");
           setConfirmPassword("");
           navigate("/login");
@@ -101,6 +105,20 @@ const Register = () => {
             type="email"
             placeholder="Email"
             value={email} onChange={(e) => setEmail(e.target.value)} required
+          />
+        </div>
+        <div className="mb-3">
+          <input
+            type="name"
+            placeholder="Full name"
+            value={name} onChange={(e) => setName(e.target.value)} required
+          />
+        </div>
+        <div className="mb-3">
+          <input
+            type="rol"
+            placeholder="Rol del usuario"
+            value={rol} onChange={(e) => setRol(e.target.value)} required
           />
         </div>
 
