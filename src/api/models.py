@@ -34,26 +34,7 @@ class EstadoRol(enum.Enum):
     barman = "barman"
     admin = "admin"
 
-#class Categories(db.Model):
-    # __tablename__= 'categories'
-    # id: Mapped[int] = mapped_column(primary_key=True)
-    # name: Mapped[str] = mapped_column(String(50), nullable=False)
     
-
-    # platos :  Mapped[List["Plates"]] = relationship(
-     #   back_populates= 'categorias') 
-
-
-    # def __str__(self):
-     #   return f' Categoria {self.name}'
-     
-     #def serialize(self):
-        #return {
-         #   "id": self.id,
-        #    "name": self.name,
-            # do not serialize the password, its a security breach
-      #  }
-     
     
 class Plates(db.Model):
     __tablename__= 'plates'

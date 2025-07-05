@@ -43,7 +43,7 @@ const Login = () => {
             popup: 'p-2',
             confirmButton: 'btn btn-danger btn-sm',
           },
-          
+
         }).then(() => {
           navigate("/private"); // Re-dirige después de cerrar el modal a la pagin /private o la principal. decidiremos el nombre 
         });
@@ -81,46 +81,64 @@ const Login = () => {
 
   return (
 
-    <div className="container d-flex justify-content-center align-items-center vh-100">
-      <div className="row w-100" style={{ maxWidth: "900px" }}>
-        {/* Imagen */}
-        <div className="col-md-6 d-none d-md-block">
-          #<img src="/workspaces/Aplicacion-de-gestion-de-comandas/public/img.jpg.png"
-            
-            className="img-fluid rounded"
-            style={{ height: "100%", objectFit: "cover" }}
+    <form
+      onSubmit={handleLogin}
+      className="login-background d-flex align-items-start justify-content-start w-70 vh-100 p-4"
+    >
+      <div
+        className="w-100 p-4"
+        style={{
+          maxWidth: "320px",
+          backgroundColor: "rgba(255, 255, 255, 0.6)",
+          borderRadius: "16px",
+          boxShadow: "0 4px 15px rgba(0, 0, 0, 0.1)",
+          backdropFilter: "blur(4px)" // Efecto glass suave
+        }}
+      >
+        <h2 className="text-start mb-2">Log in </h2>
+
+        <div className="mb-2">
+          <input
+            className="form-control"
+            type="email"
+            placeholder="Email"
+            value={email} onChange={(e) => setEmail(e.target.value)} required
           />
         </div>
 
-{/* Formulario */}
-        <div className="col-md-6 d-flex align-items-start">
-          <form onSubmit={handleLogin} className="w-100 p-4">
-            <h2 className="text-start mb-4">Log in </h2>
-            <div className="mb-3">
-              <input
-                type="email"
-                placeholder="Email"
-                value={email} onChange={(e) => setEmail(e.target.value)} required />
-            </div>
+        <div className="mb-2">
+          <input
+            className="form-control"
+            type="password"
+            placeholder="Password"
+            value={password} onChange={(e) => setPassword(e.target.value)} required
+          />
+        </div>
 
-            <div className="mb-3">
-              <input
-                type="password"
-                placeholder="Password"
-                value={password} onChange={(e) => setPassword(e.target.value)} required />
-            </div>
-
-            <button type="submit" className="btn btn-danger">Log in </button>
-            <div className="mt-3 text-start">
-              <span>¿Aún no tienes cuenta? </span>
-              <div>
-                <Link ClassName="text-red text-align-center" to="/register"> Sign up for an account</Link>
-              </div>
-            </div>
-          </form>
+        <button
+          type="submit"
+          className="btn w-100"
+          style={{
+            backgroundColor: "#fa8072",
+            color: "white",
+            fontWeight: "bold",
+            border: "none",
+            fontWeight: "500",
+            transition: "background-color 0.3s"
+          }}
+          onMouseOver={(e) => (e.target.style.backgroundColor = "#e76b60")}
+          onMouseOut={(e) => (e.target.style.backgroundColor = "#fa8072")}
+        >
+          Log in
+        </button>
+        <div className="mt-3 text-start">
+          <span>¿Dont you have an account yet? </span>
+          <div>
+            <Link className="text-decoration-none" to="/register"> Sign up for an account</Link>
+          </div>
         </div>
       </div>
-    </div>
+    </form>
 
   )
 }

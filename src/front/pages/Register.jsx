@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2"; //para los mensajes modales de alerta
+import Select from "react-select"; // para hacer un select de react para el rol
+
 
 // este componente es para REGISTRAR UN NUEVO USUARIO por primera vez en el aplicativo
 const Register = () => {
@@ -13,6 +15,12 @@ const Register = () => {
   const [messageType, setMessageType] = useState(""); // "success" | "danger"
   const BASE_URL = import.meta.env.VITE_BACKEND_URL;
   const navigate = useNavigate();
+  const EstadoRol = [
+    "camarero",
+    "cocinero",
+    "barman",
+    "admin"
+  ];
 
   const Registrarse = async (e) => {
     e.preventDefault();
@@ -88,6 +96,11 @@ const Register = () => {
     }
   };
 
+  const options = EstadoRol.map((rol) => ({
+    value: rol,
+    label: rol
+  }));
+
   return (
     <form
       onSubmit={Registrarse}
@@ -103,9 +116,9 @@ const Register = () => {
           backdropFilter: "blur(4px)" // Efecto glass suave
         }}
       >
-        <h2 className="mb-4 fw-bold">Create an Account</h2>
+        <h2 className="mb-3 fw-bold">Create an Account</h2>
 
-        <div className="mb-3">
+        <div className="mb-2">
           <input
             className="form-control"
             type="email"
@@ -116,7 +129,7 @@ const Register = () => {
           />
         </div>
 
-        <div className="mb-3">
+        <div className="mb-2">
           <input
             className="form-control"
             type="text"
@@ -127,18 +140,33 @@ const Register = () => {
           />
         </div>
 
-        <div className="mb-3">
-          <input
-            className="form-control"
-            type="text"
-            placeholder="Role"
-            value={rol}
-            onChange={(e) => setRol(e.target.value)}
-            required
+
+        <div className="mb-2">
+          <Select
+            options={options}
+            value={options.find((o) => o.value === rol)}
+            onChange={(selected) => setRol(selected.value)}
+            placeholder="Select a role"
+            styles={{
+              control: (base) => ({
+                ...base,
+                backgroundColor: "rgba(255,255,255,0.6)",
+                borderRadius: "8px",
+                borderColor: "#ccc",
+                boxShadow: "none",
+                fontSize: "0.9rem"
+              }),
+              menu: (base) => ({
+                ...base,
+                zIndex: 9999
+              })
+            }}
           />
         </div>
 
-        <div className="mb-3">
+
+
+        <div className="mb-2">
           <input
             className="form-control"
             type="password"
@@ -149,7 +177,7 @@ const Register = () => {
           />
         </div>
 
-        <div className="mb-3">
+        <div className="mb-2">
           <input
             className="form-control"
             type="password"
