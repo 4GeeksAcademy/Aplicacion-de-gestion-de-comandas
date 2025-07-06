@@ -109,11 +109,15 @@ const Register = () => {
       <div
         className="w-100 p-4"
         style={{
-          maxWidth: "400px",
+          maxWidth: "320px",
           backgroundColor: "rgba(255, 255, 255, 0.8)",
           borderRadius: "16px",
           boxShadow: "0 4px 15px rgba(0, 0, 0, 0.1)",
-          backdropFilter: "blur(4px)" // Efecto glass suave
+          backdropFilter: "blur(4px)", // Efecto glass suave
+          width: "100%",
+          zIndex: 1, // Asegura que quede por encima del filtro del fondo
+          position: "relative",
+
         }}
       >
         <h2 className="mb-3 fw-bold">Create an Account</h2>

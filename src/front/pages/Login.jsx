@@ -85,6 +85,9 @@ const Login = () => {
       onSubmit={handleLogin}
       className="login-background d-flex align-items-start justify-content-start w-70 vh-100 p-4"
     >
+
+
+
       <div
         className="w-100 p-4"
         style={{
@@ -92,10 +95,15 @@ const Login = () => {
           backgroundColor: "rgba(255, 255, 255, 0.6)",
           borderRadius: "16px",
           boxShadow: "0 4px 15px rgba(0, 0, 0, 0.1)",
-          backdropFilter: "blur(4px)" // Efecto glass suave
+          backdropFilter: "blur(4px)", // Efecto glass suave
+          width: "100%",
+                         
+          zIndex: 10,
         }}
       >
-        <h2 className="text-start mb-2">Log in </h2>
+        <h3 className="text-center mb-2">Welcome to  </h3>
+        <h4 className="text-center mb-2"> Hana Sushi Bar 🍣</h4>
+        <p className="text-start mb-2"> Log in </p>
 
         <div className="mb-2">
           <input
@@ -138,6 +146,7 @@ const Login = () => {
           </div>
         </div>
       </div>
+       
     </form>
 
   )

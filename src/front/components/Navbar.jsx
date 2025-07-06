@@ -1,5 +1,6 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 export const Navbar = () => {
 	const location = useLocation();
@@ -24,18 +25,42 @@ export const Navbar = () => {
 					{!token ? (
 						<>
 							{location.pathname === "/login" && (
-								<Link to="/register" className="btn btn-outline-light me-2">Sign Up</Link>
+								<Link to="/register" className="btn btn-outline-light me-2">
+									Sign Up
+								</Link>
 							)}
-							<Link to="/login" className="btn btn-outline-light me-2">Log in</Link>
+							{location.pathname === "/register" && (
+								<Link to="/login" className="btn btn-outline-light me-2">
+									Log in
+								</Link>
+							)}
+
 						</>
 					) : (
 						<>
 							<span className="me-2 text-white">👤 {user}</span>
-							<button className="btn btn-light" onClick={handleLogout}>
+							<button className="btn btn-outline-light me-2" onClick={handleLogout}>
 								Logout
 							</button>
 						</>
 					)}
+					<button
+						className="btn btn-outline-light me-2"
+						onClick={() => {
+							Swal.fire({
+								title: "¡See you soon!",
+								text: "Thank you for use the Hana Sushi Bar app😊",
+								icon: "info",
+								confirmButtonText: "Close",
+								confirmButtonColor: "#fa8072",
+							}).then(() => {
+								window.location.href = 'about:blank';
+							});
+						}}
+					>
+						Close
+					</button>
+
 				</div>
 			</div>
 		</nav>

@@ -6,8 +6,15 @@
   background-position: center;
   background-repeat: no-repeat;
   background-attachment: fixed;
-  min-height: 100vh;
+  width: 100%;
+  height:100dvh;
+  min-height: 100dvh;
   overflow: hidden; /* Evita scroll horizontal y vertical */
+  display: flex;
+  align-items:center;
+  justify-content: center;
+  padding: 1rem;
+  position:relative;
 }
 
 .login-background  {
@@ -18,8 +25,15 @@
   background-position: center;
   background-repeat: no-repeat;
   background-attachment: fixed;
-  min-height: 100vh;
+  width: 100%;
+  height:100dvh;
+  min-height: 100dvh;
   overflow: hidden; /* Evita scroll horizontal y vertical */
+  display: flex;
+  align-items:center;
+  justify-content: center;
+  padding: 1rem;
+  position:relative;
 }
 
 .private-background  {
@@ -30,9 +44,20 @@
   background-position: center;
   background-repeat: no-repeat;
   background-attachment: fixed;
-  min-height: 100vh;
+
+  width: 100%;
+  height:100dvh;
+  min-height: 100dvh;
   overflow: hidden; /* Evita scroll horizontal y vertical */
+  display: flex;
+  align-items:center;
+  justify-content: center;
+  padding: 1rem;
+  position:relative;
+
   }
+
+
   
 
 body, html {
@@ -79,4 +104,17 @@ select.form-control option {
 
 
 
-/* https://thumbs.dreamstime.com/b/different-types-sushi-12073347.jpg */
+/* https://thumbs.dreamstime.com/b/different-types-sushi-12073347.jpg
+
+.register-background::before,
+.login-background::before,
+.private-background::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  
+  background-color: rgba(255, 255, 255, 0.6); /* capa blanca semitransparente */
+    /* backdrop-filter: blur(2px);                /* desenfoque suave */
+    /* z-index: 0;
+} */
