@@ -32,16 +32,10 @@ const Private = () => {
 
 
   return (
-    <div className="private-background  d-flex flex-column justify-content-center align-items-center vh-100 text-center">
-      <h2
-        className="text-danger fw-bold"
-        style={{ fontSize: "2rem", textShadow: "1px 1px 2px rgba(0,0,0,0.2)" }}
-      >
-        
-      </h2>
+    <div className="private-background  d-flex align-items-start justify-content-start w-70 vh-100 p-4">
+     
      
     </div>
-
   );
 };
 export default Private;

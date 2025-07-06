@@ -97,12 +97,12 @@ const Login = () => {
           boxShadow: "0 4px 15px rgba(0, 0, 0, 0.1)",
           backdropFilter: "blur(4px)", // Efecto glass suave
           width: "100%",
-                         
+
           zIndex: 10,
         }}
       >
         <h3 className="text-center mb-2">Welcome to  </h3>
-        <h4 className="text-center mb-2"> Hana Sushi Bar 🍣</h4>
+        <h4 className="text-center mb-2"> Hayashi Sushi Bar 🍣</h4>
         <p className="text-start mb-2"> Log in </p>
 
         <div className="mb-2">
@@ -145,8 +145,17 @@ const Login = () => {
             <Link className="text-decoration-none" to="/register"> Sign up for an account</Link>
           </div>
         </div>
+
+        <hr className="my-3" style={{ opacity: 0.4 }} />
+
+        {/* Olvidaste tu contraseña */}
+        <div>
+          <Link className="text-decoration-none " to="/reset-password">
+            Forgot your password?
+          </Link>
+        </div>
       </div>
-       
+
     </form>
 
   )

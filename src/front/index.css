@@ -37,7 +37,7 @@
 }
 
 .private-background  {
-  background-image: url('https://img.freepik.com/vector-premium/comida-japonesa-mesa-madera-vista-superior_43029-919.jpg');
+  background-image: url('https://tse4.mm.bing.net/th/id/OIP.WxyCsJPiSVxBFIXTxffKlAHaHa?r=0&pid=ImgDet&w=178&h=178&c=7&dpr=1,5&o=7&rm=3');
   width: 100vw;
   height: 100vh;
   background-size: cover;
@@ -54,6 +54,11 @@
   justify-content: center;
   padding: 1rem;
   position:relative;
+
+  background-color: rgba(255, 255, 255, 0.6); /* capa blanca semitransparente */
+  backdrop-filter: blur(4px);                /* desenfoque suave */
+  z-index: 0;
+  
 
   }
 

@@ -2,8 +2,12 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import String, Boolean, Integer, ForeignKey, DateTime, Enum, Numeric 
 from sqlalchemy.orm import Mapped, mapped_column , relationship
 from typing import List
-from datetime import datetime, timezone
+from datetime import datetime, timezone, UTC
 from zoneinfo import ZoneInfo
+
+
+from datetime import datetime, timedelta
+import uuid
 
 import enum
 
@@ -98,6 +102,9 @@ class User(db.Model):
     name: Mapped[str] = mapped_column(nullable=False)
     rol: Mapped[EstadoRol] = mapped_column(Enum(EstadoRol), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean(), nullable=False)
+    #Campos añadidos para reset de contraseña
+    reset_token: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    token_expiration: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
     comandas: Mapped[List['Orders']] = relationship(
         back_populates= 'usuarios')  #entre comillas porque la clase Comandas no se ha definido aun
@@ -110,9 +117,13 @@ class User(db.Model):
         return {
             "id": self.id,
             "email": self.email,
-            "rol": self.rol.value # es un diccionario 
+            "rol": self.rol.value, # es un diccionario 
             # do not serialize the password, its a security breach
+            "token_expiration": self.token_expiration
         }
+    def generate_reset_token(self):
+        self.reset_token = str(uuid.uuid4())
+        self.token_expiration = datetime.now(UTC) + timedelta(minutes=30)
     
 class Orders(db.Model):
      __tablename__= 'orders'

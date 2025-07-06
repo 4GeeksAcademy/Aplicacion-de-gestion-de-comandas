@@ -5,6 +5,8 @@ import os
 from flask import Flask, request, jsonify, url_for, send_from_directory
 from flask_migrate import Migrate
 from flask_swagger import swagger
+from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
+import smtplib
 from api.utils import APIException, generate_sitemap
 from api.models import db,  User, EstadoRol, EstadoComanda, EstadoCategorias, EstadoMesa, Plates, Tables, Orders, Orders_Plates
 from api.routes import api
@@ -23,6 +25,8 @@ from flask_jwt_extended import jwt_required
 from flask_jwt_extended import JWTManager
 
 from flask_bcrypt import Bcrypt
+from flask_mail import Mail, Message
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 
 # from flask_bcrypt import Bcrypt
 
@@ -35,6 +39,7 @@ static_file_dir = os.path.join(os.path.dirname(
 
 
 app = Flask(__name__)
+mail = Mail(app)
 app.url_map.strict_slashes = False
 bcrypt = Bcrypt(app)  # para encriptar
 CORS(app)
@@ -580,9 +585,11 @@ def role_required(*roles):
     return wrapper
 
 
-# -------------------------------RESET PASSWORD --------------------------------
+# -----------------------------AUTENTICACION----------------------------------
 
+#---------------------RESET PASSWORD-----------------------------------------
 
+#MARTA
 @app.route('/reset-password', methods=['POST'])
 def reset_password():
     body = request.get_json(silent=True)
@@ -604,6 +611,57 @@ def reset_password():
     except Exception as e:
         db.session.rollback()
         return jsonify({'msg': f'Error al actualizar contraseña: {str(e)}'}), 500
+    
+#-----------------------chequear---------------------------------------------------
+# 1️⃣ Request password reset
+@app.route('/reset-password', methods=['POST'])
+def reset_password():
+    body = request.get_json(silent=True)
+    email= body['email']
+
+    if email not in body:
+        return jsonify({"msg": "Debe introducir el correo a donde se le enviara el link."}), 200
+    
+    user = User.query.filter_by(email=body['email']).first()
+    if user is None:
+        return jsonify({'msg': 'Usuario no encontrado'}), 404
+
+   
+    token = serializer.dumps(email, salt='password-reset-salt')
+    reset_url = url_for('reset_password', token=token, _external=True)
+
+    # Enviar email real
+    try:
+        msg = Message("Recuperación de contraseña", recipients=[email])
+        msg.body = f"Haz clic en el siguiente enlace para resetear tu contraseña:\n{reset_url}"
+        mail.send(msg)
+        print(f"[DEBUG] Link enviado: {reset_url}")
+    except Exception as e:
+        print(f"Error enviando correo: {e}")
+        return jsonify({"error": "Error al enviar el correo"}), 500
+
+    return jsonify({"message": "Enlace enviado al correo."})
+
+# 2️⃣ Endpoint to validate token and set new password
+@app.route('/reset-password/<token>', methods=['POST'])
+def reset_password(token):
+    try:
+        email = serializer.loads(token, salt='password-reset-salt', max_age=3600)  # 1 hour expiration
+    except SignatureExpired:
+        return jsonify({"error": "Token expired."}), 400
+    except BadSignature:
+        return jsonify({"error": "Invalid token."}), 400
+
+    body =  request.get_json(silent=True)
+    new_password = body['password']
+
+    if not new_password or len(new_password) < 6:
+        return jsonify({"error": "Contraseña demasiado corta"}), 400
+
+    hashed_pw = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt())
+    users_db[email]['password'] = hashed_pw.decode("utf-8")
+
+    return jsonify({"message": "Contraseña actualizada correctamente."})
 
 # ----------------------------------------------------------------------------------
 
@@ -611,3 +669,6 @@ def reset_password():
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3001))
     app.run(host='0.0.0.0', port=PORT, debug=True)
+
+
+#pip install flask flask-mail bcrypt
