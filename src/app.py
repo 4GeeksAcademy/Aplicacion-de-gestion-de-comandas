@@ -17,7 +17,7 @@ from sqlalchemy.orm import load_only
 
 
 # from src.api.models import db
-from flask import Flask
+from flask import Flask, render_template
 # importaciones adicionales para credenciales
 from flask_jwt_extended import create_access_token
 from flask_jwt_extended import get_jwt_identity
@@ -25,7 +25,7 @@ from flask_jwt_extended import jwt_required
 from flask_jwt_extended import JWTManager
 
 from flask_bcrypt import Bcrypt
-from flask_mail import Mail, Message
+from flask_mail import Mail, Message # para enviar correos para reset password
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 
 # from flask_bcrypt import Bcrypt
@@ -39,7 +39,6 @@ static_file_dir = os.path.join(os.path.dirname(
 
 
 app = Flask(__name__)
-mail = Mail(app)
 app.url_map.strict_slashes = False
 bcrypt = Bcrypt(app)  # para encriptar
 CORS(app)
@@ -47,8 +46,27 @@ CORS(app)
 
 app.url_map.strict_slashes = False
 # para tener la llave fuera del codigo
-app.config["JWT_SECRET_KEY"] = os.getenv('JWT_KEY')
+app.config["JWT_SECRET_KEY"] = os.getenv('JWT_KEY') #la llave esta en .env
+serializer = URLSafeTimedSerializer(app.config['JWT_SECRET_KEY'])
+
 jwt = JWTManager(app)
+
+
+
+# Configuración del correo. se pone antes de mail=Mail(app)
+app.config.update(dict(
+    DEBUG = False, 
+    MAIL_SERVER = 'smtp.gmail.com',
+    MAIL_PORT = 587,
+    MAIL_USE_TLS = True,
+    MAIL_USE_SSL = False,
+    MAIL_USERNAME = 'gestiondecomandas@gmail.com',
+    MAIL_PASSWORD = os.getenv('MAIL_PASSWORD'), # la variable MAIL_PASSWORD esta en .env
+    MAIL_DEFAULT_SENDER = 'gestiondecomandas@gmail.com',
+))
+
+
+mail = Mail(app)
 
 # database condiguration
 db_url = os.getenv("DATABASE_URL")
@@ -585,83 +603,73 @@ def role_required(*roles):
     return wrapper
 
 
-# -----------------------------AUTENTICACION----------------------------------
-
-#---------------------RESET PASSWORD-----------------------------------------
-
-#MARTA
-@app.route('/reset-password', methods=['POST'])
-def reset_password():
-    body = request.get_json(silent=True)
-
-    if not body or 'email' not in body or 'new_password' not in body:
-        return jsonify({'msg': 'Faltan campos obligatorios: email y new_password'}), 400
-
-    user = User.query.filter_by(email=body['email']).first()
-
-    if user is None:
-        return jsonify({'msg': 'Usuario no encontrado'}), 404
-
-    # se puede hashear la contraseña para mayor seguridad
-    user.password = body['new_password']
-
-    try:
-        db.session.commit()
-        return jsonify({'msg': 'Contraseña actualizada correctamente'}), 200
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({'msg': f'Error al actualizar contraseña: {str(e)}'}), 500
+# -----------------------------AUTENTICACION----------------------------------------
     
-#-----------------------chequear---------------------------------------------------
-# 1️⃣ Request password reset
-@app.route('/reset-password', methods=['POST'])
-def reset_password():
+#--------------------------------SEND EMAIL-----------------------------------------
+@app.route('/send-email', methods= ['GET'])
+def send_email():
+     reset_url = f'VITE_BACKEND_URL/restore-password'  # este sería dinámico normalmente
+     msg = Message(
+        subject = 'Recuperación de contraseña', 
+        sender = 'gestiondecomandas@gmail.com',
+        recipients=['gestiondecomandas@gmail.com'], # aqui va el correo o lista de correos desde donde se recibira un codigo para cambiar la contraseña
+        )
+      
+     msg.html = render_template('reset_email.html', reset_url=reset_url) # Renderiza el HTML que esta en src/templates
+     mail.send(msg)
+     return jsonify({'msg': 'Correo enviado'})
+
+#--------------------------POST REQUEST RESET PASSWORD---(SOLICITAR ENLACE)-------------------------------
+#  Request password reset
+@app.route('/request-password-reset', methods=['POST'])
+def request_reset_password():
     body = request.get_json(silent=True)
     email= body['email']
 
     if email not in body:
-        return jsonify({"msg": "Debe introducir el correo a donde se le enviara el link."}), 200
+        return jsonify({"msg": "Debe introducir el correo ."}), 200
     
     user = User.query.filter_by(email=body['email']).first()
     if user is None:
-        return jsonify({'msg': 'Usuario no encontrado'}), 404
+        return jsonify({'msg': 'Usuario no encontrado'}), 404  
 
    
     token = serializer.dumps(email, salt='password-reset-salt')
     reset_url = url_for('reset_password', token=token, _external=True)
 
     # Enviar email real
-    try:
-        msg = Message("Recuperación de contraseña", recipients=[email])
-        msg.body = f"Haz clic en el siguiente enlace para resetear tu contraseña:\n{reset_url}"
-        mail.send(msg)
-        print(f"[DEBUG] Link enviado: {reset_url}")
-    except Exception as e:
-        print(f"Error enviando correo: {e}")
-        return jsonify({"error": "Error al enviar el correo"}), 500
+    msg = Message(
+        subject='Recuperación de contraseña',
+        sender = 'gestiondecomandas@gmail.com',
+        recipients=[email] # el email que entro por body
+    )
+    msg.html = render_template('reset_email.html', reset_url=reset_url) #el cuerpo del correo esta en reset_email.html
+    mail.send(msg)
+    return jsonify({"msg": "Correo de recuperación enviado"}), 200
 
-    return jsonify({"message": "Enlace enviado al correo."})
 
-# 2️⃣ Endpoint to validate token and set new password
+#------------------------POST CAMBIAR LA CONTRASEÑA CON EL TOKEN---------------------
 @app.route('/reset-password/<token>', methods=['POST'])
-def reset_password(token):
+def reset_password_token(token):
     try:
-        email = serializer.loads(token, salt='password-reset-salt', max_age=3600)  # 1 hour expiration
+        email = serializer.loads(token, salt='password-reset-salt', max_age=3600) # para que el token dure 1hora
     except SignatureExpired:
-        return jsonify({"error": "Token expired."}), 400
+        return jsonify({"error": "Token expirado"}), 400
     except BadSignature:
-        return jsonify({"error": "Invalid token."}), 400
+        return jsonify({"error": "Token inválido"}), 400
 
-    body =  request.get_json(silent=True)
-    new_password = body['password']
+    body = request.get_json(silent = True)
+    new_password = body.get('password')
+
+    user= User()
 
     if not new_password or len(new_password) < 6:
-        return jsonify({"error": "Contraseña demasiado corta"}), 400
+        return jsonify({"error": "Contraseña inválida"}), 400
 
-    hashed_pw = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt())
-    users_db[email]['password'] = hashed_pw.decode("utf-8")
+    hashed_pw = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt()) #encripto la contraseña
+    user[email]['password'] = hashed_pw.decode("utf-8")
 
-    return jsonify({"message": "Contraseña actualizada correctamente."})
+    return jsonify({"message": "Contraseña actualizada correctamente"}), 200
 
 # ----------------------------------------------------------------------------------
 
@@ -671,4 +679,5 @@ if __name__ == '__main__':
     app.run(host='0.0.0.0', port=PORT, debug=True)
 
 
-#pip install flask flask-mail bcrypt
+#pipenv install flask flask-mail bcrypt
+#pipenv install itsdangerous

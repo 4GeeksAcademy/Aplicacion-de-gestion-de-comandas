@@ -13,6 +13,8 @@ import Login from "./pages/Login";  //si se export default, el componente no se 
 import Private from "./pages/Private";
 import Register from "./pages/Register";
 import ResetPassword from "./pages/ResetPassword";
+import RequestReset from "./pages/RequestReset";
+
 
 
 
@@ -35,6 +37,9 @@ export const router = createBrowserRouter(
       <Route path="/private" element={<Private />} />
       <Route path="/register" element={<Register />} />
       <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/request-reset-password" element={<RequestReset />} />
     </Route>
-  )
+  ),
+
+  
 );

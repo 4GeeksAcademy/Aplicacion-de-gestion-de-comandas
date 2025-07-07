@@ -103,8 +103,8 @@ class User(db.Model):
     rol: Mapped[EstadoRol] = mapped_column(Enum(EstadoRol), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean(), nullable=False)
     #Campos añadidos para reset de contraseña
-    reset_token: Mapped[str | None] = mapped_column(String(100), nullable=True)
-    token_expiration: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+   # reset_token: Mapped[str | None] = mapped_column(String(100), nullable=True)
+   # token_expiration: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
     comandas: Mapped[List['Orders']] = relationship(
         back_populates= 'usuarios')  #entre comillas porque la clase Comandas no se ha definido aun

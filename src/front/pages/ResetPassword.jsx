@@ -6,6 +6,7 @@ const ResetPassword = () => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [message, setMessage] = useState(null);
     const [error, setError] = useState(null);
+    
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -23,7 +24,7 @@ const ResetPassword = () => {
         }
 
         try {
-            const response = await fetch('/api/reset-password', {
+            const response = await fetch(BASE_URL+"/reset-password", {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, new_password: newPassword }),
@@ -108,7 +109,7 @@ const ResetPassword = () => {
             color: "white",
             fontWeight: "bold",
             border: "none",
-            fontWeight: "500",
+           
             transition: "background-color 0.3s"
           }}
           onMouseOver={(e) => (e.target.style.backgroundColor = "#e76b60")}

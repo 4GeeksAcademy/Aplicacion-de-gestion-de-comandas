@@ -20,10 +20,10 @@ sqlalchemy = "*"
 flask-migrate = "*"
 flask-bcrypt = "*"
 flask-cors = "*"
-itsdangerous = "*"
 flask = "*"
 flask-mail = "*"
 bcrypt = "*"
+itsdangerous = "*"
 
 [requires]
 python_version = "3.13"
