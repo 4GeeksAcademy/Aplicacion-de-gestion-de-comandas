@@ -5,6 +5,8 @@ import os
 from flask import Flask, request, jsonify, url_for, send_from_directory
 from flask_migrate import Migrate
 from flask_swagger import swagger
+from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
+import smtplib
 from api.utils import APIException, generate_sitemap
 from api.models import db,  User, EstadoRol, EstadoComanda, EstadoCategorias, EstadoMesa, Plates, Tables, Orders, Orders_Plates
 from api.routes import api
@@ -12,17 +14,19 @@ from api.admin import setup_admin
 from api.commands import setup_commands
 from datetime import datetime
 from sqlalchemy.orm import load_only
-from flask_cors import CORS
+
 
 # from src.api.models import db
-from flask import Flask
+from flask import Flask, render_template
 # importaciones adicionales para credenciales
 from flask_jwt_extended import create_access_token
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
 from flask_jwt_extended import JWTManager
 
-from flask_bcrypt import Bcrypt
+from flask_bcrypt import Bcrypt # para encriptar las contraseñas 
+from flask_mail import Mail, Message # para enviar correos para reset password
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 
 # from flask_bcrypt import Bcrypt
 
@@ -37,12 +41,33 @@ static_file_dir = os.path.join(os.path.dirname(
 app = Flask(__name__)
 app.url_map.strict_slashes = False
 bcrypt = Bcrypt(app)  # para encriptar
+CORS(app)
+CORS(app, supports_credentials=True)
 
 
 app.url_map.strict_slashes = False
 # para tener la llave fuera del codigo
-app.config["JWT_SECRET_KEY"] = os.getenv('JWT_KEY')
+app.config["JWT_SECRET_KEY"] = os.getenv('JWT_KEY') #la llave esta en .env
+serializer = URLSafeTimedSerializer(app.config['JWT_SECRET_KEY'])
+
 jwt = JWTManager(app)
+
+
+
+# Configuración del correo. se pone antes de mail=Mail(app)
+app.config.update(dict(
+    DEBUG = False, 
+    MAIL_SERVER = 'smtp.gmail.com',
+    MAIL_PORT = 587,
+    MAIL_USE_TLS = True,
+    MAIL_USE_SSL = False,
+    MAIL_USERNAME = 'gestiondecomandas@gmail.com',
+    MAIL_PASSWORD = os.getenv('MAIL_PASSWORD'), # la variable MAIL_PASSWORD esta en .env
+    MAIL_DEFAULT_SENDER = 'gestiondecomandas@gmail.com',
+))
+
+
+mail = Mail(app)
 
 # database condiguration
 db_url = os.getenv("DATABASE_URL")
@@ -55,7 +80,7 @@ else:
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 MIGRATE = Migrate(app, db, compare_type=True)
 db.init_app(app)
-CORS(app)
+
 
 # add the admin
 setup_admin(app)
@@ -486,7 +511,7 @@ def get_table_by_id(table_id):
 def update_tables(table_id):
     body = request.get_json(silent=True)
     table = Tables.query.get(table_id)
-    if body is None:  # ***decia table
+    if body is None:  
         return jsonify({'msg': 'Mesa no encontrada!'}), 404
     if 'state' in body:
         try:
@@ -494,7 +519,7 @@ def update_tables(table_id):
         except ValueError:
             return jsonify({'msg': f'Estado no válido!!'}), 404
     if 'seats' in body:
-        table.seats = body['seats']  # ****decia table.state
+        table.seats = body['seats']  
     if 'user_id' in body:
         user = User.query.get(body['user_id'])
         if user is None:
@@ -508,7 +533,7 @@ def update_tables(table_id):
         return jsonify({'msg': 'Error al actualizar la mesa', 'error': str(e)}), 500
 
 
-# -------------------------------REGISTER ---OK--------------------------------
+# -------------------------------REGISTER ---OK-OK-------------------------------
 
 
 @app.route('/register', methods=['POST'])
@@ -517,26 +542,28 @@ def register():
     if body is None:
         return jsonify({'msg': 'Debes enviar informarmación en el body'}), 400
     if 'name' not in body:
-        return jsonify({'msg': 'El campo name es obligatorio'}), 400
-    if 'rol' not in body:
-        return jsonify({'msg': 'El campo rol es obligatorio'}), 400
+        return jsonify({'msg': 'El campo name es obligatorio'}), 400 
     if 'email' not in body:
         return jsonify({'msg': 'El campo email es obligatorio'}), 400
+    try:
+        rol_enum = EstadoRol[body['rol']]
+    except KeyError:
+        return jsonify({'msg': f"Rol '{body['rol']}' no válido"}), 400
     if 'password' not in body:
         return jsonify({'msg': 'El campo password es obligatorio'}), 400
     new_user = User()
     new_user.name = body['name']
-    new_user.rol = body['rol']
     new_user.email = body['email']
+    new_user.rol = rol_enum
     new_user.password = bcrypt.generate_password_hash(
-        body['password']).decode('utf-8')
+        body['password']).decode('utf-8')  #se guardo contraseña encriptada
     new_user.is_active = True
     db.session.add(new_user)
     db.session.commit()
     return jsonify({'msg': f'Usuario {new_user.name} CREADO'}), 201
 
 
-# -------------------------------LOGIN ---OK--------------------------------
+# -------------------------------LOGIN ---OK-OK-------------------------------
 
 
 @app.route('/login', methods=['POST'])
@@ -544,7 +571,7 @@ def login():
 
     body = request.get_json(silent=True)
     if body is None:
-        return jsonify({'msg': 'Debes enviar informarmación en el body'}), 400
+        return jsonify({'msg': 'Debes enviar información en el body'}), 400
     if 'email' not in body:
         return jsonify({'msg': 'El campo email es obligatorio'}), 400
     if 'password' not in body:
@@ -558,13 +585,13 @@ def login():
     print(user.password)
 
     password_correct = bcrypt.check_password_hash(
-        user.password, body['password'])  # returns True
+        user.password, body['password'])  # returns True. chequea si la contraseña recibida es la misma de la BD
 
     if not password_correct:
         return jsonify({'msg': 'Usuario o contraseña errónea'}), 400
 
-    acces_token = create_access_token(identity=user.email)
-    return jsonify({'msg': 'OK', 'Token': acces_token}), 200
+    acces_token = create_access_token(identity=user.email) #genero token 
+    return jsonify({'msg': 'OK', 'Token': acces_token, 'user': user.email}), 200
 
 # -------------------------------PROTECCIÓN ---OK--------------------------------
 
@@ -594,34 +621,125 @@ def role_required(*roles):
     return wrapper
 
 
-# -------------------------------RESET PASSWORD --------------------------------
+# -----------------------------AUTENTICACION-------------------------------------------
+    
+#--------------------------------SEND EMAIL----OK---OK----------------------------------
+@app.route('/send-email', methods= ['GET']) #enviando correo a mi correo de prueba
+def send_email():
+     reset_url = f'VITE_BACKEND_URL/restore-password'  # este sería dinámico normalmente
+     msg = Message(
+        subject = 'Recuperación de contraseña', 
+        sender = 'gestiondecomandas@gmail.com',
+        recipients=['gestiondecomandas@gmail.com'], # aqui va el correo o lista de correos desde donde se recibira un codigo para cambiar la contraseña
+        )
+      
+     msg.html = render_template('reset_email.html', reset_url=reset_url) # Renderiza el HTML que esta en src/templates
+     mail.send(msg)
+     return jsonify({'msg': 'Correo enviado'})
 
-
-@app.route('/reset-password', methods=['POST'])
-def reset_password():
+#--------------------------POST REQUEST RESET PASSWORD---(SOLICITAR ENLACE)------OK---OK----------------------
+#  Request  reset password
+@app.route('/api/request-reset-password', methods=['POST'])
+def request_reset_password():
     body = request.get_json(silent=True)
+   
 
-    if not body or 'email' not in body or 'new_password' not in body:
-        return jsonify({'msg': 'Faltan campos obligatorios: email y new_password'}), 400
-
-    user = User.query.filter_by(email=body['email']).first()
-
+    if not body or 'email' not in body:
+        return jsonify({'msg': 'Debe introducir el correo electronico'}), 400
+    
+    email = body['email']
+    user = User.query.filter_by(email=email).first()
     if user is None:
-        return jsonify({'msg': 'Usuario no encontrado'}), 404
+        return jsonify({'msg': 'Usuario no encontrado'}), 400
 
-    # se puede hashear la contraseña para mayor seguridad
-    user.password = body['new_password']
+   
+    token = serializer.dumps(email, salt='password-reset-salt')
 
+    FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000") #Intenta leer una variable de entorno llamada FRONTEND_URL, si no existe usa localhost:3000
+    reset_url = f"{FRONTEND_URL}/reset-password/{token}"
+
+   # reset_url = url_for('reset_password_token', token=token, _external=True) #reset_password_token es la funcion de abajo que resetea contraseña 
+    print("token", token)
+    print("email", email)
+    print("url", reset_url)
+
+    # Enviar email real
+    msg = Message(
+        subject='Recuperación de contraseña',
+        sender = 'gestiondecomandas@gmail.com',
+        recipients=[email] # el email que entro por body
+    )
+    msg.html = render_template('reset_email.html', reset_url=reset_url) #el cuerpo del correo esta en reset_email.html
+    mail.send(msg)
+    return jsonify({'msg': 'Correo de recuperación enviado',
+                    'token': token}), 200
+
+
+#------------------------POST CAMBIAR LA CONTRASEÑA CON EL TOKEN---Ok--OK----------------
+@app.route('/api/reset-password/<token>', methods=['POST'])
+def reset_password_token(token):
     try:
-        db.session.commit()
-        return jsonify({'msg': 'Contraseña actualizada correctamente'}), 200
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({'msg': f'Error al actualizar contraseña: {str(e)}'}), 500
+        email = serializer.loads(token, salt='password-reset-salt', max_age=3600) # para que el token dure 1hora
+    except SignatureExpired:
+        return jsonify({"error": "Token expirado"}), 400
+    except BadSignature:
+        return jsonify({"error": "Token inválido"}), 400
+
+    body = request.get_json(silent = True)
+    
+
+    if body is None:
+        return jsonify({'msg': 'Debe introducir los datos'}), 400
+    
+    new_password = body['password']
+
+    if  len(new_password) <= 5:
+        return jsonify({"error": "Contraseña inválida. Debe tener al menos 6 caracteres"}), 400
+    
+    
+    if 'confirm_password' not in body:
+         return jsonify({'msg': 'debe reiterar la contraseña'}), 400
+    confirm_password = body['confirm_password']
+
+    if new_password != confirm_password:
+        return jsonify({'msg': 'deben coincidir las contraseñas'}), 400
+    
+    user=  User.query.filter_by(email=email).first()
+
+    hashed_pw = bcrypt.generate_password_hash(new_password).decode('utf-8') #encripto la contraseña
+    user.password = hashed_pw
+    db.session.commit()
+    print("new password", hashed_pw)
+
+    return jsonify({"message": "Contraseña actualizada correctamente"}), 200
 
 # ----------------------------------------------------------------------------------
+
+
+#get de platos por categoris 
+
+
+@app.route('/plates/<string:category_name>', methods=['GET'])
+@jwt_required()
+def get_plates_by_category(category_name):
+    try:
+        category_enum = EstadoCategorias(category_name)
+    except ValueError:
+        return jsonify({'msg': f"'{category_name}' is not a valid category."}), 400
+
+    plates = Plates.query.filter_by(categories=category_enum).all()
+
+    if not plates:
+        return jsonify({'msg': 'Plates not found for this category'}), 404
+
+    serialized_plates = [plate.serialize() for plate in plates]
+    return jsonify({'msg': 'ok', 'results': serialized_plates}), 200
 
 
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3001))
     app.run(host='0.0.0.0', port=PORT, debug=True)
+
+
+#pipenv install flask flask-mail bcrypt
+#pipenv install itsdangerous

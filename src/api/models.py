@@ -2,8 +2,12 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import String, Boolean, Integer, ForeignKey, DateTime, Enum, Numeric 
 from sqlalchemy.orm import Mapped, mapped_column , relationship
 from typing import List
-from datetime import datetime, timezone
+from datetime import datetime, timezone, UTC
 from zoneinfo import ZoneInfo
+
+
+from datetime import datetime, timedelta
+import uuid
 
 import enum
 
@@ -11,49 +15,34 @@ import enum
 db = SQLAlchemy()
 
 class EstadoCategorias(enum.Enum):
-    primer_plato = "primer_plato"
-    segundo_plato = "segundo_plato"
-    postres = "postres"  
-    bebidas = "bebidas" 
+    primer_plato = "starters"
+    segundo_plato = "main_dishes"
+    postres = "desserts"  
+    bebidas = "drinks" 
 
 class EstadoComanda(enum.Enum):
-    pendiente = "pendiente"
-    en_cocina = "en_preparacion"
-    servida = "servida"
-    cancelada = "cancelada"
+    pendiente = "pending"
+    en_cocina = "preparing"
+    ready = "ready"
+    cancelada = "cancelled"
 
 class EstadoMesa(enum.Enum):
-    disponible = "disponible"
-    ocupada = "ocupada"
-    reservada = "reservada"
-    cerrada = "cerrada"
+    disponible = "available"
+    ocupada = "busy"
+    reservada = "reserved"
+    cerrada = "closed"
 
 class EstadoRol(enum.Enum):
-    camarero = "camarero"
-    cocinero = "cocinero"
-    barman = "barman"
+    camarero = "waiter"
+    cocinero = "cooker"
     admin = "admin"
 
-#class Categories(db.Model):
-    # __tablename__= 'categories'
-    # id: Mapped[int] = mapped_column(primary_key=True)
-    # name: Mapped[str] = mapped_column(String(50), nullable=False)
+class EstadoPlato(enum.Enum):
+    pending ="pending"
+    completed = "completed"
+    rejected = "rejected"
+
     
-
-    # platos :  Mapped[List["Plates"]] = relationship(
-     #   back_populates= 'categorias') 
-
-
-    # def __str__(self):
-     #   return f' Categoria {self.name}'
-     
-     #def serialize(self):
-        #return {
-         #   "id": self.id,
-        #    "name": self.name,
-            # do not serialize the password, its a security breach
-      #  }
-     
     
 class Plates(db.Model):
     __tablename__= 'plates'
@@ -64,6 +53,7 @@ class Plates(db.Model):
     available: Mapped[bool] =mapped_column(Boolean, nullable= True)
     categories: Mapped[EstadoCategorias] = mapped_column(Enum(EstadoCategorias), nullable=False)
     #category_id: Mapped[int] = mapped_column(ForeignKey('categories.id'))
+    status: Mapped[EstadoPlato] = mapped_column(Enum(EstadoPlato) , default= EstadoPlato.pending, nullable=False)
 
    # categorias: Mapped["Categories"] = relationship(
       #  back_populates= 'platos') 
@@ -80,9 +70,9 @@ class Plates(db.Model):
             "description": self.description,
             "price": self.price,
             "available": self.available,
-            "categories": self.categories.value
+            "categories": self.categories.value,
             #"category_id": self.category_id
-           
+            'status': self.status.value  
         }  
 
 class Tables(db.Model):
@@ -117,6 +107,9 @@ class User(db.Model):
     name: Mapped[str] = mapped_column(nullable=False)
     rol: Mapped[EstadoRol] = mapped_column(Enum(EstadoRol), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean(), nullable=False)
+    #Campos añadidos para reset de contraseña
+   # reset_token: Mapped[str | None] = mapped_column(String(100), nullable=True)
+   # token_expiration: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
     comandas: Mapped[List['Orders']] = relationship(
         back_populates= 'usuarios')  #entre comillas porque la clase Comandas no se ha definido aun
@@ -129,9 +122,13 @@ class User(db.Model):
         return {
             "id": self.id,
             "email": self.email,
-            "rol": self.rol.value # es un diccionario 
+            "rol": self.rol.value, # es un diccionario 
             # do not serialize the password, its a security breach
+            "token_expiration": self.token_expiration
         }
+    def generate_reset_token(self):
+        self.reset_token = str(uuid.uuid4())
+        self.token_expiration = datetime.now(UTC) + timedelta(minutes=30)
     
 class Orders(db.Model):
      __tablename__= 'orders'
@@ -164,7 +161,6 @@ class Orders(db.Model):
             "mesa_id": self.mesa_id,
             "usuario_id": self.usuario_id,
             "state": self.state.value,
-            "total_price": self.total_price,
             "guest_notes": self.guest_notes,
             
             "total_price": float(self.total_price) if self.total_price is not None else 0.0,
@@ -186,7 +182,7 @@ class Orders_Plates(db.Model):
         back_populates= 'comanda_platos') 
     
     def __str__(self):
-        return f'comanda {self.order_id} tiene {self.count_plat}   {self.plato.name}'
+        return f'comanda {self.order_id} tiene {self.count_plat}   {self.plato.name if self.plato else 'Unknow Plate'}' 
     
     def serialize(self):
         return {
