@@ -6,7 +6,7 @@ from flask import Flask, request, jsonify, url_for, send_from_directory
 from flask_migrate import Migrate
 from flask_swagger import swagger
 from api.utils import APIException, generate_sitemap
-from api.models import db,  User, EstadoRol, EstadoComanda, EstadoMesa, Plates, Tables, Orders, Orders_Plates
+from api.models import db,  User, EstadoRol, EstadoComanda, EstadoCategorias, EstadoMesa, Plates, Tables, Orders, Orders_Plates
 from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
@@ -94,8 +94,7 @@ def serve_any_other_file(path):
     return response
 
 
-
-#----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 # ----------------------------------GET TODAS LAS COMANDAS ---OK--------------------------
@@ -309,7 +308,7 @@ def eliminar_comanda_por_mesa_id(mesa_id):
         return jsonify({'msg': f'Error eliminando las comandas: {str(e)}'}), 500
 
 
-#----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 # ---------GET USERS ---OK----------------------------------------------
@@ -367,7 +366,7 @@ def post_user():
 
     return jsonify({'msg': 'Usuario creado correctamente', 'user': new_user.serialize()}), 201
 
-#----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 # -------------------------------GET PLATOS ---OK----------------------------------------
@@ -393,6 +392,24 @@ def get_plate_by_id(id):
         return jsonify({'msg': 'Plato no encontrado'}), 404
     return jsonify({'msg': 'ok', 'result': plates.serialize()}), 200
 
+# -----------------------------GET UN PLATO POR CATEGORIAS ---OK-----------------------------
+
+
+@app.route('/plates/<string:category_name>', methods=['GET'])
+@jwt_required()
+def get_plates_by_category(category_name):
+    try:
+        category_enum = EstadoCategorias(category_name)
+    except ValueError:
+        return jsonify({'msg': f"'{category_name}' is not a valid category."}), 400
+
+    plates = Plates.query.filter_by(categories=category_enum).all()
+
+    if not plates:
+        return jsonify({'msg': 'Plates not found for this category'}), 404
+
+    serialized_plates = [plate.serialize() for plate in plates]
+    return jsonify({'msg': 'ok', 'results': serialized_plates}), 200
 
 
 # --------------- PUT DE PLATOS DE EDU ---OK ---------------------------------
