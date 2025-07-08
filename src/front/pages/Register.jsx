@@ -200,7 +200,7 @@ const Register = () => {
             color: "white",
             fontWeight: "bold",
             border: "none",
-            fontWeight: "500",
+            
             transition: "background-color 0.3s"
           }}
           onMouseOver={(e) => (e.target.style.backgroundColor = "#e76b60")}

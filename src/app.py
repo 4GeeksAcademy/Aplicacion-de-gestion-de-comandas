@@ -24,7 +24,7 @@ from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
 from flask_jwt_extended import JWTManager
 
-from flask_bcrypt import Bcrypt
+from flask_bcrypt import Bcrypt # para encriptar las contraseñas 
 from flask_mail import Mail, Message # para enviar correos para reset password
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 
@@ -42,6 +42,7 @@ app = Flask(__name__)
 app.url_map.strict_slashes = False
 bcrypt = Bcrypt(app)  # para encriptar
 CORS(app)
+CORS(app, supports_credentials=True)
 
 
 app.url_map.strict_slashes = False
@@ -603,10 +604,10 @@ def role_required(*roles):
     return wrapper
 
 
-# -----------------------------AUTENTICACION----------------------------------------
+# -----------------------------AUTENTICACION-------------------------------------------
     
-#--------------------------------SEND EMAIL-----------------------------------------
-@app.route('/send-email', methods= ['GET'])
+#--------------------------------SEND EMAIL----OK---OK----------------------------------
+@app.route('/send-email', methods= ['GET']) #enviando correo a mi correo de prueba
 def send_email():
      reset_url = f'VITE_BACKEND_URL/restore-password'  # este sería dinámico normalmente
      msg = Message(
@@ -619,23 +620,26 @@ def send_email():
      mail.send(msg)
      return jsonify({'msg': 'Correo enviado'})
 
-#--------------------------POST REQUEST RESET PASSWORD---(SOLICITAR ENLACE)-------------------------------
-#  Request password reset
-@app.route('/request-password-reset', methods=['POST'])
+#--------------------------POST REQUEST RESET PASSWORD---(SOLICITAR ENLACE)------OK---OK----------------------
+#  Request  reset password
+@app.route('/api/request-reset-password', methods=['POST'])
 def request_reset_password():
     body = request.get_json(silent=True)
-    email= body['email']
+   
 
-    if email not in body:
-        return jsonify({"msg": "Debe introducir el correo ."}), 200
+    if not body or 'email' not in body:
+        return jsonify({'msg': 'Debe introducir el correo electronico'}), 400
     
-    user = User.query.filter_by(email=body['email']).first()
+    email = body['email']
+    user = User.query.filter_by(email=email).first()
     if user is None:
-        return jsonify({'msg': 'Usuario no encontrado'}), 404  
+        return jsonify({'msg': 'Usuario no encontrado'}), 400
 
    
     token = serializer.dumps(email, salt='password-reset-salt')
-    reset_url = url_for('reset_password', token=token, _external=True)
+    reset_url = url_for('reset_password_token', token=token, _external=True) #reset_password_token es la funcion de abajo que resetea contraseña 
+    print("token", token)
+    print("email", email)
 
     # Enviar email real
     msg = Message(
@@ -645,11 +649,12 @@ def request_reset_password():
     )
     msg.html = render_template('reset_email.html', reset_url=reset_url) #el cuerpo del correo esta en reset_email.html
     mail.send(msg)
-    return jsonify({"msg": "Correo de recuperación enviado"}), 200
+    return jsonify({'msg': 'Correo de recuperación enviado',
+                    'token': token}), 200
 
 
-#------------------------POST CAMBIAR LA CONTRASEÑA CON EL TOKEN---------------------
-@app.route('/reset-password/<token>', methods=['POST'])
+#------------------------POST CAMBIAR LA CONTRASEÑA CON EL TOKEN---Ok--OK----------------
+@app.route('/api/reset-password/<token>', methods=['POST'])
 def reset_password_token(token):
     try:
         email = serializer.loads(token, salt='password-reset-salt', max_age=3600) # para que el token dure 1hora
@@ -659,15 +664,30 @@ def reset_password_token(token):
         return jsonify({"error": "Token inválido"}), 400
 
     body = request.get_json(silent = True)
-    new_password = body.get('password')
+    
 
-    user= User()
+    if body is None:
+        return jsonify({'msg': 'Debe introducir los datos'}), 400
+    
+    new_password = body['password']
 
-    if not new_password or len(new_password) < 6:
-        return jsonify({"error": "Contraseña inválida"}), 400
+    if  len(new_password) <= 5:
+        return jsonify({"error": "Contraseña inválida. Debe tener al menos 6 caracteres"}), 400
+    
+    
+    if 'confirm_password' not in body:
+         return jsonify({'msg': 'debe reiterar la contraseña'}), 400
+    confirm_password = body['confirm_password']
 
-    hashed_pw = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt()) #encripto la contraseña
-    user[email]['password'] = hashed_pw.decode("utf-8")
+    if new_password != confirm_password:
+        return jsonify({'msg': 'deben coincidir las contraseñas'}), 400
+    
+    user=  User.query.filter_by(email=email).first()
+
+    hashed_pw = bcrypt.generate_password_hash(new_password).decode('utf-8') #encripto la contraseña
+    user.password = hashed_pw
+    db.session.commit()
+    print("new password", hashed_pw)
 
     return jsonify({"message": "Contraseña actualizada correctamente"}), 200
 

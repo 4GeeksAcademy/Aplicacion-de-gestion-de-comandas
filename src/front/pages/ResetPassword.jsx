@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useSearchParams } from "react-router-dom";
 
 const ResetPassword = () => {
     const [email, setEmail] = useState('');
@@ -6,6 +7,8 @@ const ResetPassword = () => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [message, setMessage] = useState(null);
     const [error, setError] = useState(null);
+    const [searchParams] = useSearchParams();
+    const token = searchParams.get("token");
     
 
     const handleSubmit = async (e) => {
@@ -13,27 +16,31 @@ const ResetPassword = () => {
         setMessage(null);
         setError(null);
 
-        if (newPassword !== confirmPassword) {
-            setError('Las contraseñas no coinciden');
-            return;
-        }
 
         if (newPassword.length < 6) {
             setError('La contraseña debe tener al menos 6 caracteres');
             return;
         }
 
+        if (newPassword !== confirmPassword) {
+            setError('Las contraseñas no coinciden');
+            return;
+        }
+
+        setError(null); // Limpiar errores si pasa validaciones
+
         try {
-            const response = await fetch(BASE_URL+"/reset-password", {
+            const response = await fetch(BASE_URL+`/reset-password/${token}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, new_password: newPassword }),
+                body: JSON.stringify({  newPassword }),
             });
 
             const data = await response.json();
 
             if (response.ok) {
                 setMessage(data.msg);
+                console.log(data);
                 setEmail('');
                 setNewPassword('');
                 setConfirmPassword('');
@@ -44,6 +51,7 @@ const ResetPassword = () => {
             setError('Error al conectar con el servidor');
         }
     };
+     if (!token) return <p>Token inválido o expirado.</p>;
 
     return (
         <form
@@ -69,10 +77,10 @@ const ResetPassword = () => {
                 <div className="mb-2">
                     <input
                         className="form-control"
-                        type="email"
-                        placeholder="Email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        type="password"
+                        placeholder="New Password"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
                         required
                     />
                 </div>
@@ -82,24 +90,16 @@ const ResetPassword = () => {
                     <input
                         className="form-control"
                         type="password"
-                        placeholder="New Password"
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                        required
-                    />
-                </div>
-
-
-                <div className="mb-2">
-                  
-                    <input
-                        type="password"
-                        className="form-control"
-                        required
+                        placeholder="Confirm Password"
                         value={confirmPassword}
-                        onChange={e => setConfirmPassword(e.target.value)}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        required
                     />
                 </div>
+
+
+                
+                
 
                  <button
           type="submit"

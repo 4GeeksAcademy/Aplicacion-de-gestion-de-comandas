@@ -1,85 +1,55 @@
-import { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useState } from "react";
 
 
-
-export default function RequestReset() {
-  const [searchParams] = useSearchParams();
-  const token = searchParams.get("token");
-
+const RequestReset=()=> {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [msg, setMsg] = useState("");
-  const [loading, setLoading] = useState(false);
-
+  const [message, setMessage] = useState(null);
   const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
-  const handleRequestResetPass = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    const res = await fetch(BASE_URL+"/request-password-reset", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email }),
-    });
 
-    const data = await res.json();
-    setMsg(data.message || data.error);
-    setLoading(false);
-  };
+    try {
+      const res = await fetch(BASE_URL+"/request-reset-password", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
 
-  const handleResetPassword = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    const res = await fetch(BASE_URL+`/reset-password/${token}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ password }),
-    });
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error("Error:", res.status, errorText);
+        setMessage("No se pudo enviar el correo. Intenta nuevamente.");
+        return;
+      }
 
-    const data = await res.json();
-    console.log("Respuesta del backend:", data);
-
-    setMsg(data.message || data.error);
-    setLoading(false);
+      const data = await res.json();
+      setMessage(data.message || "Correo enviado correctamente");
+      console.log(data.message)
+    } catch (err) {
+      console.error(err);
+      setMessage("Error del servidor");
+    }
   };
 
   return (
-    <div style={{ padding: "2rem", maxWidth: "400px", margin: "auto" }}>
-      <h2>{token ? "Restablecer contraseña" : "Recuperar contraseña"}</h2>
-
-      <form onSubmit={token ? handleResetPassword : handleRequestResetPass}>
-        {!token ? (
-          <>
-            <label>Correo electrónico:</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              style={{ display: "block", marginBottom: "1rem", width: "100%" }}
-            />
-          </>
-        ) : (
-          <>
-            <label>Nueva contraseña:</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              style={{ display: "block", marginBottom: "1rem", width: "100%" }}
-            />
-          </>
-        )}
-
-        <button type="submit" disabled={loading}>
-          {loading ? "Enviando..." : token ? "Cambiar contraseña" : "Enviar enlace"}
-          
-        </button>
+    <div>
+      <h2>Recuperar contraseña</h2>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="email"
+          placeholder="Correo electrónico"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+        <button type="submit">Enviar enlace</button>
       </form>
-
-      {msg && <p style={{ marginTop: "1rem" }}>{msg}</p>}
+      {message && <p>{message}</p>}
     </div>
   );
-}
+};
+
+export default  RequestReset;
