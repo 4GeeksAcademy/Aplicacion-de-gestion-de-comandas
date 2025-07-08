@@ -392,7 +392,7 @@ def get_plate_by_id(id):
         return jsonify({'msg': 'Plato no encontrado'}), 404
     return jsonify({'msg': 'ok', 'result': plates.serialize()}), 200
 
-# -----------------------------GET UN PLATO POR CATEGORIAS ---OK-----------------------------
+# -----------------------------GET PLATOS POR CATEGORIAS --------------------------------
 
 
 @app.route('/plates/<string:category_name>', methods=['GET'])
