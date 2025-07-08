@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 
 const ResetPassword = () => {
     const [email, setEmail] = useState('');
@@ -8,8 +8,9 @@ const ResetPassword = () => {
     const [message, setMessage] = useState(null);
     const [error, setError] = useState(null);
     const [searchParams] = useSearchParams();
-    const token = searchParams.get("token");
-    
+    const token = useParams();
+    BASE_URL= import.meta.env.VITE_BACKEND_URL;
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -30,10 +31,10 @@ const ResetPassword = () => {
         setError(null); // Limpiar errores si pasa validaciones
 
         try {
-            const response = await fetch(BASE_URL+`/reset-password/${token}`, {
+            const response = await fetch(BASE_URL + `/api/reset-password/${token}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({  newPassword }),
+                body: JSON.stringify({password:newPassword, confirm_password:confirmPassword }),
             });
 
             const data = await response.json();
@@ -51,7 +52,7 @@ const ResetPassword = () => {
             setError('Error al conectar con el servidor');
         }
     };
-     if (!token) return <p>Token inválido o expirado.</p>;
+    if (!token) return <p>Token inválido o expirado.</p>;
 
     return (
         <form
@@ -86,7 +87,7 @@ const ResetPassword = () => {
                 </div>
 
                 <div className="mb-2">
-                    
+
                     <input
                         className="form-control"
                         type="password"
@@ -98,30 +99,30 @@ const ResetPassword = () => {
                 </div>
 
 
-                
-                
 
-                 <button
-          type="submit"
-          className="btn w-100"
-          style={{
-            backgroundColor: "#fa8072",
-            color: "white",
-            fontWeight: "bold",
-            border: "none",
-           
-            transition: "background-color 0.3s"
-          }}
-          onMouseOver={(e) => (e.target.style.backgroundColor = "#e76b60")}
-          onMouseOut={(e) => (e.target.style.backgroundColor = "#fa8072")}
-        >
-          Reset Password
-        </button>
+
+
+                <button
+                    type="submit"
+                    className="btn w-100"
+                    style={{
+                        backgroundColor: "#fa8072",
+                        color: "white",
+                        fontWeight: "bold",
+                        border: "none",
+
+                        transition: "background-color 0.3s"
+                    }}
+                    onMouseOver={(e) => (e.target.style.backgroundColor = "#e76b60")}
+                    onMouseOut={(e) => (e.target.style.backgroundColor = "#fa8072")}
+                >
+                    Reset Password
+                </button>
 
 
                 {message && <div className="alert alert-success">{message}</div>}
                 {error && <div className="alert alert-danger">{error}</div>}
-               
+
 
             </div >
         </form>

@@ -80,6 +80,15 @@ const Login = () => {
   };
 
   return (
+      <div
+  className="d-flex justify-content-center align-items-center vh-100"
+  style={{
+    backgroundColor: "#000",  // fondo negro
+    width: "100vw",
+    height: "100vh",
+    overflow: "hidden",
+  }}
+>
 
     <form
       onSubmit={handleLogin}
@@ -150,13 +159,14 @@ const Login = () => {
 
         {/* Olvidaste tu contraseña */}
         <div>
-          <Link className="text-decoration-none " to="/reset-password">
+          <Link className="text-decoration-none " to="/request-reset-password">
             Forgot your password?
           </Link>
         </div>
       </div>
 
     </form>
+    </div>
 
   )
 }

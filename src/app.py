@@ -637,9 +637,14 @@ def request_reset_password():
 
    
     token = serializer.dumps(email, salt='password-reset-salt')
-    reset_url = url_for('reset_password_token', token=token, _external=True) #reset_password_token es la funcion de abajo que resetea contraseña 
+
+    FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000") #Intenta leer una variable de entorno llamada FRONTEND_URL, si no existe usa localhost:3000
+    reset_url = f"{FRONTEND_URL}/reset-password/{token}"
+
+   # reset_url = url_for('reset_password_token', token=token, _external=True) #reset_password_token es la funcion de abajo que resetea contraseña 
     print("token", token)
     print("email", email)
+    print("url", reset_url)
 
     # Enviar email real
     msg = Message(
@@ -692,6 +697,26 @@ def reset_password_token(token):
     return jsonify({"message": "Contraseña actualizada correctamente"}), 200
 
 # ----------------------------------------------------------------------------------
+
+
+#get de platos por categoris 
+
+
+@app.route('/plates/<string:category_name>', methods=['GET'])
+@jwt_required()
+def get_plates_by_category(category_name):
+    try:
+        category_enum = EstadoCategorias(category_name)
+    except ValueError:
+        return jsonify({'msg': f"'{category_name}' is not a valid category."}), 400
+
+    plates = Plates.query.filter_by(categories=category_enum).all()
+
+    if not plates:
+        return jsonify({'msg': 'Plates not found for this category'}), 404
+
+    serialized_plates = [plate.serialize() for plate in plates]
+    return jsonify({'msg': 'ok', 'results': serialized_plates}), 200
 
 
 if __name__ == '__main__':
