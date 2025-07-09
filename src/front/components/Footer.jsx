@@ -3,10 +3,10 @@ export const Footer = () => (
   			<p style={{ margin: 0 }}>
    			 © 2025 Gestión de Comandas. Todos los derechos reservados.<i className="fa fa-heart text-danger" /> {' '}
 			<div>
-   			 		 <a className="text-decoration-none text-light  mx-2" href="https://github.com/martanvcs">Marta Navarro</a>
-   				 	 <a className="text-decoration-none text-light mx-2" href="https://github.com/EduLG">Eduardo LG</a>
-    				 <a className="text-decoration-none text-light mx-2" href="https://github.com/HeidyDB">Heidy Diaz</a>
-   				 	 <a className="text-decoration-none text-light mx-2" href="https://github.com/MohamedRouias">Mohamed Rouias</a>
+   			 		 <a className="text-decoration-none text-muted  mx-2" href="https://github.com/martanvcs">Marta Navarro</a>
+   				 	 <a className="text-decoration-none text-muted mx-2" href="https://github.com/EduLG">Eduardo LG</a>
+    				 <a className="text-decoration-none text-muted mx-2" href="https://github.com/HeidyDB">Heidy Diaz</a>
+   				 	 <a className="text-decoration-none text-muted mx-2" href="https://github.com/MohamedRouias">Mohamed Rouias</a>
 			</div>	 		
 		     </p>
 		</footer>

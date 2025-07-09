@@ -53,7 +53,7 @@ class Plates(db.Model):
     available: Mapped[bool] =mapped_column(Boolean, nullable= True)
     categories: Mapped[EstadoCategorias] = mapped_column(Enum(EstadoCategorias), nullable=False)
     #category_id: Mapped[int] = mapped_column(ForeignKey('categories.id'))
-    status: Mapped[EstadoPlato] = mapped_column(Enum(EstadoPlato) , default= EstadoPlato.pending, nullable=False)
+    
 
    # categorias: Mapped["Categories"] = relationship(
       #  back_populates= 'platos') 
@@ -72,7 +72,7 @@ class Plates(db.Model):
             "available": self.available,
             "categories": self.categories.value,
             #"category_id": self.category_id
-            'status': self.status.value  
+             
         }  
 
 class Tables(db.Model):
@@ -121,10 +121,11 @@ class User(db.Model):
     def serialize(self):
         return {
             "id": self.id,
+            "name": self.name,
             "email": self.email,
             "rol": self.rol.value, # es un diccionario 
             # do not serialize the password, its a security breach
-            "token_expiration": self.token_expiration
+           # "token_expiration": self.token_expiration
         }
     def generate_reset_token(self):
         self.reset_token = str(uuid.uuid4())
@@ -175,6 +176,7 @@ class Orders_Plates(db.Model):
     plate_id:  Mapped[int] = mapped_column(ForeignKey('plates.id'))
     order_id:  Mapped[int] = mapped_column(ForeignKey('orders.id', ondelete='CASCADE'))
     count_plat: Mapped[int]= mapped_column(Integer, nullable=True)
+    status_plate: Mapped[EstadoPlato] = mapped_column(Enum(EstadoPlato) , default= EstadoPlato.pending, nullable=False)
 
     comanda: Mapped[Orders] = relationship(
         back_populates= 'comanda_platos') 
@@ -184,15 +186,19 @@ class Orders_Plates(db.Model):
     def __str__(self):
         return f'comanda {self.order_id} tiene {self.count_plat}   {self.plato.name if self.plato else 'Unknow Plate'}' 
     
+
     def serialize(self):
-        return {
+         result = Plates.query.filter_by(id=self.plate_id).first()
+         return {
             "id": self.id,
             "plato_id": self.plate_id,
             "nombre_plato": self.plato.name, #plato es la relatioship a Plates que deja coger el campo name 
             "comanda_id": self.order_id,
             "cantidad": self.count_plat,
+            "status_plate": self.status_plate.value,
             
-            "subtotal": float(self.plato.price) * self.count_plat if self.plato else 0.0
+            "subtotal": float(self.plato.price) * self.count_plat if self.plato else 0.0,
+            "category": result.serialize()["categories"],
     }
         
 #pipenv run migrate

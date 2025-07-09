@@ -135,7 +135,7 @@ def get_orders():
 
 
 @app.route('/orders/<int:id>', methods=['GET'])
-@jwt_required()
+#@jwt_required()
 def get_order_by_id(id):
     # query.get solo funciona para devolver primary key. para devolver otro campo usar query.filter_by
     order = Orders.query.get(id)
@@ -144,16 +144,31 @@ def get_order_by_id(id):
         return jsonify({'msg': 'Comanda no encontrada'}), 404
     return jsonify({'msg': 'ok', 'result': order.serialize()}), 200
 
-# -------------------------------POST DE COMANDAS ---OK------------------------------------
+# -------------------------------POST DE COMANDAS ---OK---OK---------------------------------
 
 
 @app.route('/orders', methods=['POST'])
-@jwt_required()
+#@jwt_required()
 def crear_comanda():
     body = request.get_json(silent=True)
+    new_order = Orders()
 
     if body is None:
-        return jsonify({'msg': 'Debes enviar informacion'}), 404
+        return jsonify({'msg': 'Debes enviar informacion para hacer la comanda '}), 404
+    
+    if 'mesa_id' in body:
+        mesa = Tables.query.get(body['mesa_id'])
+        if mesa is None:
+            return jsonify({'msg': 'Mesa no existe!!'}), 404
+        new_order.mesa_id = body['mesa_id']
+
+    if 'usuario_id' in body:
+        user = User.query.get(body['usuario_id'])
+        if user is None:
+            return jsonify({'msg': 'Usuario inexistente!!'}), 404
+        new_order.usuario_id = body['usuario_id']
+
+
     if 'mesa_id' not in body:
         return jsonify({'msg': 'Debes introducir el numero de la mesa en el campo "mesa_id"'}), 404
     if 'usuario_id' not in body:
@@ -161,9 +176,7 @@ def crear_comanda():
 
     try:
 
-        new_order = Orders()  # nuevo_comanda es una instancia de la clase
-        new_order.mesa_id = body['mesa_id']
-        new_order.usuario_id = body['usuario_id']
+        #ya instancie Orders, no necesito volver a hacerlo 
         # por defecto la inicializo en pendiente
         new_order.state = EstadoComanda['pendiente']
         new_order.total_price = 0
@@ -179,7 +192,7 @@ def crear_comanda():
             cantidad = item.get('cantidad', 1)
             if plato_id is None:
                 continue
-            plato = Plates.query.get(plato_id)  # instancio platos
+            plato = Plates.query.get(plato_id)  # instancio platos con un id especifico 
 
             # Crear relación Orders_Plates
             new_order_plate = Orders_Plates()  # instancio Order_Plates
@@ -296,7 +309,7 @@ def update_orders(order_id):
         return jsonify({'msg': 'Error al actualizar la comanda', 'error': str(e)}), 500
 
 
-# --------------------ELIMINAR UNA COMANDA CON EL ID ----OK-------------------------------------------------------
+# --------------------ELIMINAR UNA COMANDA CON EL ID ----OK---OK---------------------------------------------------
 @app.route('/orders/<int:order_id>', methods=['DELETE'])
 def eliminar_comanda_por_id(order_id):
     # duda , aqui solo obtengo el id o toda la instancia
@@ -307,11 +320,11 @@ def eliminar_comanda_por_id(order_id):
     db.session.commit()
     return jsonify({'msg': 'ok', 'results': f'La comanda con id {order_id} perteneciente a la mesa {order.mesa_id} ha sido borrado dela lista de comandas'}), 200
 
- # -------------------ELIMINAR TODAS LAS COMANDAS DE UNA MESA--- OK ----------------------
+ # -------------------ELIMINAR TODAS LAS COMANDAS DE UNA MESA--- OK---OK------------------
 
 
 @app.route('/orders/table/<int:mesa_id>', methods=['DELETE'])
-@jwt_required()
+#@jwt_required()
 def eliminar_comanda_por_mesa_id(mesa_id):
     # Buscar todas las comandas asociadas a esa mesa
     orders = Orders.query.filter_by(mesa_id=mesa_id).all()
@@ -334,10 +347,10 @@ def eliminar_comanda_por_mesa_id(mesa_id):
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-# ---------GET USERS ---OK----------------------------------------------
+# ---------GET USERS ---OK---OK-------------------------------------------
 
 @app.route('/users', methods=['GET'])
-@jwt_required()
+#@jwt_required()
 def get_users():
     users = User.query.all()
     print(users)
@@ -347,7 +360,7 @@ def get_users():
     return jsonify({'msg': 'ok', 'results': user_serialized}), 200
 
 
-# ---------GET by id USERS ---OK ---------------------------------------
+# ---------GET by id USERS ---OK---OK------------------------------------
 
 @app.route('/users/<int:id>', methods=['GET'])
 @jwt_required()
@@ -360,16 +373,16 @@ def get_user_by_id(id):
     return jsonify({'msg': 'ok', 'result': user.serialize()}), 200
 
 
-# ---------POST USERS ---OK----------------------------------------------
+# ---------POST USERS ---OK---OK-------------------------------------------
 
 @app.route('/users', methods=['POST'])
 @jwt_required()
 def post_user():
     body = request.get_json(silent=True)
 
-    required_fields = ['email', 'password', 'name', 'rol', 'is_active']
+    required_fields = ['email', 'password', 'name', 'rol']
     if not all(field in body for field in required_fields):
-        return jsonify({'msg': 'Some fields are missing to fill'}), 400
+        return jsonify({'msg': 'Some fields like email, password, name, rol are missing to fill'}), 400
 
     try:
         rol_enum = EstadoRol[body['rol']]
@@ -381,7 +394,7 @@ def post_user():
         password=body['password'],
         name=body['name'],
         rol=rol_enum,
-        is_active=body['is_active']
+        is_active= True
     )
 
     db.session.add(new_user)
@@ -392,9 +405,9 @@ def post_user():
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-# -------------------------------GET PLATOS ---OK----------------------------------------
+# -------------------------------GET PLATOS ---OK---OK-------------------------------------
 @app.route('/plates', methods=['GET'])
-@jwt_required()
+#@jwt_required()
 def get_plates():
     plates = Plates.query.all()
     print(plates)
@@ -403,11 +416,11 @@ def get_plates():
         plates_serialized.append(plates.serialize())
     return jsonify({'msg': 'ok', 'results': plates_serialized}), 200
 
-# -----------------------------GET UN PLATO POR id ---OK-----------------------------
+# -----------------------------GET UN PLATO POR id ---OK---OK--------------------------
 
 
 @app.route('/plates/<int:id>', methods=['GET'])
-@jwt_required()
+#@jwt_required()
 def get_plate_by_id(id):
     plates = Plates.query.get(id)
     print(plates)
@@ -417,7 +430,7 @@ def get_plate_by_id(id):
 
 
 
-# --------------- PUT DE PLATOS DE EDU ---OK ---------------------------------
+# --------------- PUT DE PLATOS DE EDU ---OK ---OK------------------------------
 
 
 @app.route('/plates/<int:plate_id>', methods=['PUT'])  # <- RUTA CORREGIDA
@@ -460,12 +473,12 @@ def update_plates(plate_id):
         return jsonify({'msg': 'Error al actualizar el plato', 'error': str(e)}), 500
 
 
-#----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------------
 
 
-# -------------------------------GET DE TABLES ---OK --------------------------------
+# -------------------------------GET DE TABLES ---OK ---OK-----------------------------
 @app.route('/tables', methods=['GET'])
-@jwt_required()
+#@jwt_required()
 def get_tables():
     tables = Tables.query.all()
     print(tables)
@@ -475,9 +488,9 @@ def get_tables():
     return jsonify({'msg': 'OK', 'result': tables_serialized})
 
 
-# -------------------------------GET DE UNA TABLE ID ---OK--------------------------------
+# -------------------------------GET DE UNA TABLE ID ---OK---OK-----------------------------
 @app.route('/tables/<int:table_id>', methods=['GET'])
-@jwt_required()
+#@jwt_required()
 def get_table_by_id(table_id):
     table = Tables.query.filter_by(id=table_id).first()
     print(table)
@@ -486,7 +499,7 @@ def get_table_by_id(table_id):
     return jsonify({'msg': 'OK', 'result': table.serialize()})
 
 
-# -------------------------------PUT DE UNA TABLES ID ---OK--------------------------------
+# -------------------------------PUT DE UNA TABLES ID ---OK---OK-----------------------------
 @app.route('/tables/<int:table_id>', methods=['PUT'])
 def update_tables(table_id):
     body = request.get_json(silent=True)
@@ -607,7 +620,7 @@ def role_required(*roles):
     return wrapper
 
 
-# -----------------------------AUTENTICACION-------------------------------------------
+# ------------------------------------AUTENTICACION-------------------------------------------
     
 #--------------------------------SEND EMAIL----OK---OK----------------------------------
 @app.route('/send-email', methods= ['GET']) #enviando correo a mi correo de prueba
@@ -643,7 +656,7 @@ def request_reset_password():
    
     token = create_access_token(identity=email,
                                additional_claims=additional_claims,
-                               expires_delta=timedelta(minutes=10))
+                               expires_delta=timedelta(minutes=15))
     
     FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000") #Intenta leer una variable de entorno llamada FRONTEND_URL, si no existe usa localhost:3000
     reset_url = f"{FRONTEND_URL}/reset-password?token={token}"
@@ -705,7 +718,7 @@ def reset_password_token(token):
 # ----------------------------------------------------------------------------------
 
 
-#get de platos por categoris 
+#get de platos por categoris OK OK
 
 
 @app.route('/plates/<string:category_name>', methods=['GET'])
