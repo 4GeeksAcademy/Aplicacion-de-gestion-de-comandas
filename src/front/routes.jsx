@@ -1,5 +1,3 @@
-// Import necessary components and functions from react-router-dom.
-
 import {
   createBrowserRouter,
   createRoutesFromElements,
@@ -9,12 +7,13 @@ import { Layout } from "./pages/Layout";
 import { Home } from "./pages/Home";
 import { Single } from "./pages/Single";
 import { Demo } from "./pages/Demo";
-import Login from "./pages/Login";  //si se export default, el componente no se pone entre llaves aqui
+import Login from "./pages/Login";
 import Private from "./pages/Private";
 import Register from "./pages/Register";
 import ResetPassword from "./pages/ResetPassword";
 import RequestReset from "./pages/RequestReset";
 import TableMap from "./pages/TableMap";
+import OrdersDashboard from "./pages/OrdersDashboard";
 
 
 
@@ -40,6 +39,8 @@ export const router = createBrowserRouter(
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/request-reset-password" element={<RequestReset />} />
       <Route path="/table-map" element={<TableMap/>} />
+      <Route path="/orders-dashboard" element={<OrdersDashboard />} />
+      
     </Route>
   ),
 
