@@ -1,0 +1,361 @@
+/* ------------------ martanvcs {OrdersDashboard} {Start}  ------------------ */
+
+/* ------------------ Estilos base y configuración general ------------------ */
+body {
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+  background-color: #191823;
+  color: #333;
+}
+
+.orders-dashboard {
+  padding: 1rem;
+  background-color: #191823;
+  min-height: 100vh;
+}
+
+/* ------------------ Cabecera principal con logo, filtros y perfil ------------------ */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  color: white;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.order-header > div > div {
+  color: white;
+  font-weight: bold;
+}
+
+/* ------------------ Botones de filtro superiores (All, Completed, etc.) ------------------ */
+.filters {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.filter-btn {
+  padding: 0.3rem 0.6rem;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  background-color: #f4f4f4;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.filter-btn.active {
+  background-color: #e4a2b0;
+  font-weight: bold;
+  color: white;
+}
+
+/* ------------------ Sección de usuario (perfil + logout) ------------------ */
+.user-panel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.logout {
+  background: none;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.profile-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.profile-btn:hover {
+  transform: scale(1.1);
+}
+
+/* ------------------ Botones de resumen de pedidos (por número) ------------------ */
+.orders-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.order-button {
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.order-button:hover {
+  filter: brightness(1.1);
+}
+.order-button.completed {
+  background-color: #d4f4da;
+}
+
+.order-button.rejected {
+  background-color: #fdd6dd;
+}
+
+.order-button.pending {
+  background-color: #e7e7e7;
+}
+
+.order-button.completed::before {
+  content: "\f00c";
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  margin-right: 5px;
+}
+
+.order-button.rejected::before {
+  content: "\f00d";
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  margin-right: 5px;
+}
+
+.order-button.pending::before {
+  content: "\f254";
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  margin-right: 5px;
+}
+
+/* ------------------ Tarjeta de cada pedido ------------------ */
+.order-card {
+  background: linear-gradient(to bottom, #2f2531, #1e1a26);
+  border-radius: 12px;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  font-size: 0.85rem;
+  border: 0.1px solid #e4a2b0;
+  box-shadow: 0 6px 18px rgba(228, 162, 176, 0.25);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.order-card:hover {
+  transform: scale(1);
+  box-shadow: 0 10px 24px rgba(228, 162, 176, 0.35);
+}
+
+.order-card.closed .order-content,
+.order-card.closed .confirm-order-actions {
+  display: none;
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+}
+
+.comment-btn {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  color: #e4a2b0;
+  font-weight: bold;
+}
+
+/* ------------------ Contenido por categoría dentro de la tarjeta ------------------ */
+.order-content {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.order-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 160px;
+  background: linear-gradient(to bottom, #ada0a0, #ffffff);
+  border-radius: 10px;
+  padding: 0.5rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  min-width: 250px;
+  border: 0.2px solid #e4a2b0;
+}
+
+.order-section h4 {
+  color: white;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+/* ------------------ Cada plato individual ------------------ */
+.order-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  font-weight: bold;
+  background-color: white;
+  border-radius: 5px;
+  padding: 0.3rem;
+  margin-bottom: 0.3rem;
+}
+
+/* ------------------ Acciones debajo de los platos ------------------ */
+.order-actions-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-top: 0.5rem;
+}
+
+@media (min-width: 600px) {
+  .order-actions-bottom {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+/* ------------------ Botones para cambiar estado de cada plato ------------------ */
+.status-controls {
+  display: flex;
+  flex-direction: row;
+  gap: 0.3rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.status-btn {
+  font-size: 0.65rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #aaa;
+  background-color: white;
+  cursor: pointer;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.status-btn.completed {
+  border-color: #96a86b;
+  color: #96a86b;
+}
+
+.status-btn.rejected {
+  border-color: #9a5075;
+  color: #9a5075;
+  background-color: #fde6eb;
+}
+
+.status-btn.pending {
+  color: #555;
+  background-color: #eee;
+  border-color: #bbb;
+}
+
+.status-btn.selected {
+  outline: 2px solid black;
+  font-weight: bold;
+  background-color: #cce5ff;
+}
+
+/* ------------------ Pie de la tarjeta: Confirmar o Reiniciar ------------------ */
+.order-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 500px) {
+  .order-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.confirm-order-btn,
+.reset-order-btn {
+  padding: 0.3rem 0.6rem;
+  font-size: 0.75rem;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-weight: bold;
+  border: none;
+}
+
+.confirm-order-btn {
+  background-color: #c8f7d4;
+  color: #0a5206;
+  transition: background-color 0.2s ease;
+}
+
+.confirm-order-btn:hover {
+  background-color: #a9eec2;
+}
+
+.reset-order-btn {
+  background-color: #ffe9b3;
+  color: #b26500;
+  transition: background-color 0.2s ease;
+}
+
+.reset-order-btn:hover {
+  background-color: #ffd35c;
+}
+
+/* ------------------ Información extra, notas y títulos ------------------ */
+.order-meta {
+  font-size: 0.7rem;
+  color: white;
+  margin-top: 0.2rem;
+}
+
+.order-note {
+  margin-top: 0.4rem;
+  background-color: #eef7fb;
+  border-left: 4px solid #0288d1;
+  padding: 0.3rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  color: #333;
+  font-style: italic;
+}
+
+.order-list-title {
+  color: white;
+  font-weight: bold;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.order-list-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+/* ------------------ martanvcs {OrdersDashboard} {End}  ------------------ */
