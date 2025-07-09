@@ -68,8 +68,9 @@ const ResetPassword = () => {
             </div>
         )
     }
-
+    if (!token) return <p>Token inválido o expirado.</p>;
     return (
+            <> 
         { showVerifiedMessage && (
             <div className="alert alert-success text-center rounded-3 shadow-sm fw-bold" style={{ backgroundColor: "#e0ffe0", color: "#2e7d32" }}>
                 ✅ Email verified successfully!
@@ -147,6 +148,7 @@ const ResetPassword = () => {
 
     </div >
 </form>
+</>
     );
 };
 
