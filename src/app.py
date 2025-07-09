@@ -41,7 +41,7 @@ static_file_dir = os.path.join(os.path.dirname(
 app = Flask(__name__)
 app.url_map.strict_slashes = False
 bcrypt = Bcrypt(app)  # para encriptar
-CORS(app)
+
 CORS(app, supports_credentials=True)
 
 
@@ -553,6 +553,7 @@ def register():
 def login():
 
     body = request.get_json(silent=True)
+    print (body)
     if body is None:
         return jsonify({'msg': 'Debes enviar información en el body'}), 400
     if 'email' not in body:
@@ -574,7 +575,12 @@ def login():
         return jsonify({'msg': 'Usuario o contraseña errónea'}), 400
 
     acces_token = create_access_token(identity=user.email) #genero token 
-    return jsonify({'msg': 'OK', 'Token': acces_token, 'user': user.email}), 200
+    return jsonify({'msg': 'OK', 
+                    'Token': acces_token,
+                    'user':{
+                          
+                          'email': user.email,
+                          'rol': user.rol.value}}), 200
 
 # -------------------------------PROTECCIÓN ---OK--------------------------------
 

@@ -14,6 +14,7 @@ import Private from "./pages/Private";
 import Register from "./pages/Register";
 import ResetPassword from "./pages/ResetPassword";
 import RequestReset from "./pages/RequestReset";
+import TableMap from "./pages/TableMap";
 
 
 
@@ -38,6 +39,7 @@ export const router = createBrowserRouter(
       <Route path="/register" element={<Register />} />
       <Route path="/reset-password/:token" element={<ResetPassword />} />
       <Route path="/request-reset-password" element={<RequestReset />} />
+      <Route path="/table-map" element={<TableMap/>} />
     </Route>
   ),
 
