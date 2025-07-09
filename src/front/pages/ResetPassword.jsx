@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { useParams, useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams , useLocation} from "react-router-dom";
+
 
 const ResetPassword = () => {
     const [email, setEmail] = useState('');
@@ -8,8 +9,13 @@ const ResetPassword = () => {
     const [message, setMessage] = useState(null);
     const [error, setError] = useState(null);
     const [searchParams] = useSearchParams();
-    const token = useParams();
-    BASE_URL= import.meta.env.VITE_BACKEND_URL;
+    const location = useLocation();
+    const query = new URLSearchParams(location.search);
+    const token = query.get("token") 
+   
+    console.log(token)
+    const BASE_URL= import.meta.env.VITE_BACKEND_URL;
+    console.log(BASE_URL);
 
 
     const handleSubmit = async (e) => {
@@ -33,7 +39,8 @@ const ResetPassword = () => {
         try {
             const response = await fetch(BASE_URL + `/api/reset-password/${token}`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json' ,
+                            'Authorization': `Bearer ${token}`},
                 body: JSON.stringify({password:newPassword, confirm_password:confirmPassword }),
             });
 

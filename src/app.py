@@ -12,18 +12,15 @@ from api.models import db,  User, EstadoRol, EstadoComanda, EstadoCategorias, Es
 from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
-from datetime import datetime
+from datetime import datetime, timedelta
 from sqlalchemy.orm import load_only
+
 
 
 # from src.api.models import db
 from flask import Flask, render_template
 # importaciones adicionales para credenciales
-from flask_jwt_extended import create_access_token
-from flask_jwt_extended import get_jwt_identity
-from flask_jwt_extended import jwt_required
-from flask_jwt_extended import JWTManager
-
+from flask_jwt_extended import create_access_token, get_jwt, get_jwt_identity, jwt_required, JWTManager
 from flask_bcrypt import Bcrypt # para encriptar las contraseñas 
 from flask_mail import Mail, Message # para enviar correos para reset password
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
@@ -48,7 +45,7 @@ CORS(app, supports_credentials=True)
 app.url_map.strict_slashes = False
 # para tener la llave fuera del codigo
 app.config["JWT_SECRET_KEY"] = os.getenv('JWT_KEY') #la llave esta en .env
-serializer = URLSafeTimedSerializer(app.config['JWT_SECRET_KEY'])
+serializer = URLSafeTimedSerializer(os.getenv('JWT_KEY'))
 
 jwt = JWTManager(app)
 
@@ -642,15 +639,18 @@ def request_reset_password():
         return jsonify({'msg': 'Usuario no encontrado'}), 400
 
    
-    token = serializer.dumps(email, salt='password-reset-salt')
-
+    additional_claims = {'type': 'reset_password'}
+   
+    token = create_access_token(identity=email,
+                               additional_claims=additional_claims,
+                               expires_delta=timedelta(minutes=10))
+    
     FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000") #Intenta leer una variable de entorno llamada FRONTEND_URL, si no existe usa localhost:3000
-    reset_url = f"{FRONTEND_URL}/reset-password/{token}"
+    reset_url = f"{FRONTEND_URL}/reset-password?token={token}"
 
    # reset_url = url_for('reset_password_token', token=token, _external=True) #reset_password_token es la funcion de abajo que resetea contraseña 
     print("token", token)
-    print("email", email)
-    print("url", reset_url)
+    
 
     # Enviar email real
     msg = Message(
@@ -666,14 +666,14 @@ def request_reset_password():
 
 #------------------------POST CAMBIAR LA CONTRASEÑA CON EL TOKEN---Ok--OK----------------
 @app.route('/api/reset-password/<token>', methods=['POST'])
+@jwt_required()
 def reset_password_token(token):
-    try:
-        email = serializer.loads(token, salt='password-reset-salt', max_age=3600) # para que el token dure 1hora
-    except SignatureExpired:
-        return jsonify({"error": "Token expirado"}), 400
-    except BadSignature:
-        return jsonify({"error": "Token inválido"}), 400
+    claims= get_jwt()
+    if claims.get('type') != 'reset_password' :
+        return jsonify({'msg': 'token no valido'}), 403
+    
 
+    email = get_jwt_identity()
     body = request.get_json(silent = True)
     
 
