@@ -22,8 +22,8 @@ flask = "*"
 flask-mail = "*"
 bcrypt = "*"
 itsdangerous = "*"
-flask-cors = "*"
 python-dotenv = "*"
+flask-cors = "*"
 
 [requires]
 python_version = "3.13"
