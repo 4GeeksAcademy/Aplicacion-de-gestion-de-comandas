@@ -9,27 +9,31 @@ import { Single } from "./pages/Single";
 import { Demo } from "./pages/Demo";
 import Login from "./pages/Login";
 import Private from "./pages/Private";
-import Signup from "./pages/Register";
 import OrdersDashboard from "./pages/OrdersDashboard";
+import Register from "./pages/Register";
+import ResetPassword from "./pages/ResetPassword";
+import RequestReset from "./pages/RequestReset";
+import TableMap from "./pages/TableMap";
+
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
     <>
       {/* 🌐 RUTA PRINCIPAL con Layout */}
-      <Route path="/" element={<Layout />} errorElement={<h1>Not found!</h1>} >
-        <Route path="/" element={<Home />} />
-        <Route path="/single/:theId" element={<Single />} />
-        <Route path="/demo" element={<Demo />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/private" element={<Private />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/orders-dashboard" element={<OrdersDashboard />} />
-      </Route>
-
-      {/*  RUTA AISLADA sin Layout */}
-      <Route path="/orders-test" element={<OrdersDashboard />} />
-    </>
-
     
-  )
+      {/* Nested Routes: Defines sub-routes within the BaseHome component. */}
+      <Route path="/" element={<Login />} />
+      <Route path="/single/:theId" element={<Single />} />  {/* Dynamic route for single items */}
+      <Route path="/demo" element={<Demo />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/private" element={<Private />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/request-reset-password" element={<RequestReset />} />
+      <Route path="/table-map" element={<TableMap/>} />
+      <Route path="/orders-dashboard" element={<OrdersDashboard />} />
+    </>
+  ),
+
+  
 );
