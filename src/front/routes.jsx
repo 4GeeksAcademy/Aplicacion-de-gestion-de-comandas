@@ -14,6 +14,7 @@ import Private from "./pages/Private";
 import Register from "./pages/Register";
 import ResetPassword from "./pages/ResetPassword";
 import RequestReset from "./pages/RequestReset";
+import Menu from "./pages/Menu";
 
 
 
@@ -38,8 +39,9 @@ export const router = createBrowserRouter(
       <Route path="/register" element={<Register />} />
       <Route path="/reset-password/:token" element={<ResetPassword />} />
       <Route path="/request-reset-password" element={<RequestReset />} />
+      <Route path="/menu" element={<Menu />} />
     </Route>
   ),
 
-  
+
 );
