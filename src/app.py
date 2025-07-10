@@ -24,6 +24,7 @@ from flask_jwt_extended import create_access_token, get_jwt, get_jwt_identity, j
 from flask_bcrypt import Bcrypt # para encriptar las contraseñas 
 from flask_mail import Mail, Message # para enviar correos para reset password
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
+from werkzeug.security import generate_password_hash
 
 # from flask_bcrypt import Bcrypt
 
@@ -360,17 +361,18 @@ def get_users():
     return jsonify({'msg': 'ok', 'results': user_serialized}), 200
 
 
-# ---------GET by id USERS ---OK---OK------------------------------------
+# ---------GET by id USERS ---OK---OK------------MODIFICADO PARA QUE REGRESE UN TOKEN
 
 @app.route('/users/<int:id>', methods=['GET'])
-@jwt_required()
+#@jwt_required()
 def get_user_by_id(id):
     # query.get solo funciona para devolver primary key. para devolver otro campo usar query.filter_by
     user = User.query.get(id)
     print(user)
+    acces_token = create_access_token(identity=user.email) #genero token 
     if user is None:
         return jsonify({'msg': 'Usuario no encontrado'}), 404
-    return jsonify({'msg': 'ok', 'result': user.serialize()}), 200
+    return jsonify({'msg': 'ok', 'token': acces_token, 'result': user.serialize()}), 200
 
 
 # ---------POST USERS ---OK---OK-------------------------------------------
@@ -379,6 +381,9 @@ def get_user_by_id(id):
 @jwt_required()
 def post_user():
     body = request.get_json(silent=True)
+
+    if body is None:
+        return jsonify({'msg': 'Debe introducir los datos para crear usuario: email, password, name y rol'}), 400
 
     required_fields = ['email', 'password', 'name', 'rol']
     if not all(field in body for field in required_fields):
@@ -391,7 +396,8 @@ def post_user():
 
     new_user = User(
         email=body['email'],
-        password=body['password'],
+        password=bcrypt.generate_password_hash(
+        body['password']).decode('utf-8'),
         name=body['name'],
         rol=rol_enum,
         is_active= True
@@ -401,6 +407,39 @@ def post_user():
     db.session.commit()
 
     return jsonify({'msg': 'Usuario creado correctamente', 'user': new_user.serialize()}), 201
+
+# ---------PUT USERS POR ID---OK---OK-------------------------------------------
+
+@app.route('/users/<int:id>', methods=['PUT'])
+@jwt_required()
+def put_user(id):
+    body = request.get_json(silent=True)
+    update_user = User.query.get(id)
+
+    if body is None:
+        return jsonify({'msg': 'Debe introducir los datos  que quiere modificar del usuario'}), 400
+    if 'password' in body:
+        update_user.password = bcrypt.generate_password_hash(
+        body['password']).decode('utf-8'),
+
+    if 'rol' in body:
+        try:
+          rol_enum = EstadoRol[body['rol']]
+        except KeyError:
+          return jsonify({'msg': f"Rol '{body['rol']}' no válido"}), 400
+        update_user.rol = rol_enum
+
+    if 'name'  in body:
+        return jsonify({'msg': 'no se puede modificar el nombre del usuario. cree una nueva cuenta'})
+    if 'email' in body:
+        return jsonify({'msg': 'no se puede modificar el correo del usuario. cree una nueva cuenta'})
+
+       
+
+    db.session.add(update_user)
+    db.session.commit()
+
+    return jsonify({'msg': 'Usuario ACTUALIZADO correctamente', 'user': update_user.serialize()}), 201
 
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -656,7 +695,7 @@ def request_reset_password():
    
     token = create_access_token(identity=email,
                                additional_claims=additional_claims,
-                               expires_delta=timedelta(minutes=15))
+                               expires_delta=timedelta(minutes=30))
     
     FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000") #Intenta leer una variable de entorno llamada FRONTEND_URL, si no existe usa localhost:3000
     reset_url = f"{FRONTEND_URL}/reset-password?token={token}"
