@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
 import smtplib
 from api.utils import APIException, generate_sitemap
-from api.models import db,  User, EstadoRol, EstadoComanda, EstadoCategorias, EstadoMesa, Plates, Tables, Orders, Orders_Plates
+from api.models import db,  User, EstadoRol, EstadoComanda, EstadoCategorias, EstadoMesa, EstadoPlato, Plates, Tables, Orders, Orders_Plates
 from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
@@ -722,7 +722,7 @@ def request_reset_password():
 def reset_password_token(token):
     claims= get_jwt()
     if claims.get('type') != 'reset_password' :
-        return jsonify({'msg': 'token no valido'}), 403
+        return jsonify({'msg': 'Invalid Token'}), 403
     
 
     email = get_jwt_identity()
@@ -775,6 +775,34 @@ def get_plates_by_category(category_name):
 
     serialized_plates = [plate.serialize() for plate in plates]
     return jsonify({'msg': 'ok', 'results': serialized_plates}), 200
+
+#-------------------------------------------------------------------
+# endpoint de marta 
+
+@app.route('/api/orders/<int:order_id>/plate-status', methods=['PUT']) 
+@jwt_required() 
+def update_plate_status(order_id): 
+    body = request.get_json(silent=True) 
+ 
+    if not body or 'plate_id' not in body or 'status_plate' not in body: 
+        return jsonify({'msg': 'Faltan datos en el body (plate_id y status_plate requeridos)'}), 400 
+ 
+    plate_id = body['plate_id'] 
+    new_status = body['status_plate'] 
+ 
+    if new_status not in EstadoPlato[body['status_plate']]: 
+        return jsonify({'msg': f"Estado '{new_status}' no es válido"}), 400 
+ 
+    relation = Orders_Plates.query.filter_by(order_id=order_id, plate_id=plate_id).first() 
+    if not relation: 
+        return jsonify({'msg': f"No se encontró el plato {plate_id} en la comanda {order_id}"}), 404 
+ 
+    relation.status_plate = EstadoPlato[new_status] 
+    db.session.commit() 
+ 
+    return jsonify({'msg': 'Estado actualizado correctamente', 'result': relation.serialize()}), 200 
+ 
+ 
 
 
 if __name__ == '__main__':

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useSearchParams, useLocation, useNavigate } from "react-router-dom";
 
 
@@ -11,13 +11,21 @@ const ResetPassword = () => {
     const [searchParams] = useSearchParams();
     const [showVerifiedMessage, setShowVerifiedMessage] = useState(false);
     const location = useLocation();
-    const query = new URLSearchParams(location.search);
-    const token = query.get("token")
+    const navigate = useNavigate();
+    const query = new URLSearchParams(location.search); //direccion url
+    const token = query.get("token");
+    const verified = query.get("verified"); // leemos si ?verified=true viene en la URL
 
-    console.log(token)
+    console.log(token) 
     const BASE_URL = import.meta.env.VITE_BACKEND_URL;
     console.log(BASE_URL);
 
+    useEffect(() => {
+        if (verified === 'true') { //si el token esta verificado
+            setShowVerifiedMessage(true); //fijo mensaje en true
+            setTimeout(() => setShowVerifiedMessage(false), 9000); //lo dejo por 9 segundos 
+        }
+    }, [verified]); //esto lo hago cada vez q se modifique verified 
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -26,12 +34,12 @@ const ResetPassword = () => {
 
 
         if (newPassword.length < 6) {
-            setError('La contraseña debe tener al menos 6 caracteres');
+            setError('Password should have 6 characters or more');
             return;
         }
 
         if (newPassword !== confirmPassword) {
-            setError('Las contraseñas no coinciden');
+            setError('Passwords does not match');
             return;
         }
 
@@ -51,21 +59,22 @@ const ResetPassword = () => {
 
             if (response.ok) {
                 //setMessage(data.msg);
+                setMessage("Password reset successfully! Redirecting to login...");
                 console.log(data);
                 setEmail('');
                 setNewPassword('');
                 setConfirmPassword('');
-                setMessage("Password reset successfully! Redirecting to login...");
+                
                 setTimeout(() => {
                     navigate("/login?reset=true");
-                }, 2000);
+                }, 5000);
 
 
             } else {
-                setError(data.msg || 'Error desconocido');
+                setError(data.msg || 'Unknow Error');
             }
         } catch (err) {
-            setError('Error al conectar con el servidor');
+            setError('Error trying to conect to the server');
         }
     };
 
@@ -130,9 +139,6 @@ const ResetPassword = () => {
                             required
                         />
                     </div>
-
-
-
 
 
                     <button
