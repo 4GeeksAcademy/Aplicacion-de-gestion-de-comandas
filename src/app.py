@@ -121,7 +121,7 @@ def serve_any_other_file(path):
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-# ----------------------------------GET TODAS LAS COMANDAS ---OK--------------------------
+# ----------------------------------GET TODAS LAS COMANDAS ---OK---OK-----------------------
 @app.route('/orders', methods=['GET'])
 @jwt_required()
 def get_orders():
@@ -132,7 +132,7 @@ def get_orders():
         user_serialized.append(order.serialize())
     return jsonify({'msg': 'ok', 'results': user_serialized}), 200
 
-# -------------------------------GET DE UNA COMANDA ---OK--------------------------------
+# -------------------------------GET DE UNA COMANDA ---OK---OK-----------------------------
 
 
 @app.route('/orders/<int:id>', methods=['GET'])
@@ -140,7 +140,7 @@ def get_orders():
 def get_order_by_id(id):
     # query.get solo funciona para devolver primary key. para devolver otro campo usar query.filter_by
     order = Orders.query.get(id)
-    print(order)
+    print( "comanda", order)
     if order is None:
         return jsonify({'msg': 'Comanda no encontrada'}), 404
     return jsonify({'msg': 'ok', 'result': order.serialize()}), 200
@@ -222,6 +222,10 @@ def crear_comanda():
 def update_orders(order_id):
     body = request.get_json(silent=True)
     update_order = Orders.query.get(order_id)
+    print(update_order)
+
+    if update_order is None:
+        return({'msg': f'la comanda {order_id} no existe'}), 404
 
     if body is None:
         return jsonify({'msg': 'Debe introducir los elementos de la comanda a modifiar!'}), 404
@@ -242,13 +246,16 @@ def update_orders(order_id):
         user = User.query.get(body['usuario_id'])
         if user is None:
             return jsonify({'msg': 'Usuario inexistente!!'}), 404
-        update_order.usuario_id = body['user_id']
+        update_order.usuario_id = body['usuario_id']
 
     if 'guest_notes' in body:
         update_order.guest_notes = body['guest_notes']
 
-    print(body['platos'])
+    
     if 'platos' in body:
+        print('Body recibido:', body)
+        print('Contiene platos:', 'platos' in body)
+        print(body['platos'])
         try:
             # Eliminar platos anteriores de esa comanda
             # Orders_Plates.query.filter_by(order_id=update_order.id).delete()
@@ -267,10 +274,11 @@ def update_orders(order_id):
                 if plato_id is None:
                     continue
 
-                plato = Plates.query.get(plato_id)
-                print(plato)  # plato que se va a modificar su cantidad
-                if not plato:
-                    continue
+                plato_obj = Plates.query.get(plato_id)
+
+                if not plato_obj:
+                      continue
+                precio = float(plato_obj.price)
                 if cantidad == 0:
                     if plato_id in platos_actuales_dict:
                         # borro el plato
@@ -283,19 +291,31 @@ def update_orders(order_id):
                     plato_existente = platos_actuales_dict[plato_id]
                     plato_existente.count_plat = cantidad
                     db.session.add(plato_existente)
+                                          
 
                 else:
                  # No existe: crear nuevo registro
-                    plato = Orders_Plates()
-                    plato.order_id = update_order.id,
-                    plato.plate_id = plato_id,
-                    plato.count_plat = cantidad
-
-                    db.session.add(nuevo_plato)
+                    plato_nuevo = Orders_Plates()
+                    plato_nuevo.order_id = update_order.id
+                    plato_nuevo.plate_id = plato_id
+                    plato_nuevo.count_plat = cantidad
+                    db.session.add(plato_nuevo)
                 # db.session.commit()
-                total += float(plato.price) * cantidad
+                total += precio * cantidad
+               # print(total)
 
+
+            platos_actualizados = Orders_Plates.query.filter_by(order_id=update_order.id).all()
+            total = 0
+            for op in platos_actualizados:
+                 plato = Plates.query.get(op.plate_id)
+                 if plato:
+                     total += float(plato.price) * op.count_plat
+
+            
             update_order.total_price = total
+            print("Total calculado:", update_order.total_price)
+            db.session.add(update_order)
 
         except Exception as e:
             db.session.rollback()
@@ -303,6 +323,7 @@ def update_orders(order_id):
 
     # Guardar cambios
     try:
+        
         db.session.commit()
         return jsonify({'msg': 'Comanda actualizada correctamente!', 'result': update_order.serialize()}), 200
     except Exception as e:
@@ -776,7 +797,7 @@ def get_plates_by_category(category_name):
     serialized_plates = [plate.serialize() for plate in plates]
     return jsonify({'msg': 'ok', 'results': serialized_plates}), 200
 
-#-------------------------------------------------------------------
+#------------------PUT DE ORDEN PARA MODIFICAR ESTADO DEL PLATO DADO SU ID ---OK---OK-------------------
 # endpoint de marta 
 
 @app.route('/api/orders/<int:order_id>/plate-status', methods=['PUT']) 
@@ -788,16 +809,18 @@ def update_plate_status(order_id):
         return jsonify({'msg': 'Faltan datos en el body (plate_id y status_plate requeridos)'}), 400 
  
     plate_id = body['plate_id'] 
-    new_status = body['status_plate'] 
- 
-    if new_status not in EstadoPlato[body['status_plate']]: 
-        return jsonify({'msg': f"Estado '{new_status}' no es válido"}), 400 
+   
+    try:
+        new_status = EstadoPlato(body['status_plate']) 
+    except KeyError:
+        return jsonify({'msg': f"Estado del plato '{body['status_plate']}' no válido"}), 400
+   
  
     relation = Orders_Plates.query.filter_by(order_id=order_id, plate_id=plate_id).first() 
     if not relation: 
         return jsonify({'msg': f"No se encontró el plato {plate_id} en la comanda {order_id}"}), 404 
  
-    relation.status_plate = EstadoPlato[new_status] 
+    relation.status_plate = new_status 
     db.session.commit() 
  
     return jsonify({'msg': 'Estado actualizado correctamente', 'result': relation.serialize()}), 200 
