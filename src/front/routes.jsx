@@ -14,6 +14,8 @@ import ResetPassword from "./pages/ResetPassword";
 import RequestReset from "./pages/RequestReset";
 import TableMap from "./pages/TableMap";
 import OrdersDashboard from "./pages/OrdersDashboard";
+import Tables from "./pages/Tables";
+import TableOrder from "./pages/TableOrder";
 
 
 
@@ -40,7 +42,9 @@ export const router = createBrowserRouter(
       <Route path="/request-reset-password" element={<RequestReset />} />
       <Route path="/table-map" element={<TableMap/>} />
       <Route path="/orders-dashboard" element={<OrdersDashboard />} />
-      
+      <Route path="/tables" element={<Tables />} />
+      <Route path="/table-order/:id" element={<TableOrder />} />
+
     </Route>
   ),
 
