@@ -40,7 +40,7 @@ app = Flask(__name__)
 app.url_map.strict_slashes = False
 bcrypt = Bcrypt(app)  # para encriptar
 
-CORS(app, supports_credentials=True)
+CORS(app)
 
 
 app.url_map.strict_slashes = False
