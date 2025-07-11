@@ -40,7 +40,7 @@ app = Flask(__name__)
 app.url_map.strict_slashes = False
 bcrypt = Bcrypt(app)  # para encriptar
 
-CORS(app, supports_credentials=True)
+CORS(app)
 
 
 app.url_map.strict_slashes = False
@@ -796,27 +796,7 @@ def reset_password_token(token):
 
     return jsonify({"message": "Contraseña actualizada correctamente"}), 200
 
-# ----------------------------------------------------------------------------------
 
-
-#get de platos por categoris OK OK
-
-
-@app.route('/plates/<string:category_name>', methods=['GET'])
-@jwt_required()
-def get_plates_by_category(category_name):
-    try:
-        category_enum = EstadoCategorias(category_name)
-    except ValueError:
-        return jsonify({'msg': f"'{category_name}' is not a valid category."}), 400
-
-    plates = Plates.query.filter_by(categories=category_enum).all()
-
-    if not plates:
-        return jsonify({'msg': 'Plates not found for this category'}), 404
-
-    serialized_plates = [plate.serialize() for plate in plates]
-    return jsonify({'msg': 'ok', 'results': serialized_plates}), 200
 
 #------------------PUT DE ORDEN PARA MODIFICAR ESTADO DEL PLATO DADO SU ID ---OK---OK-------------------
 # endpoint de marta 
