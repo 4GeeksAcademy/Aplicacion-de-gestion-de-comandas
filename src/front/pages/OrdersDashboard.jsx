@@ -85,7 +85,6 @@ const OrdersDashboard = () => {
     );
   };
 
-  // para endpoint /orders/<order_id>/plate-status
   const updateItemStatus = (orderId, plateId, newStatus) => {
     const token = localStorage.getItem("token");
 
@@ -97,7 +96,7 @@ const OrdersDashboard = () => {
       },
       body: JSON.stringify({
         plate_id: plateId,
-        status: newStatus,
+        status_plate: newStatus, 
       }),
     })
       .then((res) => res.json())
@@ -108,7 +107,9 @@ const OrdersDashboard = () => {
             return {
               ...order,
               platos: order.platos.map((p) =>
-                p.plato_id === plateId ? { ...p, status: newStatus } : p
+                p.plato_id === plateId
+                  ? { ...p, status_plate: newStatus }
+                  : p
               ),
             };
           })
@@ -159,11 +160,11 @@ const OrdersDashboard = () => {
     filter === "all"
       ? orders
       : orders
-        .map((order) => ({
-          ...order,
-          platos: order.platos.filter((p) => p.status === filter),
-        }))
-        .filter((order) => order.platos.length > 0);
+          .map((order) => ({
+            ...order,
+            platos: order.platos.filter((p) => p.status_plate === filter),
+          }))
+          .filter((order) => order.platos.length > 0);
 
   return (
     <div className="orders-dashboard">
@@ -208,8 +209,9 @@ const OrdersDashboard = () => {
       {filteredOrders.map((order) => (
         <div
           key={order.id}
-          className={`order-card ${openOrderIds.includes(order.id) ? "" : "closed"
-            }`}
+          className={`order-card ${
+            openOrderIds.includes(order.id) ? "" : "closed"
+          }`}
         >
           <div className="order-header" onClick={() => toggleOrder(order.id)}>
             <div>
@@ -229,7 +231,8 @@ const OrdersDashboard = () => {
                 <i className="fas fa-clock"></i>{" "}
                 {new Date(order.date).toLocaleString()} —{" "}
                 <i className="fas fa-user-tie"></i>{" "}
-                {users[order.usuario_id]?.name || `User #${order.usuario_id}`}
+                {users[order.usuario_id]?.name ||
+                  `User #${order.usuario_id}`}
               </div>
               {visibleNotes.includes(order.id) && (
                 <div className="order-note">
@@ -241,7 +244,7 @@ const OrdersDashboard = () => {
 
           <div className="order-content">
             {categories.map((cat) => {
-              const items = order.platos.filter((p) => p.categoria === cat);
+              const items = order.platos.filter((p) => p.category === cat);
               if (items.length === 0) return null;
 
               return (
@@ -253,8 +256,9 @@ const OrdersDashboard = () => {
                       <span className="qty">Qty: {item.cantidad}</span>
                       <div className="order-actions-bottom">
                         <button
-                          className={`status-btn completed ${item.status === "completed" ? "selected" : ""
-                            }`}
+                          className={`status-btn completed ${
+                            item.status_plate === "completed" ? "selected" : ""
+                          }`}
                           onClick={() =>
                             updateItemStatus(order.id, item.plato_id, "completed")
                           }
@@ -262,8 +266,9 @@ const OrdersDashboard = () => {
                           ✅ COMPLETED
                         </button>
                         <button
-                          className={`status-btn rejected ${item.status === "rejected" ? "selected" : ""
-                            }`}
+                          className={`status-btn rejected ${
+                            item.status_plate === "rejected" ? "selected" : ""
+                          }`}
                           onClick={() =>
                             updateItemStatus(order.id, item.plato_id, "rejected")
                           }
@@ -271,8 +276,9 @@ const OrdersDashboard = () => {
                           ❌ REJECTED
                         </button>
                         <button
-                          className={`status-btn pending ${item.status === "pending" ? "selected" : ""
-                            }`}
+                          className={`status-btn pending ${
+                            item.status_plate === "pending" ? "selected" : ""
+                          }`}
                           onClick={() =>
                             updateItemStatus(order.id, item.plato_id, "pending")
                           }
@@ -309,4 +315,3 @@ const OrdersDashboard = () => {
 };
 
 export default OrdersDashboard;
-
