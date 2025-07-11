@@ -23,7 +23,6 @@ const Login = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include",
         body: JSON.stringify({ email, password }),
       });
 
@@ -107,7 +106,7 @@ const Login = () => {
         overflow: "hidden",
       }}
     >
-      
+
       <form
         onSubmit={handleLogin}
         className="login-background d-flex align-items-start justify-content-start w-70 vh-100 p-4"
