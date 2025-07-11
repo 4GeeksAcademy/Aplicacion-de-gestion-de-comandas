@@ -15,6 +15,8 @@ import RequestReset from "./pages/RequestReset";
 import TableMap from "./pages/TableMap";
 import OrdersDashboard from "./pages/OrdersDashboard";
 import Admin from "./pages/Admin";
+import Tables from "./pages/Tables";
+import TableOrder from "./pages/TableOrder";
  
 
 
@@ -44,6 +46,8 @@ export const router = createBrowserRouter(
       <Route path="/table-map" element={<TableMap/>} />
       <Route path="/orders-dashboard" element={<OrdersDashboard />} />
       <Route path="/admin-bar" element={<Admin />} />
+      <Route path="/tables" element={<Tables />} />
+      <Route path="/table-order/:id" element={<TableOrder />} />
       
     </Route>
   ),

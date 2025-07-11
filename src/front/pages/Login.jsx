@@ -23,6 +23,7 @@ const Login = () => {
         headers: {
           "Content-Type": "application/json",
         },
+        //  credentials: "include",
         body: JSON.stringify({ email, password }),
       });
 
@@ -30,9 +31,9 @@ const Login = () => {
       console.log("Respuesta del backend:", data);
 
       if (res.ok) {
-        localStorage.setItem("token", data.token); //guardo el token y el usuario en localStorage
+        localStorage.setItem("token", data.Token); //guardo el token y el usuario en localStorage
         localStorage.setItem("user", JSON.stringify(data.user));
-
+        
         const userRol = data.user.rol; // extraigo el rol
 
         // ✅ Mostrar modal de éxito
@@ -50,11 +51,11 @@ const Login = () => {
           },
 
         }).then(() => {
-          if (userRol === "waiter" ) { //rol es la variable const rol = data.user.rol.value
-            navigate("/table-map"); //aun verificar esta ruta con mohamed
-          } else if (userRol === "cooker" ) {
+          if (userRol === "waiter") { //rol es la variable const rol = data.user.rol.value
+            navigate("/tables"); //aun verificar esta ruta con mohamed
+          } else if (userRol === "cooker") {
             navigate('/orders-dashboard'); // componente vista de cocina
-          } else if (userRol === 'admin') {  
+          } else if (userRol === 'admin') {
             navigate('/admin-bar');
           } else {
             navigate('/'); // por si acaso
@@ -106,7 +107,7 @@ const Login = () => {
         overflow: "hidden",
       }}
     >
-      
+
       <form
         onSubmit={handleLogin}
         className="login-background d-flex align-items-start justify-content-start w-70 vh-100 p-4"

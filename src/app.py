@@ -651,6 +651,8 @@ def login():
         return jsonify({'msg': 'El campo email es obligatorio'}), 400
     if 'password' not in body:
         return jsonify({'msg': 'El campo password es obligatorio'}), 400
+    if 'name' not in body:
+        return jsonify({'msg': 'El campo name es obligatorio'}), 400
 
     user = User.query.filter_by(email=body['email']).first()
 
@@ -669,7 +671,7 @@ def login():
     return jsonify({'msg': 'OK', 
                     'Token': acces_token,
                     'user':{
-                          
+                          'name': user.name,
                           'email': user.email,
                           'rol': user.rol.value}}), 200
 

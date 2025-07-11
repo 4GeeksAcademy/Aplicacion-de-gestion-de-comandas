@@ -5,9 +5,24 @@ import Swal from "sweetalert2";
 export const Navbar = () => {
 	const location = useLocation();
 	const navigate = useNavigate();
-
+	
 	const token = localStorage.getItem("token");
-	const user = localStorage.getItem("user");
+	//const user = localStorage.getItem("user");
+	//localStorage.setItem("user", JSON.stringify(user));
+	
+	const rawUser = localStorage.getItem("user");
+	
+	//const user = rawUser ? JSON.parse(rawUser) : null;
+	const user = JSON.parse(localStorage.getItem("user"));
+	console.log(user)
+
+	/* useEffect(() => {
+   		 if (user) {
+     		 console.log("Email del usuario:", user.email);
+      		 console.log("Nombre del usuario:", user.name);
+           }
+       }, [user]);*/
+
 
 	const isAuthenticated = !!token;
 	const handleLogout = () => {
@@ -38,7 +53,7 @@ export const Navbar = () => {
 						</>
 					) : (
 						<>
-							<span className="me-2 text-white">👤 {user}</span>
+							<span className="me-2 text-white">👤 {user.name}</span>
 							<button className="btn btn-outline-light me-2" onClick={handleLogout}>
 								Logout
 							</button>

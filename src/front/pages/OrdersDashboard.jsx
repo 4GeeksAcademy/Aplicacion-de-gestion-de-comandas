@@ -21,9 +21,9 @@ const OrdersDashboard = () => {
     const token = localStorage.getItem("token");
     const rol = localStorage.getItem("rol");
 
-    if (!token || (rol !== "cocinero" && rol !== "admin")) {
-      navigate("/login");
-    }
+    //if (!token || (rol !== "cocinero" && rol !== "admin")) {
+     // navigate("/login");
+    //}
   }, []);
 
   useEffect(() => {
@@ -63,7 +63,7 @@ const OrdersDashboard = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    fetch(`${API}api/plates`, {
+    fetch(BASE_URL + "/plates", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -91,7 +91,7 @@ const OrdersDashboard = () => {
   const updateItemStatus = (orderId, plateId, newStatus) => {
     const token = localStorage.getItem("token");
 
-    fetch(`${API}api/orders/${orderId}/plate-status`, {
+    fetch(`${BASE_URL}api/orders/${orderId}/plate-status`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

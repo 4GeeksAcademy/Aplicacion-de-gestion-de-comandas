@@ -1,11 +1,44 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+const BASE_URL = import.meta.env.VITE_BACKEND_URL; // esta variable esta en .env
 
 const Admin = () => {
   const navigate = useNavigate();
- 
 
+  const fetchOrders = async () => {
+  try {
+    const res = await fetch(`${BASE_URL}/orders`, {
+      method: "GET",
+      credentials: "include", // si tu backend usa cookies/sesiones
+      headers: {
+        "Content-Type": "application/json",
+        // Si usas JWT:
+        // Authorization: `Bearer ${localStorage.getItem("token")}`
+      }
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      console.error("Respuesta con error:", data);
+      throw new Error("Error en la petición de órdenes");
+    }
+
+    // Asegúrate de que `data.orders` existe antes de usar forEach
+    if (data.orders && Array.isArray(data.orders)) {
+      data.orders.forEach(order => {
+        // tu lógica aquí
+      });
+    } else {
+      console.warn("No hay comandas disponibles");
+    }
+  } catch (err) {
+    console.error("Error cargando comandas:", err);
+  }
+};
+ 
   return (
+    <>
     <div
       className="d-flex justify-content-center align-items-center vh-100"
       style={{
@@ -71,6 +104,7 @@ const Admin = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
