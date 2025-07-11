@@ -1,23 +1,23 @@
+import StateManagedSelect from "react-select";
+
 export const initialStore=()=>{
   return{
+    user: null,
+    token: null,
+    tables: [],   
     message: null,
-    todos: [
-      {
-        id: 1,
-        title: "Make the bed",
-        background: null,
-      },
-      {
-        id: 2,
-        title: "Do my homework",
-        background: null,
-      }
-    ]
+    todos: [],    
   }
 }
 
 export default function storeReducer(store, action = {}) {
   switch(action.type){
+    case "set_tables":
+      return {...store, tables: action.payload};
+      
+    case "set_orders":
+      return {...store, tables: action.payload};
+
     case 'set_hello':
       return {
         ...store,
@@ -33,6 +33,6 @@ export default function storeReducer(store, action = {}) {
         todos: store.todos.map((todo) => (todo.id === id ? { ...todo, background: color } : todo))
       };
     default:
-      throw Error('Unknown action.');
-  }    
+      return store; 
+  }  
 }

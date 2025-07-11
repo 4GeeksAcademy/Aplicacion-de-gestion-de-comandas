@@ -69,85 +69,93 @@ const ResetPassword = () => {
         )
     }
 
-    return (
-        { showVerifiedMessage && (
-            <div className="alert alert-success text-center rounded-3 shadow-sm fw-bold" style={{ backgroundColor: "#e0ffe0", color: "#2e7d32" }}>
-                ✅ Email verified successfully!
-            </div>
-        )}
 
-<form
-    onSubmit={handleSubmit}
-    className="register-background d-flex align-items-start justify-content-start w-100 vh-100 p-4"
->
-    <div
-        className="w-100 p-4"
-        style={{
-            maxWidth: "320px",
-            backgroundColor: "rgba(255, 255, 255, 0.8)",
-            borderRadius: "16px",
-            boxShadow: "0 4px 15px rgba(0, 0, 0, 0.1)",
-            backdropFilter: "blur(4px)", // Efecto glass suave
-            width: "100%",
-            zIndex: 1, // Asegura que quede por encima del filtro del fondo
-            position: "relative",
+    // he metido el form dentro del return porque me daba problemas a la hora de correr el front
+    return ( 
+        <>
+            {showVerifiedMessage && (
+                <div className="alert alert-success text-center rounded-3 shadow-sm fw-bold" style={{ backgroundColor: "#e0ffe0", color: "#2e7d32" }}>
+                    ✅ Email verified successfully!
+                </div>
+            )}
 
-        }}
-    >
-        <h2 className="mb-3 fw-bold">Reset Password</h2>
+            < form
+                onSubmit={handleSubmit}
+                className="register-background d-flex align-items-start justify-content-start w-100 vh-100 p-4"
+            >
 
-        <div className="mb-2">
-            <input
-                className="form-control"
-                type="password"
-                placeholder="New Password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                required
-            />
-        </div>
+                <div
+                    className="w-100 p-4"
+                    style={{
+                        maxWidth: "320px",
+                        backgroundColor: "rgba(255, 255, 255, 0.8)",
+                        borderRadius: "16px",
+                        boxShadow: "0 4px 15px rgba(0, 0, 0, 0.1)",
+                        backdropFilter: "blur(4px)", // Efecto glass suave
+                        width: "100%",
+                        zIndex: 1, // Asegura que quede por encima del filtro del fondo
+                        position: "relative",
 
-        <div className="mb-2">
+                    }}
+                >
+                    <h2 className="mb-3 fw-bold">Reset Password</h2>
 
-            <input
-                className="form-control"
-                type="password"
-                placeholder="Confirm Password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-            />
-        </div>
+                    <div className="mb-2">
+                        <input
+                            className="form-control"
+                            type="password"
+                            placeholder="New Password"
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                            required
+                        />
+                    </div>
 
+                    <div className="mb-2">
 
-
-
-
-        <button
-            type="submit"
-            className="btn w-100"
-            style={{
-                backgroundColor: "#fa8072",
-                color: "white",
-                fontWeight: "bold",
-                border: "none",
-
-                transition: "background-color 0.3s"
-            }}
-            onMouseOver={(e) => (e.target.style.backgroundColor = "#e76b60")}
-            onMouseOut={(e) => (e.target.style.backgroundColor = "#fa8072")}
-        >
-            Reset Password
-        </button>
+                        <input
+                            className="form-control"
+                            type="password"
+                            placeholder="Confirm Password"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            required
+                        />
+                    </div>
 
 
-        {message && <div className="alert alert-success">{message}</div>}
-        {error && <div className="alert alert-danger">{error}</div>}
 
 
-    </div >
-</form>
+
+                    <button
+                        type="submit"
+                        className="btn w-100"
+                        style={{
+                            backgroundColor: "#fa8072",
+                            color: "white",
+                            fontWeight: "bold",
+                            border: "none",
+
+                            transition: "background-color 0.3s"
+                        }}
+                        onMouseOver={(e) => (e.target.style.backgroundColor = "#e76b60")}
+                        onMouseOut={(e) => (e.target.style.backgroundColor = "#fa8072")}
+                    >
+                        Reset Password
+                    </button>
+
+
+                    {message && <div className="alert alert-success">{message}</div>}
+                    {error && <div className="alert alert-danger">{error}</div>}
+
+
+                </div >
+            </form >
+        </>
+        
+        
     );
+    
 };
 
 export default ResetPassword;
