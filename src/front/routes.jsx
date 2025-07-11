@@ -1,5 +1,3 @@
-// Import necessary components and functions from react-router-dom.
-
 import {
   createBrowserRouter,
   createRoutesFromElements,
@@ -9,18 +7,21 @@ import { Layout } from "./pages/Layout";
 import { Home } from "./pages/Home";
 import { Single } from "./pages/Single";
 import { Demo } from "./pages/Demo";
-import Login from "./pages/Login";  //si se export default, el componente no se pone entre llaves aqui
+import Login from "./pages/Login";
 import Private from "./pages/Private";
 import Register from "./pages/Register";
 import ResetPassword from "./pages/ResetPassword";
 import RequestReset from "./pages/RequestReset";
+import TableMap from "./pages/TableMap";
+import OrdersDashboard from "./pages/OrdersDashboard";
 import Menu from "./pages/Menu";
 
 
 
 
 export const router = createBrowserRouter(
-  createRoutesFromElements(
+    createRoutesFromElements(
+
     // CreateRoutesFromElements function allows you to build route elements declaratively.
     // Create your routes here, if you want to keep the Navbar and Footer in all views, add your new routes inside the containing Route.
     // Root, on the contrary, create a sister Route, if you have doubts, try it!
@@ -37,8 +38,10 @@ export const router = createBrowserRouter(
       <Route path="/login" element={<Login />} />
       <Route path="/private" element={<Private />} />
       <Route path="/register" element={<Register />} />
-      <Route path="/reset-password/:token" element={<ResetPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/request-reset-password" element={<RequestReset />} />
+      <Route path="/table-map" element={<TableMap/>} />
+      <Route path="/orders-dashboard" element={<OrdersDashboard />} />
       <Route path="/menu" element={<Menu />} />
     </Route>
   ),
