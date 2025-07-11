@@ -20,7 +20,7 @@ const OrdersDashboard = () => {
     const rol = localStorage.getItem("rol");
 
     if (!token || (rol !== "cocinero" && rol !== "admin")) {
-      navigate("/login");
+    navigate("/login");
     }
   }, []);
 
