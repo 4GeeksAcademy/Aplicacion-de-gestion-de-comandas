@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useSearchParams, useLocation, useNavigate } from "react-router-dom";
 
 
@@ -9,14 +9,23 @@ const ResetPassword = () => {
     const [message, setMessage] = useState(null);
     const [error, setError] = useState(null);
     const [searchParams] = useSearchParams();
+    const [showVerifiedMessage, setShowVerifiedMessage] = useState(false);
     const location = useLocation();
-    const query = new URLSearchParams(location.search);
-    const token = query.get("token")
+    const navigate = useNavigate();
+    const query = new URLSearchParams(location.search); //direccion url
+    const token = query.get("token");
+    const verified = query.get("verified"); // leemos si ?verified=true viene en la URL
 
-    console.log(token)
+    console.log(token) 
     const BASE_URL = import.meta.env.VITE_BACKEND_URL;
     console.log(BASE_URL);
 
+    useEffect(() => {
+        if (verified === 'true') { //si el token esta verificado
+            setShowVerifiedMessage(true); //fijo mensaje en true
+            setTimeout(() => setShowVerifiedMessage(false), 9000); //lo dejo por 9 segundos 
+        }
+    }, [verified]); //esto lo hago cada vez q se modifique verified 
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -25,12 +34,12 @@ const ResetPassword = () => {
 
 
         if (newPassword.length < 6) {
-            setError('La contraseña debe tener al menos 6 caracteres');
+            setError('Password should have 6 characters or more');
             return;
         }
 
         if (newPassword !== confirmPassword) {
-            setError('Las contraseñas no coinciden');
+            setError('Passwords does not match');
             return;
         }
 
@@ -49,29 +58,38 @@ const ResetPassword = () => {
             const data = await response.json();
 
             if (response.ok) {
-                setMessage(data.msg);
+                //setMessage(data.msg);
+                setMessage("Password reset successfully! Redirecting to login...");
                 console.log(data);
                 setEmail('');
                 setNewPassword('');
                 setConfirmPassword('');
+                
+                setTimeout(() => {
+                    navigate("/login?reset=true");
+                }, 5000);
+
+
             } else {
-                setError(data.msg || 'Error desconocido');
+                setError(data.msg || 'Unknow Error');
             }
         } catch (err) {
-            setError('Error al conectar con el servidor');
+            setError('Error trying to conect to the server');
         }
     };
-    {
-        !token && (
-            <div className="alert alert-danger text-center rounded-3 shadow-sm fw-bold" style={{ backgroundColor: "#ffe5e5", color: "#b30000" }}>
-                Token expired or invalid. Please request a new reset link.
+
+    if (!token) {
+        return (
+            <div className="d-flex justify-content-center align-items-center vh-100">
+                <div className="alert alert-danger text-center rounded-3 shadow p-4" style={{ backgroundColor: "#ffe5e5", color: "#b30000" }}>
+                    ❌ Token expired or invalid. Please request a new reset link.
+                </div>
             </div>
-        )
+        );
     }
-
-
-    // he metido el form dentro del return porque me daba problemas a la hora de correr el front
-    return ( 
+  
+    //if (!token) return <p>Token inválido o expirado.</p>;
+    return (
         <>
             {showVerifiedMessage && (
                 <div className="alert alert-success text-center rounded-3 shadow-sm fw-bold" style={{ backgroundColor: "#e0ffe0", color: "#2e7d32" }}>
@@ -79,11 +97,10 @@ const ResetPassword = () => {
                 </div>
             )}
 
-            < form
+            <form
                 onSubmit={handleSubmit}
                 className="register-background d-flex align-items-start justify-content-start w-100 vh-100 p-4"
             >
-
                 <div
                     className="w-100 p-4"
                     style={{
@@ -124,9 +141,6 @@ const ResetPassword = () => {
                     </div>
 
 
-
-
-
                     <button
                         type="submit"
                         className="btn w-100"
@@ -150,10 +164,8 @@ const ResetPassword = () => {
 
 
                 </div >
-            </form >
+            </form>
         </>
-        
-        
     );
     
 };
