@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
 import smtplib
 from api.utils import APIException, generate_sitemap
-from api.models import db,  User, EstadoRol, EstadoComanda, EstadoCategorias, EstadoMesa, Plates, Tables, Orders, Orders_Plates
+from api.models import db,  User, EstadoRol, EstadoComanda, EstadoCategorias, EstadoMesa, EstadoPlato, Plates, Tables, Orders, Orders_Plates
 from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
@@ -24,6 +24,7 @@ from flask_jwt_extended import create_access_token, get_jwt, get_jwt_identity, j
 from flask_bcrypt import Bcrypt # para encriptar las contraseñas 
 from flask_mail import Mail, Message # para enviar correos para reset password
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
+from werkzeug.security import generate_password_hash
 
 # from flask_bcrypt import Bcrypt
 
@@ -119,7 +120,7 @@ def serve_any_other_file(path):
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-# ----------------------------------GET TODAS LAS COMANDAS ---OK--------------------------
+# ----------------------------------GET TODAS LAS COMANDAS ---OK---OK-----------------------
 @app.route('/orders', methods=['GET'])
 @jwt_required()
 def get_orders():
@@ -130,7 +131,7 @@ def get_orders():
         user_serialized.append(order.serialize())
     return jsonify({'msg': 'ok', 'results': user_serialized}), 200
 
-# -------------------------------GET DE UNA COMANDA ---OK--------------------------------
+# -------------------------------GET DE UNA COMANDA ---OK---OK-----------------------------
 
 
 @app.route('/orders/<int:id>', methods=['GET'])
@@ -138,7 +139,7 @@ def get_orders():
 def get_order_by_id(id):
     # query.get solo funciona para devolver primary key. para devolver otro campo usar query.filter_by
     order = Orders.query.get(id)
-    print(order)
+    print( "comanda", order)
     if order is None:
         return jsonify({'msg': 'Comanda no encontrada'}), 404
     return jsonify({'msg': 'ok', 'result': order.serialize()}), 200
@@ -220,6 +221,10 @@ def crear_comanda():
 def update_orders(order_id):
     body = request.get_json(silent=True)
     update_order = Orders.query.get(order_id)
+    print(update_order)
+
+    if update_order is None:
+        return({'msg': f'la comanda {order_id} no existe'}), 404
 
     if body is None:
         return jsonify({'msg': 'Debe introducir los elementos de la comanda a modifiar!'}), 404
@@ -240,13 +245,16 @@ def update_orders(order_id):
         user = User.query.get(body['usuario_id'])
         if user is None:
             return jsonify({'msg': 'Usuario inexistente!!'}), 404
-        update_order.usuario_id = body['user_id']
+        update_order.usuario_id = body['usuario_id']
 
     if 'guest_notes' in body:
         update_order.guest_notes = body['guest_notes']
 
-    print(body['platos'])
+    
     if 'platos' in body:
+        print('Body recibido:', body)
+        print('Contiene platos:', 'platos' in body)
+        print(body['platos'])
         try:
             # Eliminar platos anteriores de esa comanda
             # Orders_Plates.query.filter_by(order_id=update_order.id).delete()
@@ -265,10 +273,11 @@ def update_orders(order_id):
                 if plato_id is None:
                     continue
 
-                plato = Plates.query.get(plato_id)
-                print(plato)  # plato que se va a modificar su cantidad
-                if not plato:
-                    continue
+                plato_obj = Plates.query.get(plato_id)
+
+                if not plato_obj:
+                      continue
+                precio = float(plato_obj.price)
                 if cantidad == 0:
                     if plato_id in platos_actuales_dict:
                         # borro el plato
@@ -281,19 +290,31 @@ def update_orders(order_id):
                     plato_existente = platos_actuales_dict[plato_id]
                     plato_existente.count_plat = cantidad
                     db.session.add(plato_existente)
+                                          
 
                 else:
                  # No existe: crear nuevo registro
-                    plato = Orders_Plates()
-                    plato.order_id = update_order.id,
-                    plato.plate_id = plato_id,
-                    plato.count_plat = cantidad
-
-                    db.session.add(nuevo_plato)
+                    plato_nuevo = Orders_Plates()
+                    plato_nuevo.order_id = update_order.id
+                    plato_nuevo.plate_id = plato_id
+                    plato_nuevo.count_plat = cantidad
+                    db.session.add(plato_nuevo)
                 # db.session.commit()
-                total += float(plato.price) * cantidad
+                total += precio * cantidad
+               # print(total)
 
+
+            platos_actualizados = Orders_Plates.query.filter_by(order_id=update_order.id).all()
+            total = 0
+            for op in platos_actualizados:
+                 plato = Plates.query.get(op.plate_id)
+                 if plato:
+                     total += float(plato.price) * op.count_plat
+
+            
             update_order.total_price = total
+            print("Total calculado:", update_order.total_price)
+            db.session.add(update_order)
 
         except Exception as e:
             db.session.rollback()
@@ -301,6 +322,7 @@ def update_orders(order_id):
 
     # Guardar cambios
     try:
+        
         db.session.commit()
         return jsonify({'msg': 'Comanda actualizada correctamente!', 'result': update_order.serialize()}), 200
     except Exception as e:
@@ -359,17 +381,18 @@ def get_users():
     return jsonify({'msg': 'ok', 'results': user_serialized}), 200
 
 
-# ---------GET by id USERS ---OK---OK------------------------------------
+# ---------GET by id USERS ---OK---OK------------MODIFICADO PARA QUE REGRESE UN TOKEN
 
 @app.route('/users/<int:id>', methods=['GET'])
-@jwt_required()
+#@jwt_required()
 def get_user_by_id(id):
     # query.get solo funciona para devolver primary key. para devolver otro campo usar query.filter_by
     user = User.query.get(id)
     print(user)
+    acces_token = create_access_token(identity=user.email) #genero token 
     if user is None:
         return jsonify({'msg': 'Usuario no encontrado'}), 404
-    return jsonify({'msg': 'ok', 'result': user.serialize()}), 200
+    return jsonify({'msg': 'ok', 'token': acces_token, 'result': user.serialize()}), 200
 
 
 # ---------POST USERS ---OK---OK-------------------------------------------
@@ -378,6 +401,9 @@ def get_user_by_id(id):
 @jwt_required()
 def post_user():
     body = request.get_json(silent=True)
+
+    if body is None:
+        return jsonify({'msg': 'Debe introducir los datos para crear usuario: email, password, name y rol'}), 400
 
     required_fields = ['email', 'password', 'name', 'rol']
     if not all(field in body for field in required_fields):
@@ -390,7 +416,8 @@ def post_user():
 
     new_user = User(
         email=body['email'],
-        password=body['password'],
+        password=bcrypt.generate_password_hash(
+        body['password']).decode('utf-8'),
         name=body['name'],
         rol=rol_enum,
         is_active= True
@@ -401,7 +428,44 @@ def post_user():
 
     return jsonify({'msg': 'Usuario creado correctamente', 'user': new_user.serialize()}), 201
 
+
+# ---------PUT USERS POR ID---OK---OK-------------------------------------------
+
+@app.route('/users/<int:id>', methods=['PUT'])
+@jwt_required()
+def put_user(id):
+    body = request.get_json(silent=True)
+    update_user = User.query.get(id)
+
+    if body is None:
+        return jsonify({'msg': 'Debe introducir los datos  que quiere modificar del usuario'}), 400
+    if 'password' in body:
+        update_user.password = bcrypt.generate_password_hash(
+        body['password']).decode('utf-8'),
+
+    if 'rol' in body:
+        try:
+          rol_enum = EstadoRol[body['rol']]
+        except KeyError:
+          return jsonify({'msg': f"Rol '{body['rol']}' no válido"}), 400
+        update_user.rol = rol_enum
+
+    if 'name'  in body:
+        return jsonify({'msg': 'no se puede modificar el nombre del usuario. cree una nueva cuenta'})
+    if 'email' in body:
+        return jsonify({'msg': 'no se puede modificar el correo del usuario. cree una nueva cuenta'})
+
+       
+
+    db.session.add(update_user)
+    db.session.commit()
+
+    return jsonify({'msg': 'Usuario ACTUALIZADO correctamente', 'user': update_user.serialize()}), 201
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
 
 # -------------------------------GET PLATOS ---OK---OK-------------------------------------
@@ -673,7 +737,7 @@ def request_reset_password():
    
     token = create_access_token(identity=email,
                                additional_claims=additional_claims,
-                               expires_delta=timedelta(minutes=15))
+                               expires_delta=timedelta(minutes=30))
     
     FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000") #Intenta leer una variable de entorno llamada FRONTEND_URL, si no existe usa localhost:3000
     reset_url = f"{FRONTEND_URL}/reset-password?token={token}"
@@ -700,7 +764,7 @@ def request_reset_password():
 def reset_password_token(token):
     claims= get_jwt()
     if claims.get('type') != 'reset_password' :
-        return jsonify({'msg': 'token no valido'}), 403
+        return jsonify({'msg': 'Invalid Token'}), 403
     
 
     email = get_jwt_identity()
@@ -753,6 +817,36 @@ def get_plates_by_category(category_name):
 
     serialized_plates = [plate.serialize() for plate in plates]
     return jsonify({'msg': 'ok', 'results': serialized_plates}), 200
+
+#------------------PUT DE ORDEN PARA MODIFICAR ESTADO DEL PLATO DADO SU ID ---OK---OK-------------------
+# endpoint de marta 
+
+@app.route('/api/orders/<int:order_id>/plate-status', methods=['PUT']) 
+@jwt_required() 
+def update_plate_status(order_id): 
+    body = request.get_json(silent=True) 
+ 
+    if not body or 'plate_id' not in body or 'status_plate' not in body: 
+        return jsonify({'msg': 'Faltan datos en el body (plate_id y status_plate requeridos)'}), 400 
+ 
+    plate_id = body['plate_id'] 
+   
+    try:
+        new_status = EstadoPlato(body['status_plate']) 
+    except KeyError:
+        return jsonify({'msg': f"Estado del plato '{body['status_plate']}' no válido"}), 400
+   
+ 
+    relation = Orders_Plates.query.filter_by(order_id=order_id, plate_id=plate_id).first() 
+    if not relation: 
+        return jsonify({'msg': f"No se encontró el plato {plate_id} en la comanda {order_id}"}), 404 
+ 
+    relation.status_plate = new_status 
+    db.session.commit() 
+ 
+    return jsonify({'msg': 'Estado actualizado correctamente', 'result': relation.serialize()}), 200 
+ 
+ 
 
 
 if __name__ == '__main__':

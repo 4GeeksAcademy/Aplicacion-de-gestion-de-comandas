@@ -1,8 +1,8 @@
 import React from 'react'
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from "react-router-dom";
+import { useLocation } from 'react-router-dom';
 import Swal from 'sweetalert2'; // <-- Importar SweetAlert2
 import useGlobalReducer from "../hooks/useGlobalReducer"; //sin llaves pues se exporto useGlobalReducer
 
@@ -12,6 +12,8 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const BASE_URL = import.meta.env.VITE_BACKEND_URL; // esta variable esta en .env
+  const location = useLocation();
+  const showResetMessage = new URLSearchParams(location.search).get('reset') === 'true';
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -50,15 +52,15 @@ const Login = () => {
 
         }).then(() => {
           if (userRol === "waiter" || userRol === "admin") { //rol es la variable const rol = data.user.rol.value
-            navigate("/table-map"); 
+            navigate("/table-map");
           } else if (userRol === "cooker" || userRol === "admin") {
             navigate('/cocina-map');
-         // } else if (rol === 'admin') { lo quito por ahora hasta que tengamos un componente admin que  sera quien modifique precios usuarios...
-           // navigate('/admin');
+            // } else if (rol === 'admin') { lo quito por ahora hasta que tengamos un componente admin que  sera quien modifique precios usuarios...
+            // navigate('/admin');
           } else {
             navigate('/'); // por si acaso
           }
-         // navigate("/private"); // Re-dirige después de cerrar el modal a la pagin /private o la principal. decidiremos el nombre 
+          // navigate("/private"); // Re-dirige después de cerrar el modal a la pagin /private o la principal. decidiremos el nombre 
         });
       } else {
         // ❌ Mostrar modal de error
@@ -93,6 +95,9 @@ const Login = () => {
   };
 
   return (
+
+
+
     <div
       className="d-flex justify-content-center align-items-center vh-100"
       style={{
@@ -102,12 +107,11 @@ const Login = () => {
         overflow: "hidden",
       }}
     >
-
+      
       <form
         onSubmit={handleLogin}
         className="login-background d-flex align-items-start justify-content-start w-70 vh-100 p-4"
       >
-
 
 
         <div
@@ -182,6 +186,6 @@ const Login = () => {
     </div>
 
   )
-}
+};
 
-export default Login
+export default Login;
