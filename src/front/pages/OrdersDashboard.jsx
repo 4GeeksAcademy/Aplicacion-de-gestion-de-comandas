@@ -10,7 +10,7 @@ const OrdersDashboard = () => {
   const [visibleNotes, setVisibleNotes] = useState([]);
 
   const navigate = useNavigate();
-  const API = import.meta.env.VITE_BACKEND_URL;
+  const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
   const filters = ["all", "completed", "rejected", "pending"];
   const categories = ["primer_plato", "segundo_plato", "postres", "bebidas"];
@@ -27,7 +27,7 @@ const OrdersDashboard = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    fetch(`${API}api/orders`, {
+    fetch(`${BASE_URL}api/orders`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -37,7 +37,7 @@ const OrdersDashboard = () => {
         setOrders(data.results || []);
         data.results.forEach((order) => {
           if (order.usuario_id && !users[order.usuario_id]) {
-            fetch(`${API}api/users/${order.usuario_id}`, {
+            fetch(`${BASE_URL}api/users/${order.usuario_id}`, {
               headers: {
                 Authorization: `Bearer ${token}`,
               },
@@ -61,7 +61,7 @@ const OrdersDashboard = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    fetch(`${API}api/plates`, {
+    fetch(`${BASE_URL}api/plates`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -88,7 +88,7 @@ const OrdersDashboard = () => {
   const updateItemStatus = (orderId, plateId, newStatus) => {
     const token = localStorage.getItem("token");
 
-    fetch(`${API}api/orders/${orderId}/plate-status`, {
+    fetch(`${BASE_URL}api/orders/${orderId}/plate-status`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -96,7 +96,7 @@ const OrdersDashboard = () => {
       },
       body: JSON.stringify({
         plate_id: plateId,
-        status_plate: newStatus, 
+        status_plate: newStatus,
       }),
     })
       .then((res) => res.json())
@@ -120,23 +120,23 @@ const OrdersDashboard = () => {
 
   const confirmAllItems = (orderId) => {
     const token = localStorage.getItem("token");
-    fetch(`${API}api/orders/${orderId}`, {
+    fetch(`${BASE_URL}api/orders/${orderId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ state: "servida" }),
+      body: JSON.stringify({ state: "ready" }), // ← CORREGIDO
     }).then(() => {
       setOrders((prev) =>
-        prev.map((o) => (o.id === orderId ? { ...o, state: "servida" } : o))
+        prev.map((o) => (o.id === orderId ? { ...o, state: "ready" } : o))
       );
     });
   };
 
   const resetOrderStatus = (orderId) => {
     const token = localStorage.getItem("token");
-    fetch(`${API}api/orders/${orderId}`, {
+    fetch(`${BASE_URL}api/orders/${orderId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -160,11 +160,11 @@ const OrdersDashboard = () => {
     filter === "all"
       ? orders
       : orders
-          .map((order) => ({
-            ...order,
-            platos: order.platos.filter((p) => p.status_plate === filter),
-          }))
-          .filter((order) => order.platos.length > 0);
+        .map((order) => ({
+          ...order,
+          platos: order.platos.filter((p) => p.status_plate === filter),
+        }))
+        .filter((order) => order.platos.length > 0);
 
   return (
     <div className="orders-dashboard">
@@ -199,7 +199,11 @@ const OrdersDashboard = () => {
         <h3 className="order-list-title">Order list:</h3>
         <div className="orders-buttons">
           {orders.map((order) => (
-            <button key={order.id} className={`order-button ${order.state}`}>
+            <button
+              key={order.id}
+              className={`order-button ${order.state}`}
+              onClick={() => toggleOrder(order.id)}
+            >
               #{order.id}
             </button>
           ))}
@@ -209,9 +213,8 @@ const OrdersDashboard = () => {
       {filteredOrders.map((order) => (
         <div
           key={order.id}
-          className={`order-card ${
-            openOrderIds.includes(order.id) ? "" : "closed"
-          }`}
+          className={`order-card ${openOrderIds.includes(order.id) ? "" : "closed"
+            }`}
         >
           <div className="order-header" onClick={() => toggleOrder(order.id)}>
             <div>
@@ -256,9 +259,8 @@ const OrdersDashboard = () => {
                       <span className="qty">Qty: {item.cantidad}</span>
                       <div className="order-actions-bottom">
                         <button
-                          className={`status-btn completed ${
-                            item.status_plate === "completed" ? "selected" : ""
-                          }`}
+                          className={`status-btn completed ${item.status_plate === "completed" ? "selected" : ""
+                            }`}
                           onClick={() =>
                             updateItemStatus(order.id, item.plato_id, "completed")
                           }
@@ -266,9 +268,8 @@ const OrdersDashboard = () => {
                           ✅ COMPLETED
                         </button>
                         <button
-                          className={`status-btn rejected ${
-                            item.status_plate === "rejected" ? "selected" : ""
-                          }`}
+                          className={`status-btn rejected ${item.status_plate === "rejected" ? "selected" : ""
+                            }`}
                           onClick={() =>
                             updateItemStatus(order.id, item.plato_id, "rejected")
                           }
@@ -276,9 +277,8 @@ const OrdersDashboard = () => {
                           ❌ REJECTED
                         </button>
                         <button
-                          className={`status-btn pending ${
-                            item.status_plate === "pending" ? "selected" : ""
-                          }`}
+                          className={`status-btn pending ${item.status_plate === "pending" ? "selected" : ""
+                            }`}
                           onClick={() =>
                             updateItemStatus(order.id, item.plato_id, "pending")
                           }
@@ -294,7 +294,7 @@ const OrdersDashboard = () => {
           </div>
 
           <div className="order-footer">
-            <strong>Total: €{order.total_price.toFixed(2)}</strong>
+            <strong>Total: €{(order.total_price || 0).toFixed(2)}</strong>
             <button
               className="confirm-order-btn"
               onClick={() => confirmAllItems(order.id)}
