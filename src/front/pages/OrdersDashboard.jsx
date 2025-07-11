@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useLocation } from 'react-router-dom';
 
 const OrdersDashboard = () => {
   const [orders, setOrders] = useState([]);
@@ -10,7 +11,8 @@ const OrdersDashboard = () => {
   const [visibleNotes, setVisibleNotes] = useState([]);
 
   const navigate = useNavigate();
-  const API = import.meta.env.VITE_BACKEND_URL;
+  //const API = import.meta.env.VITE_BACKEND_URL;
+  const BASE_URL = import.meta.env.VITE_BACKEND_URL; // esta variable esta en .env
 
   const filters = ["all", "completed", "rejected", "pending"];
   const categories = ["primer_plato", "segundo_plato", "postres", "bebidas"];
@@ -27,7 +29,7 @@ const OrdersDashboard = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    fetch(`${API}api/orders`, {
+    fetch(BASE_URL + "/orders", {
       headers: {
         Authorization: `Bearer ${token}`,
       },

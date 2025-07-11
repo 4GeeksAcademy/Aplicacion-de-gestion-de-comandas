@@ -51,12 +51,12 @@ const Login = () => {
           },
 
         }).then(() => {
-          if (userRol === "waiter" || userRol === "admin") { //rol es la variable const rol = data.user.rol.value
-            navigate("/table-map");
-          } else if (userRol === "cooker" || userRol === "admin") {
-            navigate('/cocina-map');
-            // } else if (rol === 'admin') { lo quito por ahora hasta que tengamos un componente admin que  sera quien modifique precios usuarios...
-            // navigate('/admin');
+          if (userRol === "waiter" ) { //rol es la variable const rol = data.user.rol.value
+            navigate("/table-map"); //aun verificar esta ruta con mohamed
+          } else if (userRol === "cooker" ) {
+            navigate('/orders-dashboard'); // componente vista de cocina
+          } else if (userRol === 'admin') {  
+            navigate('/admin-bar');
           } else {
             navigate('/'); // por si acaso
           }
