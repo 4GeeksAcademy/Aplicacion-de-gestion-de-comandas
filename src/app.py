@@ -41,6 +41,7 @@ app.url_map.strict_slashes = False
 bcrypt = Bcrypt(app)  # para encriptar
 
 CORS(app)
+#CORS(app, supports_credentials=True)
 
 
 app.url_map.strict_slashes = False
@@ -651,8 +652,7 @@ def login():
         return jsonify({'msg': 'El campo email es obligatorio'}), 400
     if 'password' not in body:
         return jsonify({'msg': 'El campo password es obligatorio'}), 400
-    if 'name' not in body:
-        return jsonify({'msg': 'El campo name es obligatorio'}), 400
+   
 
     user = User.query.filter_by(email=body['email']).first()
 

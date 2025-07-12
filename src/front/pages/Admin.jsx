@@ -30,10 +30,10 @@ const Admin = () => {
         // tu lógica aquí
       });
     } else {
-      console.warn("No hay comandas disponibles");
+      console.warn("No orders available");
     }
   } catch (err) {
-    console.error("Error cargando comandas:", err);
+    console.error("Error loading orders:", err);
   }
 };
  
