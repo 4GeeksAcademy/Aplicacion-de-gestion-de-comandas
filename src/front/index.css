@@ -397,6 +397,26 @@ body {
   position:relative;
 }
 
+
+.tables-background  {
+  background-image: url('https://tokyodeli.com.vn/Data/Sites/3/Product/2558/sashimi-c%C3%A1-h%E1%BB%93i.png');
+  width: 100vw;
+  height: 100vh;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  width: 100%;
+  height:100dvh;
+  min-height: 100dvh;
+  overflow: hidden; /* Evita scroll horizontal y vertical */
+  display: flex;
+  align-items:center;
+  justify-content: center;
+  padding: 1rem;
+  position:relative;
+}
+
 .private-background  {
   background-image: url('https://tse4.mm.bing.net/th/id/OIP.WxyCsJPiSVxBFIXTxffKlAHaHa?r=0&pid=ImgDet&w=178&h=178&c=7&dpr=1,5&o=7&rm=3');
   width: 100vw;

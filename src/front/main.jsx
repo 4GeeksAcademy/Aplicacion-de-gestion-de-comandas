@@ -20,6 +20,10 @@ const Main = () => {
             <StoreProvider> 
                 {/* Set up routing for the application */} 
                 <RouterProvider router={router}>
+                     future={{
+                          v7_startTransition: true,
+                          v7_relativeSplatPath: true,
+                     }}
                 </RouterProvider>
             </StoreProvider>
         </React.StrictMode>
