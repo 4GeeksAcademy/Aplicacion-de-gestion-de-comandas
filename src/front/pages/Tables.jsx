@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from 'sweetalert2';
+import Select from "react-select"; // y ejecuto en ña terminal npm install react-select
+
 
 const Tables = () => {
   const [mesas, setMesas] = useState([]);
@@ -39,16 +41,16 @@ const Tables = () => {
       if (res.ok) {
         // Actualiza el estado local para reflejar el cambio
         setMesas((mesasActuales) =>
-          mesasActuales.map((mesa) =>
+          [...mesasActuales.map((mesa) =>
             mesa.id === tableId ? { ...mesa, state: newState } : mesa
-          )
+          )].sort((a, b) => a.id - b.id)  //para q las mesas siempre se me organicen por su id
         );
       } else {
         console.error("Error updating state:", data);
         alert("Failed to update state.");
       }
-      
-     console.log("Table updated:", data);
+
+      console.log("Table updated:", data);
     } catch (error) {
       console.error("Network error:", error);
       alert("Error connecting to server.");
@@ -62,6 +64,13 @@ const Tables = () => {
     navigate("/table-order", { state: { mesa } });
   };
 
+
+  const stateOptions = [
+    { value: "available", label: "✅ Available" },
+    { value: "busy", label: "❌ Busy" },
+    { value: "reserved", label: "⏳ Reserved" },
+    { value: "closed", label: "🔒 Closed" },
+  ];
   return (
 
 
@@ -155,21 +164,36 @@ const Tables = () => {
                 </div>
 
 
-                <div className="mt-3">
-                  <select
-                    value={table.state}
-                    onClick={(e) => e.stopPropagation()}// previene que al hacer click en el dropdown me salga el mensaj q sale al dar click en el resto de la img
-                    onChange={(e) => {
-                         e.stopPropagation(); // 🛑 evita que el clic llegue al card
-                         handleStateChange(table.id, e.target.value);
+                <div className="mt-3" onClick={(e) => e.stopPropagation()}>
+                  <Select
+                    value={stateOptions.find((option) => option.value === table.state)}
+                    onChange={(selectedOption) =>
+                      handleStateChange(table.id, selectedOption.value)
+                    }
+                    options={stateOptions}
+                    isSearchable={false}
+                    styles={{
+                      control: (base) => ({
+                        ...base,
+                        minHeight: "30px",
+                        height: "30px",
+                        fontSize: "0.85rem",
+                        borderRadius: "8px",
+                      }),
+                      dropdownIndicator: (base) => ({
+                        ...base,
+                        padding: 4,
+                      }),
+                      indicatorsContainer: (base) => ({
+                        ...base,
+                        height: "30px",
+                      }),
+                      menu: (base) => ({
+                        ...base,
+                        zIndex: 9999,
+                      }),
                     }}
-                    className="form-select form-select-sm"
-                  >
-                    <option value="available">Available</option>
-                    <option value="busy">Busy</option>
-                    <option value="reserved">Reserved</option>
-                    <option value="closed">Closed</option>
-                  </select>
+                  />
                 </div>
 
 

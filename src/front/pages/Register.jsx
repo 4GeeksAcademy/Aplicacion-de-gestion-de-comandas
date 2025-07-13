@@ -147,11 +147,11 @@ const Register = () => {
 
         <div className="mb-2">
           <Select
-            options={options}
-            value={options.find((o) => o.value === rol)}
-            onChange={(selected) => setRol(selected.value)}
-            placeholder="Select a role"
-            styles={{
+             options={options}
+             value={options.find((o) => o.value === rol)}
+             onChange={(selected) => setRol(selected.value)}
+             placeholder="Select a role"
+             styles={{
               control: (base) => ({
                 ...base,
                 backgroundColor: "rgba(255,255,255,0.6)",
