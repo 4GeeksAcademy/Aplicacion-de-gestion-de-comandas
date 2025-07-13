@@ -24,6 +24,39 @@ const Tables = () => {
     fetchMesas();
   }, []);
 
+
+  const handleStateChange = async (tableId, newState) => {
+    try {
+      const res = await fetch(`${BASE_URL}/tables/${tableId}`, { //el endpoint de PUt de una table por id tiene que estar en app.py
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ state: newState }), // el state que entra como parametro
+      });
+
+      const data = await res.json(); // traigo el data 
+      if (res.ok) {
+        // Actualiza el estado local para reflejar el cambio
+        setMesas((mesasActuales) =>
+          mesasActuales.map((mesa) =>
+            mesa.id === tableId ? { ...mesa, state: newState } : mesa
+          )
+        );
+      } else {
+        console.error("Error updating state:", data);
+        alert("Failed to update state.");
+      }
+      
+     console.log("Table updated:", data);
+    } catch (error) {
+      console.error("Network error:", error);
+      alert("Error connecting to server.");
+    }
+  };
+
+
+
   const handleClick = (mesa) => {
     console.log("Mesa clickeada:", mesa);
     navigate("/table-order", { state: { mesa } });
@@ -31,7 +64,8 @@ const Tables = () => {
 
   return (
 
-    <div className="container mt-3 px-10 py-10" style={{ border: ' 1px solid #e76b60', color: "#e76b60" }}>
+
+    <div className="container mt-3 px-10 py-10">
       <h2 className="mb-4 mt-4">Tables</h2>
       <div className="row mb-3 g-4">
         {mesas.map((table) => (
@@ -101,6 +135,8 @@ const Tables = () => {
               />
               <div className="card-body text-center">
                 <h5 className="card-title">Table {table.id}</h5>
+
+
                 <div className="card-text">
                   🪑 Seats: {table.seats}
                   <br />
@@ -117,6 +153,26 @@ const Tables = () => {
                     <span className="text-secondary">🔒 Closed</span>
                   )}
                 </div>
+
+
+                <div className="mt-3">
+                  <select
+                    value={table.state}
+                    onClick={(e) => e.stopPropagation()}// previene que al hacer click en el dropdown me salga el mensaj q sale al dar click en el resto de la img
+                    onChange={(e) => {
+                         e.stopPropagation(); // 🛑 evita que el clic llegue al card
+                         handleStateChange(table.id, e.target.value);
+                    }}
+                    className="form-select form-select-sm"
+                  >
+                    <option value="available">Available</option>
+                    <option value="busy">Busy</option>
+                    <option value="reserved">Reserved</option>
+                    <option value="closed">Closed</option>
+                  </select>
+                </div>
+
+
               </div>
             </div>
           </div>
@@ -128,3 +184,4 @@ const Tables = () => {
 
 export default Tables;
 //https://tse3.mm.bing.net/th/id/OIP.8t5TFov2Q7P5rAGzwxohVwAAAA?pid=ImgDet&w=178&h=178&c=7&dpr=1,5&o=7&rm=3
+// <div className="container mt-3 px-10 py-10" style={{ border: ' 1px solid #e76b60', color: "#e76b60" }}> */}
