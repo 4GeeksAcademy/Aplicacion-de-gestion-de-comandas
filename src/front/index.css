@@ -4,7 +4,7 @@
 body {
   margin: 0;
   font-family: "Poppins", sans-serif;
-  background-color: #191823;
+  background-color: #191823; 
   color: #333;
 }
 
@@ -446,14 +446,14 @@ body {
 
   
 
-body, html {
+/*body, html {
   margin: 0;
   padding: 0;
   height: 100%;
   overflow-x: hidden;
   font-family: 'Roboto', sans-serif;
 }
-
+*/
 select.form-control option {
   white-space: nowrap;
   overflow: hidden;

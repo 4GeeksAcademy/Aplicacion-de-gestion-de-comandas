@@ -6,6 +6,7 @@ const TableMap = () => {
   const navigate = useNavigate();
 
   const BASE_URL = import.meta.env.VITE_BACKEND_URL;
+  console.log("BASE_URL:", BASE_URL);
 
   useEffect(() => {
     const fetchMesas = async () => {
@@ -27,11 +28,13 @@ const TableMap = () => {
   };
 
   return (
-<div className="container py-4">
+
+<div className="container py-4" style={{ border: '2px solid red' }}>
       <h2 className="mb-4">Tables</h2>
       <div className="row g-4">
         {mesas.map((table) => (
           <div className="col-6 col-md-4 col-lg-3" key={table.id}>
+            
             <div
               className="card h-100"
               style={{
@@ -54,15 +57,15 @@ const TableMap = () => {
                 cursor: "pointer",
               }}
               onClick={() => {
-                if (table.state === "available" || table.state === "busy") {
-                  navigate("/table-order", { state: { table } });
-                } else {
+                if (table.state === "available" || table.state === "busy")
+                   {handleClick} 
+                else {
                   alert("Mesa no disponible para ordenar.");
                 }
               }}
             >
               <img
-                src={table.image_url || "/default_table.jpg"}
+                src={"https://tse3.mm.bing.net/th/id/OIP.8t5TFov2Q7P5rAGzwxohVwAAAA?pid=ImgDet&w=178&h=178&c=7&dpr=1,5&o=7&rm=3"}
                 className="card-img-top"
                 alt={`Mesa ${table.id}`}
                 style={{ height: "150px", objectFit: "cover" }}

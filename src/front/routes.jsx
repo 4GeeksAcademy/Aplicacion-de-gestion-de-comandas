@@ -43,7 +43,7 @@ export const router = createBrowserRouter(
       <Route path="/register" element={<Register />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/request-reset-password" element={<RequestReset />} />
-      <Route path="/table-map" element={<TableMap/>} />
+      
       <Route path="/orders-dashboard" element={<OrdersDashboard />} />
       <Route path="/admin-bar" element={<Admin />} />
       <Route path="/tables" element={<Tables />} />

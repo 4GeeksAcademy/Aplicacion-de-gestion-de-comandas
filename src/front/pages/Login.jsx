@@ -52,7 +52,7 @@ const Login = () => {
 
         }).then(() => {
           if (userRol === "waiter") { //rol es la variable const rol = data.user.rol.value
-            navigate("/tables"); //aun verificar esta ruta con mohamed
+            navigate("/tables"); //componente vista de todas las mesas del salon 
           } else if (userRol === "cooker") {
             navigate('/orders-dashboard'); // componente vista de cocina
           } else if (userRol === 'admin') {
