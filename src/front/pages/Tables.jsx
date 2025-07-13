@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from 'sweetalert2';
-import Select from "react-select"; // y ejecuto en ña terminal npm install react-select
+import Select from "react-select"; // e instalo en la terminal del front  npm install react-select
 
 
 const Tables = () => {

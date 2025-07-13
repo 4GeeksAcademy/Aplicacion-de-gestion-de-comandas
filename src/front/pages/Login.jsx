@@ -39,9 +39,9 @@ const Login = () => {
         // ✅ Mostrar modal de éxito
         Swal.fire({
           icon: 'success',
-          title: '¡Login exitoso!',
-          text: 'Usted se ha logueado correctamente',
-          confirmButtonText: 'Continuar',
+          title: '¡Successful login!',
+          text: 'You have logged in successfully.',
+          confirmButtonText: 'Continue',
           width: "200px",
           timer: 3000,
           customClass: {
@@ -66,8 +66,8 @@ const Login = () => {
         // ❌ Mostrar modal de error
         Swal.fire({
           icon: 'error',
-          title: 'Error de autenticación',
-          text: data.msg || 'Credenciales incorrectas',
+          title: 'Authentication error',
+          text: data.msg || 'Incorrect credentials',
           width: "200px",
           timer: 3000,
           customClass: {
@@ -81,8 +81,8 @@ const Login = () => {
       console.error("ERROR DE FETCH:", err);
       Swal.fire({
         icon: 'error',
-        title: 'Error del servidor',
-        text: 'No se pudo conectar con el servidor',
+        title: 'Server error',
+        text: 'Could not connect to the server.',
         width: "200px",
         timer: 3000,
         customClass: {
@@ -95,8 +95,6 @@ const Login = () => {
   };
 
   return (
-
-
 
     <div
       className="d-flex justify-content-center align-items-center vh-100"
@@ -112,8 +110,6 @@ const Login = () => {
         onSubmit={handleLogin}
         className="login-background d-flex align-items-start justify-content-start w-70 vh-100 p-4"
       >
-
-
         <div
           className="w-100 p-4"
           style={{
