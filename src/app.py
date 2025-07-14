@@ -141,7 +141,7 @@ def get_orders():
 @app.route('/orders/<int:id>', methods=['GET'])
 @jwt_required()
 def get_order_by_id(id):
-    usuario_id = get_jwt_identity() #usuario es el q esta logueado
+    usuario_id = get_jwt_identity()  # usuario es el q esta logueado
     # query.get solo funciona para devolver primary key. para devolver otro campo usar query.filter_by
     order = Orders.query.get(id)
     print("comanda", order)
@@ -652,7 +652,6 @@ def login():
         return jsonify({'msg': 'El campo email es obligatorio'}), 400
     if 'password' not in body:
         return jsonify({'msg': 'El campo password es obligatorio'}), 400
-   
 
     user = User.query.filter_by(email=body['email']).first()
 
@@ -672,10 +671,10 @@ def login():
     acces_token = create_access_token(identity=user.email)  # genero token
     return jsonify({'msg': 'OK',
                     'Token': acces_token,
-                    'user':{
-                          'name': user.name,
-                          'email': user.email,
-                          'rol': user.rol.value}}), 200
+                    'user': {
+                        'name': user.name,
+                        'email': user.email,
+                        'rol': user.rol.value}}), 200
 
 # -------------------------------PROTECCIÓN ---OK--------------------------------
 
