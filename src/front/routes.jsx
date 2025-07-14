@@ -17,7 +17,7 @@ import OrdersDashboard from "./pages/OrdersDashboard";
 import Admin from "./pages/Admin";
 import Tables from "./pages/Tables";
 import TableOrder from "./pages/TableOrder";
- 
+import Menu from "./pages/Menu";
 
 
 
@@ -34,25 +34,19 @@ export const router = createBrowserRouter(
     // Root Route: All navigation will start from here.
     <Route path="/" element={<Layout />} errorElement={<h1>Not found!</h1>} >
 
-      {/* Nested Routes: Defines sub-routes within the BaseHome component. */}
       <Route path="/" element={<Login />} />
-      <Route path="/single/:theId" element={<Single />} />  {/* Dynamic route for single items */}
+      <Route path="/single/:theId" element={<Single />} />
       <Route path="/demo" element={<Demo />} />
       <Route path="/login" element={<Login />} />
       <Route path="/private" element={<Private />} />
       <Route path="/register" element={<Register />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/request-reset-password" element={<RequestReset />} />
-      
       <Route path="/orders-dashboard" element={<OrdersDashboard />} />
       <Route path="/admin-bar" element={<Admin />} />
       <Route path="/tables" element={<Tables />} />
       <Route path="/table-order/:id" element={<TableOrder />} />
-      
-
-
+      <Route path="/menu" element={<Menu />} />
     </Route>
   ),
-
-
 );

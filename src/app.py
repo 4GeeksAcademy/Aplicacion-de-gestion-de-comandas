@@ -222,7 +222,7 @@ def crear_comanda():
         return jsonify({'msg': f'Error al crear la comanda: {str(e)}'}), 500
 
 
-# -----------------------------PUT DE COMANDA ----OK----------------------------------------------------
+# -----------------------------PUT DE COMANDA POR ID ----OK----------------------------------------------------
 
 @app.route('/orders/<int:order_id>', methods=['PUT'])
 @jwt_required()
@@ -465,7 +465,6 @@ def put_user(id):
 
     return jsonify({'msg': 'Usuario ACTUALIZADO correctamente', 'user': update_user.serialize()}), 201
 
-# ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -497,7 +496,7 @@ def get_plate_by_id(id):
 
 
 @app.route('/plates/<string:category_name>', methods=['GET'])
-@jwt_required()
+# @jwt_required()
 def get_plates_by_category(category_name):
     try:
         category_enum = EstadoCategorias(category_name)
