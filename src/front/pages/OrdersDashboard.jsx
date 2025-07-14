@@ -19,7 +19,7 @@ const OrdersDashboard = () => {
     useEffect(() => {
         const token = localStorage.getItem("token");
 
-        fetch(`${BASE_URL}orders`, {
+        fetch(`${BASE_URL}/orders`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -61,7 +61,7 @@ const OrdersDashboard = () => {
     useEffect(() => {
         const token = localStorage.getItem("token");
 
-        fetch(`${BASE_URL}plates`, {
+        fetch(`${BASE_URL}/plates`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -86,7 +86,7 @@ const OrdersDashboard = () => {
     const updateItemStatus = (orderId, plateId, newStatus) => {
         const token = localStorage.getItem("token");
 
-        fetch(`${BASE_URL}orders/${orderId}/plate-status`, {
+        fetch(`${BASE_URL}/orders/${orderId}/plate-status`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
@@ -116,7 +116,7 @@ const OrdersDashboard = () => {
 
     const confirmAllItems = (orderId) => {
         const token = localStorage.getItem("token");
-        fetch(`${BASE_URL}orders/${orderId}`, {
+        fetch(`${BASE_URL}/orders/${orderId}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
@@ -140,7 +140,7 @@ const OrdersDashboard = () => {
 
     const resetOrderStatus = (orderId) => {
         const token = localStorage.getItem("token");
-        fetch(`${BASE_URL}orders/${orderId}`, {
+        fetch(`${BASE_URL}/orders/${orderId}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
