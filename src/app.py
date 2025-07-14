@@ -42,7 +42,7 @@ bcrypt = Bcrypt(app)  # para encriptar
 
 CORS(app, supports_credentials=True, resources={
     r"/*": {
-        "origins": "https://scaling-funicular-5g6r47pqpwv3vjqg-3000.app.github.dev"
+        "origins": "https://silver-zebra-7v96jgxrgp4rcj56-3000.app.github.dev/"
     }
 })
 
