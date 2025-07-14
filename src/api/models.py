@@ -163,7 +163,7 @@ class Orders(db.Model):
             "usuario_id": self.usuario_id,
             "state": self.state.value,
             "guest_notes": self.guest_notes,
-            
+            "date": self.date,
             "total_price": float(self.total_price) if self.total_price is not None else 0.0,
             "platos": [op.serialize() for op in self.comanda_platos]
          
