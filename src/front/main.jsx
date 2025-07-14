@@ -1,11 +1,12 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import './index.css'  // Global styles for your application
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import './index.css' ; // Global styles for your application
 import { RouterProvider } from "react-router-dom";  // Import RouterProvider to use the router
 import { router } from "./routes";  // Import the router configuration
 import { StoreProvider } from './hooks/useGlobalReducer';  // Import the StoreProvider for global state management
 import { BackendURL } from './components/BackendURL';
-import './index.css';
+
+
 
 const Main = () => {
     
@@ -20,6 +21,10 @@ const Main = () => {
             <StoreProvider> 
                 {/* Set up routing for the application */} 
                 <RouterProvider router={router}>
+                     future={{
+                          v7_startTransition: true,
+                          v7_relativeSplatPath: true,
+                     }}
                 </RouterProvider>
             </StoreProvider>
         </React.StrictMode>

@@ -55,8 +55,8 @@ const Register = () => {
       if (res.ok) {
         Swal.fire({
           icon: "success",
-          title: "¡Usuario registrado con éxito!",
-          confirmButtonText: "Iniciar sesión",
+          title: "¡User registered successfully!",
+          confirmButtonText: "Log in",
           width: "200px",
           timer: 3000,
           customClass: {
@@ -75,8 +75,8 @@ const Register = () => {
       } else {
         Swal.fire({
           icon: "error",
-          title: "Error al registrar",
-          text: data.msg || "No se pudo completar el registro.",
+          title: "Register Error",
+          text: data.msg || "The registration could not be completed..",
           width: "200px",
           timer: 3000,
           customClass: {
@@ -89,8 +89,8 @@ const Register = () => {
     } catch (err) {
       Swal.fire({
         icon: "error",
-        title: "Error del servidor",
-        text: "No se pudo conectar con el backend.",
+        title: "Server Error",
+        text: "It was not possible to connect to the backend.",
         width: "200px",
       });
     }
@@ -147,11 +147,11 @@ const Register = () => {
 
         <div className="mb-2">
           <Select
-            options={options}
-            value={options.find((o) => o.value === rol)}
-            onChange={(selected) => setRol(selected.value)}
-            placeholder="Select a role"
-            styles={{
+             options={options}
+             value={options.find((o) => o.value === rol)}
+             onChange={(selected) => setRol(selected.value)}
+             placeholder="Select a role"
+             styles={{
               control: (base) => ({
                 ...base,
                 backgroundColor: "rgba(255,255,255,0.6)",

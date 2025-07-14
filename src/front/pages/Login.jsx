@@ -23,6 +23,7 @@ const Login = () => {
         headers: {
           "Content-Type": "application/json",
         },
+          credentials: "include",
         body: JSON.stringify({ email, password }),
       });
 
@@ -30,17 +31,17 @@ const Login = () => {
       console.log("Respuesta del backend:", data);
 
       if (res.ok) {
-        localStorage.setItem("token", data.token); //guardo el token y el usuario en localStorage
+        localStorage.setItem("token", data.Token); //guardo el token y el usuario en localStorage
         localStorage.setItem("user", JSON.stringify(data.user));
-
+        
         const userRol = data.user.rol; // extraigo el rol
 
         // ✅ Mostrar modal de éxito
         Swal.fire({
           icon: 'success',
-          title: '¡Login exitoso!',
-          text: 'Usted se ha logueado correctamente',
-          confirmButtonText: 'Continuar',
+          title: '¡Successful login!',
+          text: 'You have logged in successfully.',
+          confirmButtonText: 'Continue',
           width: "200px",
           timer: 3000,
           customClass: {
@@ -50,12 +51,12 @@ const Login = () => {
           },
 
         }).then(() => {
-          if (userRol === "waiter" || userRol === "admin") { //rol es la variable const rol = data.user.rol.value
-            navigate("/table-map");
-          } else if (userRol === "cooker" || userRol === "admin") {
-            navigate('/cocina-map');
-            // } else if (rol === 'admin') { lo quito por ahora hasta que tengamos un componente admin que  sera quien modifique precios usuarios...
-            // navigate('/admin');
+          if (userRol === "waiter") { //rol es la variable const rol = data.user.rol.value
+            navigate("/tables"); //componente vista de todas las mesas del salon 
+          } else if (userRol === "cooker") {
+            navigate('/orders-dashboard'); // componente vista de cocina
+          } else if (userRol === 'admin') {
+            navigate('/admin-bar');
           } else {
             navigate('/'); // por si acaso
           }
@@ -65,9 +66,9 @@ const Login = () => {
         // ❌ Mostrar modal de error
         Swal.fire({
           icon: 'error',
-          title: 'Error de autenticación',
-          text: data.msg || 'Credenciales incorrectas',
-          width: "200px",
+          title: 'Authentication error',
+          text: data.msg || 'Incorrect credentials',
+          width: "210px",
           timer: 3000,
           customClass: {
             title: 'fs-5',
@@ -80,9 +81,9 @@ const Login = () => {
       console.error("ERROR DE FETCH:", err);
       Swal.fire({
         icon: 'error',
-        title: 'Error del servidor',
-        text: 'No se pudo conectar con el servidor',
-        width: "200px",
+        title: 'Server error',
+        text: 'Could not connect to the server.',
+        width: "210px",
         timer: 3000,
         customClass: {
           title: 'fs-5',
@@ -95,8 +96,6 @@ const Login = () => {
 
   return (
 
-
-
     <div
       className="d-flex justify-content-center align-items-center vh-100"
       style={{
@@ -106,13 +105,11 @@ const Login = () => {
         overflow: "hidden",
       }}
     >
-      
+
       <form
         onSubmit={handleLogin}
         className="login-background d-flex align-items-start justify-content-start w-70 vh-100 p-4"
       >
-
-
         <div
           className="w-100 p-4"
           style={{
