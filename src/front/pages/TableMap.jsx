@@ -1,54 +1,93 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const TableMap = () => {
   const [mesas, setMesas] = useState([]);
+  const navigate = useNavigate();
 
   const BASE_URL = import.meta.env.VITE_BACKEND_URL;
+  console.log("BASE_URL:", BASE_URL);
 
   useEffect(() => {
     const fetchMesas = async () => {
       try {
-        const res = await fetch(`${BASE_URL}/api/mesas`);
+        const res = await fetch(`${BASE_URL}/tables`); //hago get de todas las mesas
         const data = await res.json();
-        setMesas(data);
+        setMesas(data.result);
+        console.log(data.result);
       } catch (err) {
-        console.error("Error al cargar las mesas", err);
+        console.error("Error loading tables", err);
       }
     };
 
     fetchMesas();
   }, []);
 
+  const handleClick = (mesa) => {
+    navigate("/table-order", { state: { mesa } });
+  };
+
   return (
-    <div className="container py-4">
-      <h2 className="mb-4">Mapa de Mesas</h2>
+
+<div className="container py-4" style={{ border: '2px solid red' }}>
+      <h2 className="mb-4">Tables</h2>
       <div className="row g-4">
-        {mesas.map((mesa) => (
-          <div className="col-6 col-md-4 col-lg-3" key={mesa.id}>
+        {mesas.map((table) => (
+          <div className="col-6 col-md-4 col-lg-3" key={table.id}>
+            
             <div
               className="card h-100"
               style={{
-                border: mesa.available ? "2px solid #28a745" : "2px solid #dc3545",
-                backgroundColor: mesa.available ? "#e8f5e9" : "#f8d7da",
+                border:
+                  table.state === "available"
+                    ? "2px solid #28a745"
+                    : table.state === "busy"
+                    ? "2px solid #dc3545"
+                    : table.state === "reserved"
+                    ? "2px solid #ffc107"
+                    : "2px solid #6c757d",
+                backgroundColor:
+                  table.state === "available"
+                    ? "#e8f5e9"
+                    : table.state === "busy"
+                    ? "#f8d7da"
+                    : table.state === "reserved"
+                    ? "#fff3cd"
+                    : "#e2e3e5",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                if (table.state === "available" || table.state === "busy")
+                   {handleClick} 
+                else {
+                  alert("Mesa no disponible para ordenar.");
+                }
               }}
             >
               <img
-                src={mesa.image_url || "/default_table.jpg"}
+                src={"https://tse3.mm.bing.net/th/id/OIP.8t5TFov2Q7P5rAGzwxohVwAAAA?pid=ImgDet&w=178&h=178&c=7&dpr=1,5&o=7&rm=3"}
                 className="card-img-top"
-                alt={`Mesa ${mesa.table_number}`}
+                alt={`Mesa ${table.id}`}
                 style={{ height: "150px", objectFit: "cover" }}
               />
               <div className="card-body text-center">
-                <h5 className="card-title">Mesa {mesa.table_number}</h5>
-                <p className="card-text">
-                  🪑 Asientos: {mesa.seater}
+                <h5 className="card-title">Table {table.id}</h5>
+                <div className="card-text">
+                  🪑 Seats: {table.seats}
                   <br />
-                  {mesa.available ? (
-                    <span className="text-success">✅ Disponible</span>
-                  ) : (
-                    <span className="text-danger">❌ Ocupada</span>
+                  {table.state === "available" && (
+                    <span className="text-success">✅ Available</span>
                   )}
-                </p>
+                  {table.state === "busy" && (
+                    <span className="text-danger">❌ Busy</span>
+                  )}
+                  {table.state === "reserved" && (
+                    <span className="text-warning">⏳ Reserved</span>
+                  )}
+                  {table.state === "closed" && (
+                    <span className="text-secondary">🔒 Closed</span>
+                  )}
+                </div>
               </div>
             </div>
           </div>

@@ -55,12 +55,13 @@
 		]
 	},
 	"dependencies": {
-		"cors": "^2.8.5",
+		"@cloudinary/react": "^1.14.3",
+		"@cloudinary/url-gen": "^1.21.0",
 		"prop-types": "^15.8.1",
 		"react": "^18.2.0",
 		"react-dom": "^18.2.0",
 		"react-router-dom": "^6.18.0",
-		"react-select": "^5.10.1",
+		"react-select": "^5.10.2",
 		"sweetalert2": "^11.22.2"
 	}
 }

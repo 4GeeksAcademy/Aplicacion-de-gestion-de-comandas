@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useLocation } from 'react-router-dom';
 
 const OrdersDashboard = () => {
     const [orders, setOrders] = useState([]);
@@ -18,7 +19,7 @@ const OrdersDashboard = () => {
     useEffect(() => {
         const token = localStorage.getItem("token");
 
-        fetch(`${BASE_URL}orders`, {
+        fetch(`${BASE_URL}/orders`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -31,7 +32,7 @@ const OrdersDashboard = () => {
 
                 ordenes.forEach((order) => {
                     if (order.usuario_id && !users[order.usuario_id]) {
-                        fetch(`${BASE_URL}users/${order.usuario_id}`, {
+                        fetch(`${BASE_URL}/users/${order.usuario_id}`, {
                             headers: {
                                 Authorization: `Bearer ${token}`,
                             },
@@ -60,7 +61,7 @@ const OrdersDashboard = () => {
     useEffect(() => {
         const token = localStorage.getItem("token");
 
-        fetch(`${BASE_URL}plates`, {
+        fetch(`${BASE_URL}/plates`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -85,7 +86,7 @@ const OrdersDashboard = () => {
     const updateItemStatus = (orderId, plateId, newStatus) => {
         const token = localStorage.getItem("token");
 
-        fetch(`${BASE_URL}orders/${orderId}/plate-status`, {
+        fetch(`${BASE_URL}/orders/${orderId}/plate-status`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
@@ -115,7 +116,7 @@ const OrdersDashboard = () => {
 
     const confirmAllItems = (orderId) => {
         const token = localStorage.getItem("token");
-        fetch(`${BASE_URL}orders/${orderId}`, {
+        fetch(`${BASE_URL}/orders/${orderId}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
@@ -139,7 +140,7 @@ const OrdersDashboard = () => {
 
     const resetOrderStatus = (orderId) => {
         const token = localStorage.getItem("token");
-        fetch(`${BASE_URL}orders/${orderId}`, {
+        fetch(`${BASE_URL}/orders/${orderId}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
