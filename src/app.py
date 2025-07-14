@@ -26,6 +26,7 @@ from flask_mail import Mail, Message # para enviar correos para reset password
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from werkzeug.security import generate_password_hash
 
+
 # from flask_bcrypt import Bcrypt
 
 from flask_cors import CORS

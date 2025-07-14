@@ -49,7 +49,7 @@ const Admin = () => {
       }}
     >
       <div
-        className="login-background d-flex align-items-start justify-content-start w-70 vh-100 p-4"
+        className="admin-background d-flex align-items-start justify-content-start w-70 vh-100 p-4"
       >
         <div
           className="w-100 p-4"
@@ -68,7 +68,7 @@ const Admin = () => {
 
           <button
             type="button"
-            onClick={() => navigate('/table-map')}
+            onClick={() => navigate('/tables')}
             className="btn w-100"
             style={{
               backgroundColor: "#fa8072",

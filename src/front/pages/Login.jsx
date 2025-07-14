@@ -68,7 +68,7 @@ const Login = () => {
           icon: 'error',
           title: 'Authentication error',
           text: data.msg || 'Incorrect credentials',
-          width: "200px",
+          width: "210px",
           timer: 3000,
           customClass: {
             title: 'fs-5',
@@ -83,7 +83,7 @@ const Login = () => {
         icon: 'error',
         title: 'Server error',
         text: 'Could not connect to the server.',
-        width: "200px",
+        width: "210px",
         timer: 3000,
         customClass: {
           title: 'fs-5',

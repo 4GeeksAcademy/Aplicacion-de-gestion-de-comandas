@@ -61,7 +61,7 @@ const Tables = () => {
 
   const handleClick = (mesa) => {
     console.log("Mesa clickeada:", mesa);
-    navigate("/table-order", { state: { mesa } });
+    navigate(`/table-order/${mesa.id}`)
   };
 
 
@@ -71,15 +71,14 @@ const Tables = () => {
     { value: "reserved", label: "⏳ Reserved" },
     { value: "closed", label: "🔒 Closed" },
   ];
-  return (
 
+  return (
 
     <div className="container mt-3 px-10 py-10">
       <h2 className="mb-4 mt-4">Tables</h2>
       <div className="row mb-3 g-4">
         {mesas.map((table) => (
           <div className="col-6 col-md-4 col-lg-3" key={table.id}>
-
             <div
               className="card h-100"
               style={{
@@ -87,18 +86,18 @@ const Tables = () => {
                   table.state === "available"
                     ? "2px solid #28a745"
                     : table.state === "busy"
-                      ? "2px solid #dc3545"
-                      : table.state === "reserved"
-                        ? "2px solid #ffc107"
-                        : "2px solid #6c757d",
+                    ? "2px solid #dc3545"
+                    : table.state === "reserved"
+                    ? "2px solid #ffc107"
+                    : "2px solid #6c757d",
                 backgroundColor:
                   table.state === "available"
                     ? "#e8f5e9"
                     : table.state === "busy"
-                      ? "#f8d7da"
-                      : table.state === "reserved"
-                        ? "#fff3cd"
-                        : "#e2e3e5",
+                    ? "#f8d7da"
+                    : table.state === "reserved"
+                    ? "#fff3cd"
+                    : "#e2e3e5",
                 cursor: "pointer",
               }}
               onClick={() => {

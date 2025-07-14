@@ -5,16 +5,16 @@ import Swal from "sweetalert2";
 export const Navbar = () => {
 	const location = useLocation();
 	const navigate = useNavigate();
-	
+
 	//const token = localStorage.getItem("token");
 	//const user = localStorage.getItem("user");
 	//localStorage.setItem("user", JSON.stringify(user));
-	
+
 	//const rawUser = localStorage.getItem("user");
-	
+
 	//const user = rawUser ? JSON.parse(rawUser) : null;
 	//const user = JSON.parse(localStorage.getItem("user"));
-	
+
 
 	const token = localStorage.getItem("token");
 	const rawUser = localStorage.getItem("user");
@@ -23,11 +23,11 @@ export const Navbar = () => {
 
 
 	/* useEffect(() => {
-   		 if (user) {
-     		 console.log("Email del usuario:", user.email);
-      		 console.log("Nombre del usuario:", user.name);
-           }
-       }, [user]);*/
+				 if (user) {
+				 console.log("Email del usuario:", user.email);
+				 console.log("Nombre del usuario:", user.name);
+		   }
+	   }, [user]);*/
 
 
 	const isAuthenticated = !!token;
@@ -43,6 +43,11 @@ export const Navbar = () => {
 		<nav className="navbar" style={{ backgroundColor: "#fa8072" }}>
 
 			<div className="container">
+
+				<div className="logo text-white">
+					<i className="fas fa-store"></i> <span>Japanese Restaurant</span>
+				</div>
+
 				<div className="ms-auto d-flex align-items-center">
 					{!token ? (
 						<>
@@ -56,6 +61,16 @@ export const Navbar = () => {
 									Log in
 								</Link>
 							)}
+							{location.pathname === "/request-reset-password" && (
+								<Link to="/login" className="btn btn-outline-light me-2">
+									Log in
+								</Link>
+							)}
+							{location.pathname === "/request-reset-password" && (
+								<Link to="/login" className="btn btn-outline-light me-2">
+									Sign Up
+								</Link>
+							)}
 
 						</>
 					) : (
@@ -67,6 +82,9 @@ export const Navbar = () => {
 						</>
 					)}
 					<button
+
+
+
 						className="btn btn-outline-light me-2"
 						onClick={() => {
 							Swal.fire({

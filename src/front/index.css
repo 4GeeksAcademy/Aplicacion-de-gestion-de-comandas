@@ -1,12 +1,28 @@
 /* ------------------ martanvcs {OrdersDashboard} {Start}  ------------------ */
 
 /* ------------------ Estilos base y configuración general ------------------ */
-body {
+html, body {
+  height: 100%; /*no borrar. footer al pie de la pagina*/
   margin: 0;
+  padding: 0;
   font-family: "Poppins", sans-serif;
   background-color: #191823; 
   color: #333;
 }
+
+body { /*no borrar. footer al pie de la pagina*/
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+#root { /*no borrar. footer al pie de la pagina*/
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+
 
 .orders-dashboard {
   padding: 1rem;
@@ -398,8 +414,8 @@ body {
 }
 
 
-.tables-background  {
-  background-image: url('https://tokyodeli.com.vn/Data/Sites/3/Product/2558/sashimi-c%C3%A1-h%E1%BB%93i.png');
+.admin-background  {
+  background-image: url('https://tse2.mm.bing.net/th/id/OIP.Hf3osO3dpdpjpgx-Uwhb4AHaE7?r=0&pid=ImgDet&w=199&h=132&c=7&dpr=1,5&o=7&rm=3');
   width: 100vw;
   height: 100vh;
   background-size: cover;

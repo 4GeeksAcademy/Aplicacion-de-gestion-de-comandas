@@ -12,7 +12,7 @@ import Private from "./pages/Private";
 import Register from "./pages/Register";
 import ResetPassword from "./pages/ResetPassword";
 import RequestReset from "./pages/RequestReset";
-import TableMap from "./pages/TableMap";
+//import TableMap from "./pages/TableMap";
 import OrdersDashboard from "./pages/OrdersDashboard";
 import Admin from "./pages/Admin";
 import Tables from "./pages/Tables";
