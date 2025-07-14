@@ -1,7 +1,7 @@
 export const Footer = () => (
 		<footer className="footer mt-auto mb-0 py-3 text-center" 
 		style={{ fontSize: '0.75rem', color: 'rgba(245, 237, 237, 0.7)' , backgroundColor: 'transparent'}}
-  			 style={{ margin: 0 }}>
+  			>
 				<div>
    			      © 2025 Gestión de Comandas. Todos los derechos reservados.<i className="fa fa-heart text-danger" /> {' '}
 			    </div>
