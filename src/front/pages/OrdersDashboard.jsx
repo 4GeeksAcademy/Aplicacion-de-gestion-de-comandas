@@ -32,7 +32,7 @@ const OrdersDashboard = () => {
 
                 ordenes.forEach((order) => {
                     if (order.usuario_id && !users[order.usuario_id]) {
-                        fetch(`${BASE_URL}users/${order.usuario_id}`, {
+                        fetch(`${BASE_URL}/users/${order.usuario_id}`, {
                             headers: {
                                 Authorization: `Bearer ${token}`,
                             },
