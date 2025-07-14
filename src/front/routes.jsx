@@ -23,7 +23,7 @@ import TableOrder from "./pages/TableOrder";
 
 
 export const router = createBrowserRouter(
-    createRoutesFromElements(
+  createRoutesFromElements(
 
     // CreateRoutesFromElements function allows you to build route elements declaratively.
     // Create your routes here, if you want to keep the Navbar and Footer in all views, add your new routes inside the containing Route.
@@ -49,8 +49,10 @@ export const router = createBrowserRouter(
       <Route path="/tables" element={<Tables />} />
       <Route path="/table-order/:id" element={<TableOrder />} />
       
+
+
     </Route>
   ),
 
-  
+
 );

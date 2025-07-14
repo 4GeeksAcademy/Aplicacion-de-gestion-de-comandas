@@ -191,6 +191,10 @@ body { /*no borrar. footer al pie de la pagina*/
   font-weight: bold;
 }
 
+.order-note {
+  color: black !important;
+}
+
 /* ------------------ Contenido por categoría dentro de la tarjeta ------------------ */
 .order-content {
   display: flex;
@@ -218,7 +222,15 @@ body { /*no borrar. footer al pie de la pagina*/
   font-weight: bold;
   margin-bottom: 0.5rem;
 }
+.order-button.ready {
+  background-color: #d4edda;
+  color: #155724;
+}
 
+.order-button.pending {
+  background-color: #f8f9fa;
+  color: #212529;
+}
 /* ------------------ Cada plato individual ------------------ */
 .order-item {
   display: flex;
@@ -384,14 +396,14 @@ body { /*no borrar. footer al pie de la pagina*/
   background-repeat: no-repeat;
   background-attachment: fixed;
   width: 100%;
-  height:100dvh;
+  height: 100dvh;
   min-height: 100dvh;
   overflow: hidden; /* Evita scroll horizontal y vertical */
   display: flex;
-  align-items:center;
+  align-items: center;
   justify-content: center;
   padding: 1rem;
-  position:relative;
+  position: relative;
 }
 
 .login-background  {
@@ -403,16 +415,15 @@ body { /*no borrar. footer al pie de la pagina*/
   background-repeat: no-repeat;
   background-attachment: fixed;
   width: 100%;
-  height:100dvh;
+  height: 100dvh;
   min-height: 100dvh;
   overflow: hidden; /* Evita scroll horizontal y vertical */
   display: flex;
-  align-items:center;
+  align-items: center;
   justify-content: center;
   padding: 1rem;
-  position:relative;
+  position: relative;
 }
-
 
 .admin-background  {
   background-image: url('https://tse2.mm.bing.net/th/id/OIP.Hf3osO3dpdpjpgx-Uwhb4AHaE7?r=0&pid=ImgDet&w=199&h=132&c=7&dpr=1,5&o=7&rm=3');
@@ -433,8 +444,10 @@ body { /*no borrar. footer al pie de la pagina*/
   position:relative;
 }
 
-.private-background  {
-  background-image: url('https://tse4.mm.bing.net/th/id/OIP.WxyCsJPiSVxBFIXTxffKlAHaHa?r=0&pid=ImgDet&w=178&h=178&c=7&dpr=1,5&o=7&rm=3');
+
+
+.private-background {
+  background-image: url("https://tse4.mm.bing.net/th/id/OIP.WxyCsJPiSVxBFIXTxffKlAHaHa?r=0&pid=ImgDet&w=178&h=178&c=7&dpr=1,5&o=7&rm=3");
   width: 100vw;
   height: 100vh;
   background-size: cover;
@@ -443,21 +456,21 @@ body { /*no borrar. footer al pie de la pagina*/
   background-attachment: fixed;
 
   width: 100%;
-  height:100dvh;
+  height: 100dvh;
   min-height: 100dvh;
   overflow: hidden; /* Evita scroll horizontal y vertical */
   display: flex;
-  align-items:center;
+  align-items: center;
   justify-content: center;
   padding: 1rem;
-  position:relative;
+  position: relative;
 
   background-color: rgba(255, 255, 255, 0.6); /* capa blanca semitransparente */
-  backdrop-filter: blur(4px);                /* desenfoque suave */
+  backdrop-filter: blur(4px); /* desenfoque suave */
   z-index: 0;
-  
+}
 
-  }
+
  
 
 /*body, html {
@@ -465,7 +478,7 @@ body { /*no borrar. footer al pie de la pagina*/
   padding: 0;
   height: 100%;
   overflow-x: hidden;
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
 }
 */
 select.form-control option {
@@ -474,11 +487,13 @@ select.form-control option {
   text-overflow: ellipsis;
 }
 
-.custom-select-wrapper { /* para el dropdown */
+.custom-select-wrapper {
+  /* para el dropdown */
   position: relative;
 }
 
-.custom-select-wrapper select { /* para el selector del dropdown */
+.custom-select-wrapper select {
+  /* para el selector del dropdown */
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -492,17 +507,16 @@ select.form-control option {
   transition: border-color 0.2s;
 }
 
-.custom-select-wrapper::after { /* para el dropdown */
-  content: '▾';
+.custom-select-wrapper::after {
+  /* para el dropdown */
+  content: "▾";
   position: absolute;
   top: 50%;
   right: 6px;
-  transform: translateY(-50%); 
+  transform: translateY(-50%);
   color: #888;
   pointer-events: none;
 }
-
-
 
 /* https://thumbs.dreamstime.com/b/different-types-sushi-12073347.jpg
 
@@ -515,6 +529,6 @@ select.form-control option {
 
   
   background-color: rgba(255, 255, 255, 0.6); /* capa blanca semitransparente */
-    /* backdrop-filter: blur(2px);                /* desenfoque suave */
-    /* z-index: 0;
+/* backdrop-filter: blur(2px);                /* desenfoque suave */
+/* z-index: 0;
 } */
