@@ -137,8 +137,9 @@ def get_orders():
 
 
 @app.route('/orders/<int:id>', methods=['GET'])
-#@jwt_required()
+@jwt_required()
 def get_order_by_id(id):
+    usuario_id = get_jwt_identity() #usuario es el q esta logueado
     # query.get solo funciona para devolver primary key. para devolver otro campo usar query.filter_by
     order = Orders.query.get(id)
     print( "comanda", order)
@@ -150,7 +151,7 @@ def get_order_by_id(id):
 
 
 @app.route('/orders', methods=['POST'])
-#@jwt_required()
+@jwt_required()
 def crear_comanda():
     body = request.get_json(silent=True)
     new_order = Orders()
@@ -347,7 +348,7 @@ def eliminar_comanda_por_id(order_id):
 
 
 @app.route('/orders/table/<int:mesa_id>', methods=['DELETE'])
-#@jwt_required()
+@jwt_required()
 def eliminar_comanda_por_mesa_id(mesa_id):
     # Buscar todas las comandas asociadas a esa mesa
     orders = Orders.query.filter_by(mesa_id=mesa_id).all()
@@ -373,7 +374,7 @@ def eliminar_comanda_por_mesa_id(mesa_id):
 # ---------GET USERS ---OK---OK-------------------------------------------
 
 @app.route('/users', methods=['GET'])
-#@jwt_required()
+@jwt_required()
 def get_users():
     users = User.query.all()
     print(users)
@@ -472,7 +473,7 @@ def put_user(id):
 
 # -------------------------------GET PLATOS ---OK---OK-------------------------------------
 @app.route('/plates', methods=['GET'])
-#@jwt_required()
+@jwt_required()
 def get_plates():
     plates = Plates.query.all()
     print(plates)
@@ -485,7 +486,7 @@ def get_plates():
 
 
 @app.route('/plates/<int:id>', methods=['GET'])
-#@jwt_required()
+@jwt_required()
 def get_plate_by_id(id):
     plates = Plates.query.get(id)
     print(plates)
@@ -561,7 +562,7 @@ def update_plates(plate_id):
 
 # -------------------------------GET DE TABLES ---OK ---OK-----------------------------
 @app.route('/tables', methods=['GET'])
-#@jwt_required()
+@jwt_required()
 def get_tables():
     tables = Tables.query.all()
     print(tables)
@@ -573,7 +574,7 @@ def get_tables():
 
 # -------------------------------GET DE UNA TABLE ID ---OK---OK-----------------------------
 @app.route('/tables/<int:table_id>', methods=['GET'])
-#@jwt_required()
+@jwt_required()
 def get_table_by_id(table_id):
     table = Tables.query.filter_by(id=table_id).first()
     print(table)

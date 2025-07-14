@@ -14,7 +14,14 @@ const Tables = () => {
   useEffect(() => {
     const fetchMesas = async () => {
       try {
-        const res = await fetch(`${BASE_URL}/tables`); //hago get de todas las mesas
+        const token = localStorage.getItem('token');
+        const res = await fetch(`${BASE_URL}/tables`, //hago get de todas las mesas
+        {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
         const data = await res.json();
         setMesas(data.result);
         console.log(data.result);

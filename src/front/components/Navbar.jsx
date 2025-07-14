@@ -95,6 +95,7 @@ export const Navbar = () => {
 								confirmButtonColor: "#fa8072",
 							}).then(() => {
 								window.location.href = 'about:blank';
+								handleLogout();
 							});
 						}}
 					>
