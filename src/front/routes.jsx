@@ -17,7 +17,7 @@ import OrdersDashboard from "./pages/OrdersDashboard";
 import Menu from "./pages/Menu";
 
 export const router = createBrowserRouter(
-    createRoutesFromElements(
+  createRoutesFromElements(
 
     // CreateRoutesFromElements function allows you to build route elements declaratively.
     // Create your routes here, if you want to keep the Navbar and Footer in all views, add your new routes inside the containing Route.
@@ -36,10 +36,8 @@ export const router = createBrowserRouter(
       <Route path="/register" element={<Register />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/request-reset-password" element={<RequestReset />} />
-      <Route path="/table-map" element={<TableMap/>} />
       <Route path="/orders-dashboard" element={<OrdersDashboard />} />
       <Route path="/menu" element={<Menu />} />
     </Route>
   ),
-
 );

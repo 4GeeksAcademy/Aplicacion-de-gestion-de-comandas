@@ -39,7 +39,11 @@ app = Flask(__name__)
 app.url_map.strict_slashes = False
 bcrypt = Bcrypt(app)  # para encriptar
 
-CORS(app)
+CORS(app, supports_credentials=True, resources={
+    r"/*": {
+        "origins": "https://scaling-funicular-5g6r47pqpwv3vjqg-3000.app.github.dev"
+    }
+})
 
 
 app.url_map.strict_slashes = False
@@ -57,8 +61,8 @@ app.config.update(dict(
     MAIL_PORT=587,
     MAIL_USE_TLS=True,
     MAIL_USE_SSL=False,
+
     MAIL_USERNAME='gestiondecomandas@gmail.com',
-    # la variable MAIL_PASSWORD esta en .env
     MAIL_PASSWORD=os.getenv('MAIL_PASSWORD'),
     MAIL_DEFAULT_SENDER='gestiondecomandas@gmail.com',
 ))
@@ -130,11 +134,11 @@ def get_orders():
         user_serialized.append(order.serialize())
     return jsonify({'msg': 'ok', 'results': user_serialized}), 200
 
+
 # -------------------------------GET DE UNA COMANDA ---OK---OK-----------------------------
 
-
 @app.route('/orders/<int:id>', methods=['GET'])
-# @jwt_required()
+@jwt_required()
 def get_order_by_id(id):
     # query.get solo funciona para devolver primary key. para devolver otro campo usar query.filter_by
     order = Orders.query.get(id)
@@ -143,11 +147,12 @@ def get_order_by_id(id):
         return jsonify({'msg': 'Comanda no encontrada'}), 404
     return jsonify({'msg': 'ok', 'result': order.serialize()}), 200
 
+
 # -------------------------------POST DE COMANDAS ---OK---OK---------------------------------
 
 
 @app.route('/orders', methods=['POST'])
-# @jwt_required()
+@jwt_required()
 def crear_comanda():
     body = request.get_json(silent=True)
     new_order = Orders()
@@ -190,6 +195,7 @@ def crear_comanda():
             cantidad = item.get('cantidad', 1)
             if plato_id is None:
                 continue
+
             # instancio platos con un id especifico
             plato = Plates.query.get(plato_id)
 
@@ -217,6 +223,7 @@ def crear_comanda():
 # -----------------------------PUT DE COMANDA POR ID ----OK----------------------------------------------------
 
 @app.route('/orders/<int:order_id>', methods=['PUT'])
+@jwt_required()
 def update_orders(order_id):
     body = request.get_json(silent=True)
     update_order = Orders.query.get(order_id)
@@ -341,7 +348,7 @@ def eliminar_comanda_por_id(order_id):
 
 
 @app.route('/orders/table/<int:mesa_id>', methods=['DELETE'])
-# @jwt_required()
+@jwt_required()
 def eliminar_comanda_por_mesa_id(mesa_id):
     # Buscar todas las comandas asociadas a esa mesa
     orders = Orders.query.filter_by(mesa_id=mesa_id).all()
@@ -367,7 +374,7 @@ def eliminar_comanda_por_mesa_id(mesa_id):
 # ---------GET USERS ---OK---OK-------------------------------------------
 
 @app.route('/users', methods=['GET'])
-# @jwt_required()
+@jwt_required()
 def get_users():
     users = User.query.all()
     print(users)
@@ -380,7 +387,7 @@ def get_users():
 # ---------GET by id USERS ---OK---OK------------MODIFICADO PARA QUE REGRESE UN TOKEN
 
 @app.route('/users/<int:id>', methods=['GET'])
-# @jwt_required()
+@jwt_required()
 def get_user_by_id(id):
     # query.get solo funciona para devolver primary key. para devolver otro campo usar query.filter_by
     user = User.query.get(id)
@@ -462,7 +469,7 @@ def put_user(id):
 
 # -------------------------------GET PLATOS ---OK---OK-------------------------------------
 @app.route('/plates', methods=['GET'])
-# @jwt_required()
+@jwt_required()
 def get_plates():
     plates = Plates.query.all()
     print(plates)
@@ -475,7 +482,7 @@ def get_plates():
 
 
 @app.route('/plates/<int:id>', methods=['GET'])
-# @jwt_required()
+@jwt_required()
 def get_plate_by_id(id):
     plates = Plates.query.get(id)
     print(plates)
@@ -551,7 +558,7 @@ def update_plates(plate_id):
 
 # -------------------------------GET DE TABLES ---OK ---OK-----------------------------
 @app.route('/tables', methods=['GET'])
-# @jwt_required()
+@jwt_required()
 def get_tables():
     tables = Tables.query.all()
     print(tables)
@@ -563,7 +570,7 @@ def get_tables():
 
 # -------------------------------GET DE UNA TABLE ID ---OK---OK-----------------------------
 @app.route('/tables/<int:table_id>', methods=['GET'])
-# @jwt_required()
+@jwt_required()
 def get_table_by_id(table_id):
     table = Tables.query.filter_by(id=table_id).first()
     print(table)
@@ -652,6 +659,7 @@ def login():
     print(user.password)
 
     password_correct = bcrypt.check_password_hash(
+
         # returns True. chequea si la contraseña recibida es la misma de la BD
         user.password, body['password'])
 
@@ -700,11 +708,13 @@ def role_required(*roles):
 # enviando correo a mi correo de prueba
 @app.route('/send-email', methods=['GET'])
 def send_email():
+
     # este sería dinámico normalmente
     reset_url = f'VITE_BACKEND_URL/restore-password'
     msg = Message(
         subject='Recuperación de contraseña',
         sender='gestiondecomandas@gmail.com',
+
         # aqui va el correo o lista de correos desde donde se recibira un codigo para cambiar la contraseña
         recipients=['gestiondecomandas@gmail.com'],
     )
@@ -749,6 +759,7 @@ def request_reset_password():
         sender='gestiondecomandas@gmail.com',
         recipients=[email]  # el email que entro por body
     )
+
     # el cuerpo del correo esta en reset_email.html
     msg.html = render_template('reset_email.html', reset_url=reset_url)
     mail.send(msg)
@@ -792,13 +803,11 @@ def reset_password_token(token):
 
     return jsonify({"message": "Contraseña actualizada correctamente"}), 200
 
-# ----------------------------------------------------------------------------------
-
 
 # ------------------PUT DE ORDEN PARA MODIFICAR ESTADO DEL PLATO DADO SU ID ---OK---OK-------------------
-# endpoint de marta
 
-@app.route('/api/orders/<int:order_id>/plate-status', methods=['PUT'])
+
+@app.route('/orders/<int:order_id>/plate-status', methods=['PUT'])
 @jwt_required()
 def update_plate_status(order_id):
     body = request.get_json(silent=True)
