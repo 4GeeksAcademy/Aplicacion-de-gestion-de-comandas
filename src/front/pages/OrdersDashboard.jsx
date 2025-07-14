@@ -140,26 +140,38 @@ const OrdersDashboard = () => {
 
     const resetOrderStatus = (orderId) => {
         const token = localStorage.getItem("token");
+
         fetch(`${BASE_URL}/orders/${orderId}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
             },
-            body: JSON.stringify({ state: "pendiente" }),
-        }).then(() => {
-            setOrders((prev) =>
-                prev.map((o) =>
-                    o.id === orderId
-                        ? {
-                            ...o,
-                            state: "pendiente",
-                            platos: o.platos.map((p) => ({ ...p, status_plate: "pending" })),
-                        }
-                        : o
-                )
-            );
-        });
+            body: JSON.stringify({ state: "pending" }) // <-- ¡valor correcto del Enum!
+        })
+            .then((res) => {
+                if (!res.ok) throw new Error("No se pudo actualizar la comanda");
+                return res.json();
+            })
+            .then(() => {
+                setOrders((prev) =>
+                    prev.map((o) =>
+                        o.id === orderId
+                            ? {
+                                ...o,
+                                state: "pending",
+                                platos: o.platos.map((p) => ({
+                                    ...p,
+                                    status_plate: "pending"
+                                })),
+                            }
+                            : o
+                    )
+                );
+            })
+            .catch((err) => {
+                console.error("Error al resetear el estado:", err);
+            });
     };
 
     const filteredOrders =
@@ -277,8 +289,8 @@ const OrdersDashboard = () => {
                                                 <div className="order-actions-bottom">
                                                     <button
                                                         className={`status-btn completed ${item.status_plate === "completed"
-                                                                ? "selected"
-                                                                : ""
+                                                            ? "selected"
+                                                            : ""
                                                             }`}
                                                         onClick={() =>
                                                             updateItemStatus(
@@ -292,8 +304,8 @@ const OrdersDashboard = () => {
                                                     </button>
                                                     <button
                                                         className={`status-btn rejected ${item.status_plate === "rejected"
-                                                                ? "selected"
-                                                                : ""
+                                                            ? "selected"
+                                                            : ""
                                                             }`}
                                                         onClick={() =>
                                                             updateItemStatus(
@@ -307,8 +319,8 @@ const OrdersDashboard = () => {
                                                     </button>
                                                     <button
                                                         className={`status-btn pending ${item.status_plate === "pending"
-                                                                ? "selected"
-                                                                : ""
+                                                            ? "selected"
+                                                            : ""
                                                             }`}
                                                         onClick={() =>
                                                             updateItemStatus(
