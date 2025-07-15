@@ -4,6 +4,7 @@ import React from 'react';
 function ItemCard({ item }) {
   if (!item) return null;
 
+
   return (
     <div className="product-card-menuview ">
       {item.image && (

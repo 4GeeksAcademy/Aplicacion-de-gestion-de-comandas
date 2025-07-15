@@ -41,6 +41,7 @@ export const Menu = () => {
                             </div>
                         ))}
                     </div>
+
                 </section>
 
                 <hr className="text-secondary" />
