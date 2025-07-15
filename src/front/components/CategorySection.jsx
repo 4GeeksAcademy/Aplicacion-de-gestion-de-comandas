@@ -3,8 +3,6 @@ import ItemCard from './ItemCard';
 
 const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
-
-
 const CategorySection = ({ category, title }) => {
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -13,8 +11,7 @@ const CategorySection = ({ category, title }) => {
     useEffect(() => {
         const fetchItems = async () => {
             try {
-               
-                const response = await fetch(`${BASE_URL}/plates/${category}`); 
+                const response = await fetch(`${BASE_URL}/plates/${category}`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -29,7 +26,7 @@ const CategorySection = ({ category, title }) => {
         };
 
         fetchItems();
-    }, [category]); 
+    }, [category]);
 
     if (loading) return <p>Loading {title}...</p>;
     if (error) return <p>Error loading {title}.</p>;
@@ -38,7 +35,7 @@ const CategorySection = ({ category, title }) => {
     return (
         <section id={category} className="mb-5">
             <h2 className="section-title mb-4">{title}</h2>
-            <div className="row g-4">
+            <div className="items-grid-menuview">
                 {items.map(item => (
                     <ItemCard key={item.id} item={item} />
                 ))}

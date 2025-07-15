@@ -1,28 +1,29 @@
 /* ------------------ martanvcs {OrdersDashboard} {Start}  ------------------ */
 
 /* ------------------ Estilos base y configuración general ------------------ */
-html, body {
+html,
+body {
   height: 100%; /*no borrar. footer al pie de la pagina*/
   margin: 0;
   padding: 0;
   font-family: "Poppins", sans-serif;
-  background-color: #191823; 
+  background-color: #191823;
   color: #333;
 }
 
-body { /*no borrar. footer al pie de la pagina*/
+body {
+  /*no borrar. footer al pie de la pagina*/
   display: flex;
   flex-direction: column;
   min-height: 100vh;
 }
 
-#root { /*no borrar. footer al pie de la pagina*/
+#root {
+  /*no borrar. footer al pie de la pagina*/
   display: flex;
   flex-direction: column;
   flex: 1;
 }
-
-
 
 .orders-dashboard {
   padding: 1rem;
@@ -387,8 +388,8 @@ body { /*no borrar. footer al pie de la pagina*/
 }
 
 /* ------------------ martanvcs {OrdersDashboard} {End}  ------------------ */
-.register-background  {
-  background-image: url('https://tse1.mm.bing.net/th/id/OIP.xLA00D4_8sOdxX133AcShAHaLH?r=0&w=1365&h=2048&rs=1&pid=ImgDetMain&o=7&rm=3');
+.register-background {
+  background-image: url("https://tse1.mm.bing.net/th/id/OIP.xLA00D4_8sOdxX133AcShAHaLH?r=0&w=1365&h=2048&rs=1&pid=ImgDetMain&o=7&rm=3");
   width: 100vw;
   height: 100vh;
   background-size: cover;
@@ -406,8 +407,8 @@ body { /*no borrar. footer al pie de la pagina*/
   position: relative;
 }
 
-.login-background  {
-  background-image: url('https://img.freepik.com/fotos-premium/comida-japonesa-sushi-cores-frescas-modernas-peixe-comida-do-mar-salmao-arroz-fresco-saboroso_853115-9801.jpg');
+.login-background {
+  background-image: url("https://img.freepik.com/fotos-premium/comida-japonesa-sushi-cores-frescas-modernas-peixe-comida-do-mar-salmao-arroz-fresco-saboroso_853115-9801.jpg");
   width: 100vw;
   height: 100vh;
   background-size: cover;
@@ -425,8 +426,8 @@ body { /*no borrar. footer al pie de la pagina*/
   position: relative;
 }
 
-.admin-background  {
-  background-image: url('https://tse2.mm.bing.net/th/id/OIP.Hf3osO3dpdpjpgx-Uwhb4AHaE7?r=0&pid=ImgDet&w=199&h=132&c=7&dpr=1,5&o=7&rm=3');
+.admin-background {
+  background-image: url("https://tse2.mm.bing.net/th/id/OIP.Hf3osO3dpdpjpgx-Uwhb4AHaE7?r=0&pid=ImgDet&w=199&h=132&c=7&dpr=1,5&o=7&rm=3");
   width: 100vw;
   height: 100vh;
   background-size: cover;
@@ -434,17 +435,15 @@ body { /*no borrar. footer al pie de la pagina*/
   background-repeat: no-repeat;
   background-attachment: fixed;
   width: 100%;
-  height:100dvh;
+  height: 100dvh;
   min-height: 100dvh;
   overflow: hidden; /* Evita scroll horizontal y vertical */
   display: flex;
-  align-items:center;
+  align-items: center;
   justify-content: center;
   padding: 1rem;
-  position:relative;
+  position: relative;
 }
-
-
 
 .private-background {
   background-image: url("https://tse4.mm.bing.net/th/id/OIP.WxyCsJPiSVxBFIXTxffKlAHaHa?r=0&pid=ImgDet&w=178&h=178&c=7&dpr=1,5&o=7&rm=3");
@@ -469,9 +468,6 @@ body { /*no borrar. footer al pie de la pagina*/
   backdrop-filter: blur(4px); /* desenfoque suave */
   z-index: 0;
 }
-
-
- 
 
 /*body, html {
   margin: 0;
@@ -532,3 +528,157 @@ select.form-control option {
 /* backdrop-filter: blur(2px);                /* desenfoque suave */
 /* z-index: 0;
 } */
+
+/* ------------------ Marta-Edu {MenuView} {Start} ------------------ */
+
+.container-menuview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #191823;
+  padding: 2rem 1rem;
+}
+
+.content-menuview {
+  width: 100%;
+  max-width: 850px;
+}
+
+.section-menuview {
+  margin-bottom: 3rem;
+  font-weight: bold;
+}
+
+.title-menuview {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: white;
+  margin-bottom: 1rem;
+  padding-left: 0.5rem;
+}
+
+.card-menuview {
+  background: linear-gradient(to bottom, #2f2531, #1e1a26);
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 0.1px solid #e4a2b0;
+  box-shadow: 0 6px 20px rgba(228, 162, 176, 0.25);
+}
+
+.card-content-menuview {
+  display: flex;
+  justify-content: center;
+}
+
+.card-inner-menuview {
+  width: 100%;
+  max-width: 800px;
+  background: linear-gradient(to bottom, #ada0a0, #ffffff);
+  padding: 1rem;
+  border: 0.1px solid #ffffff;
+  border-radius: 16px;
+}
+
+.button-menuview {
+  color: #000;
+  font-weight: 500;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  transition: background-color 0.2s ease;
+}
+.button-menuview:hover {
+  background-color: #f0f0f0;
+}
+
+.category-card-menuview {
+  background-color: #2f2531;
+  border-radius: 12px;
+  height: 100%;
+  transition: transform 0.2s ease;
+}
+.category-card-menuview:hover {
+  transform: scale(1.05);
+}
+
+.product-card-menuview-menuview {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+.product-card-menuview-menuview:hover {
+  transform: translateY(-4px);
+}
+
+.list-title-menuview {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+.product-card-menuview-menuview {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  height: 100%;
+  transition: transform 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.items-grid-menuview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.product-card-menuview {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease;
+}
+.product-card-menuview:hover {
+  transform: translateY(-4px);
+}
+
+.product-image-menuview {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 0.75rem;
+}
+
+.product-info-menuview {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.product-name-menuview {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #191823;
+}
+
+.product-description-menuview {
+  font-size: 0.95rem;
+  color: #2f2531;
+}
+
+.product-price-menuview {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #e4a2b0;
+}
+
+/* ------------------Marta- edu {MenuView} {End} ------------------ */
