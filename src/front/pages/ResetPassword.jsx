@@ -16,7 +16,7 @@ const ResetPassword = () => {
     const token = query.get("token");
     const verified = query.get("verified"); // leemos si ?verified=true viene en la URL
 
-    console.log(token) 
+    console.log(token)
     const BASE_URL = import.meta.env.VITE_BACKEND_URL;
     console.log(BASE_URL);
 
@@ -64,7 +64,7 @@ const ResetPassword = () => {
                 setEmail('');
                 setNewPassword('');
                 setConfirmPassword('');
-                
+
                 setTimeout(() => {
                     navigate("/login?reset=true");
                 }, 5000);
@@ -87,7 +87,7 @@ const ResetPassword = () => {
             </div>
         );
     }
-  
+
     //if (!token) return <p>Token inválido o expirado.</p>;
     return (
         <>
@@ -104,10 +104,14 @@ const ResetPassword = () => {
                 <div
                     className="w-100 p-4"
                     style={{
-                        maxWidth: "320px",
+                        background: "linear-gradient(to bottom, #2f2531, #1e1a26)",
                         backgroundColor: "rgba(255, 255, 255, 0.8)",
                         borderRadius: "16px",
-                        boxShadow: "0 4px 15px rgba(0, 0, 0, 0.1)",
+                        border: "0.1px solid #e4a2b0",
+                        boxShadow: "0 4px 15px rgba(231, 109, 150, 0.1)",
+                        maxWidth: "320px",
+                        color: "white",
+                        fontWeight: "bold",
                         backdropFilter: "blur(4px)", // Efecto glass suave
                         width: "100%",
                         zIndex: 1, // Asegura que quede por encima del filtro del fondo
@@ -145,15 +149,15 @@ const ResetPassword = () => {
                         type="submit"
                         className="btn w-100"
                         style={{
-                            backgroundColor: "#fa8072",
+                            background: "linear-gradient(to bottom, #e4a2b0, white)",
                             color: "white",
                             fontWeight: "bold",
                             border: "none",
 
                             transition: "background-color 0.3s"
                         }}
-                        onMouseOver={(e) => (e.target.style.backgroundColor = "#e76b60")}
-                        onMouseOut={(e) => (e.target.style.backgroundColor = "#fa8072")}
+                        onMouseOver={(e) => (e.target.style.backgroundColor = "#ffffffff")}
+                        onMouseOut={(e) => (e.target.style.backgroundColor = "#ffffffff")}
                     >
                         Reset Password
                     </button>

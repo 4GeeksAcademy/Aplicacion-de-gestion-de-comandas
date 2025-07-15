@@ -1,4 +1,4 @@
-import { useState , useEffect} from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 
@@ -45,15 +45,15 @@ const RequestReset = () => {
   };
 
   useEffect(() => {
-  if (message) {
-    const timer = setTimeout(() => {
-      setMessage(null);
-      setSuccess(false);
-    }, 10000); // 10000 ms = 10 segundos
+    if (message) {
+      const timer = setTimeout(() => {
+        setMessage(null);
+        setSuccess(false);
+      }, 10000); // 10000 ms = 10 segundos
 
-    return () => clearTimeout(timer); // Limpia si el componente se desmonta o el mensaje cambia
-  }
-}, [message]);
+      return () => clearTimeout(timer); // Limpia si el componente se desmonta o el mensaje cambia
+    }
+  }, [message]);
 
 
   return (
@@ -65,21 +65,29 @@ const RequestReset = () => {
       <div
         className="w-100 p-4"
         style={{
+
           maxWidth: "320px",
+          background: "linear-gradient(to bottom, #2f2531, #1e1a26)",
           backgroundColor: "rgba(255, 255, 255, 0.8)",
           borderRadius: "16px",
-          boxShadow: "0 4px 15px rgba(0, 0, 0, 0.1)",
+          border: "0.1px solid #e4a2b0",
+          boxShadow: "0 4px 15px rgba(231, 109, 150, 0.1)",
           backdropFilter: "blur(4px)", // Efecto glass suave
           width: "100%",
           zIndex: 1, // Asegura que quede por encima del filtro del fondo
           position: "relative",
+          color: "white"
 
         }}
       >
         <h2>Recuperar contraseña</h2>
         <div className="mb-2">
           <input
-            className="form-control"
+            className="form-control text-white"
+            style={{
+              fontWeight: "bold",
+
+            }}
             type="email"
             placeholder="Email"
             value={email}
@@ -87,25 +95,25 @@ const RequestReset = () => {
             required
           />
 
-          
+
           <button
-                    type="submit"
-                    className="btn w-100"
-                    style={{
-                        backgroundColor: "#fa8072",
-                        color: "white",
-                        fontWeight: "bold",
-                        border: "none",
-                        transition: "background-color 0.3s"
-                    }}
-                    onMouseOver={(e) => (e.target.style.backgroundColor = "#e76b60")}
-                    onMouseOut={(e) => (e.target.style.backgroundColor = "#fa8072")}
-                >
-                  Send link
-                </button>
+            type="submit"
+            className="btn w-100"
+            style={{
+              background: "linear-gradient(to bottom, #e4a2b0, white)",
+              color: "white",
+              fontWeight: "bold",
+              border: "none",
+              transition: "background-color 0.3s"
+            }}
+            onMouseOver={(e) => (e.target.style.backgroundColor = "#white")}
+            onMouseOut={(e) => (e.target.style.backgroundColor = "#white")}
+          >
+            Send link
+          </button>
         </div>
 
- {message && (
+        {message && (
           <div
             style={{
               marginTop: "10px",
@@ -117,10 +125,10 @@ const RequestReset = () => {
               textAlign: "center",
             }}
           >
- {message}
+            {message}
             {success && (
               <div style={{ marginTop: "8px" }}>
-               
+
                 <a
                   href="https://mail.google.com"
                   target="_blank"
@@ -135,9 +143,9 @@ const RequestReset = () => {
                 </a>
               </div>
             )}
-            </div>
+          </div>
         )}
-       
+
       </div>
     </form>
 

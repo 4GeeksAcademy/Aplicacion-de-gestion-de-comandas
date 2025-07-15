@@ -23,7 +23,7 @@ const Login = () => {
         headers: {
           "Content-Type": "application/json",
         },
-          credentials: "include",
+        credentials: "include",
         body: JSON.stringify({ email, password }),
       });
 
@@ -33,7 +33,7 @@ const Login = () => {
       if (res.ok) {
         localStorage.setItem("token", data.Token); //guardo el token y el usuario en localStorage
         localStorage.setItem("user", JSON.stringify(data.user));
-        
+
         const userRol = data.user.rol; // extraigo el rol
 
         // ✅ Mostrar modal de éxito
@@ -111,27 +111,20 @@ const Login = () => {
         className="login-background d-flex align-items-start justify-content-start w-70 vh-100 p-4"
       >
         <div
-          className="w-100 p-4"
-          style={{
-            maxWidth: "320px",
-            backgroundColor: "rgba(255, 255, 255, 0.6)",
-            borderRadius: "16px",
-            boxShadow: "0 4px 15px rgba(0, 0, 0, 0.1)",
-            backdropFilter: "blur(4px)", // Efecto glass suave
-            width: "100%",
+          className="login-card">
 
-            zIndex: 10,
-          }}
-        >
-          <h3 className="text-center mb-2">Welcome to  </h3>
-          <h4 className="text-center mb-2"> Hayashi Sushi Bar 🍣</h4>
-          <p className="text-start mb-2"> Log in </p>
+          <h3 className="welcome-text-login text-center mb-2">Welcome to  </h3>
+          <h4 className="restaurant-text-login text-center mb-2"> Hayashi Sushi Bar 🍣🌸</h4>
+          <p className="login-text-tittle text-start mb-2"> Log in  </p>
 
           <div className="mb-2">
             <input
               className="form-control"
+              style={{
+                fontWeight: "bold",
+              }}
               type="email"
-              placeholder="Email"
+              placeholder="Email📩"
               value={email} onChange={(e) => setEmail(e.target.value)} required
             />
           </div>
@@ -139,32 +132,34 @@ const Login = () => {
           <div className="mb-2">
             <input
               className="form-control"
+              style={{
+                fontWeight: "bold",
+              }}
               type="password"
-              placeholder="Password"
+              placeholder="Password🔐"
               value={password} onChange={(e) => setPassword(e.target.value)} required
             />
           </div>
 
           <button
-            type="submit"
-            className="btn w-100"
+            type="submit" className="bottom-login btn w-100"
             style={{
-              backgroundColor: "#fa8072",
+              background: "linear-gradient(to bottom, #e4a2b0, white)",
               color: "white",
               fontWeight: "bold",
               border: "none",
-
+              width: "100%",
               transition: "background-color 0.3s"
             }}
-            onMouseOver={(e) => (e.target.style.backgroundColor = "#e76b60")}
-            onMouseOut={(e) => (e.target.style.backgroundColor = "#fa8072")}
+            onMouseOver={(e) => (e.target.style.backgroundColor = "#ffffffff")}
+            onMouseOut={(e) => (e.target.style.backgroundColor = "#ffffffff")}
           >
             Log in
           </button>
           <div className="mt-3 text-start">
             <span>¿Dont you have an account yet? </span>
             <div>
-              <Link className="text-decoration-none" to="/register"> Sign up for an account</Link>
+              <Link className="register-click text-decoration-none" to="/register"> Sign up for an account</Link>
             </div>
           </div>
 
@@ -172,7 +167,7 @@ const Login = () => {
 
           {/* Olvidaste tu contraseña */}
           <div>
-            <Link className="text-decoration-none " to="/request-reset-password">
+            <Link className="password-click text-decoration-none " to="/request-reset-password">
               Forgot your password?
             </Link>
           </div>
