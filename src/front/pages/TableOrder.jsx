@@ -118,6 +118,12 @@ const createOrderForTable = async () => {
         <h2 className='text-light'>Mesa #{order.mesa_id}</h2>
         <button
           className="btn btn-outline-primary"
+          onClick={() => navigate("/menu")}
+        >
+          Menu
+        </button>
+        <button
+          className="btn btn-outline-primary"
           onClick={() => navigate("/tables")}
         >
           Ver Mesas
