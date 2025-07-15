@@ -12,22 +12,10 @@ export const Menu = () => {
         <div className="container-menuview">
             <div className="content-menuview">
 
-                {/* header */}
-                <header className="d-flex flex-wrap justify-content-center align-items-center mb-4 sticky-top  py-2 rounded shadow-sm">
-                    {categories.map(cat => (
-                        <a
-                            key={cat.id}
-                            href={`#${cat.id}`}
-                            className="button-menuview modern mx-2 my-1"
-                        >
-                            {cat.title}
-                        </a>
-                    ))}
-                </header>
 
                 {/*  categorías */}
                 <section className="mb-5 text-center">
-                    <h4 className="list-title-menuview mb-3 text-white">Categories</h4>
+                    <h4 className="list-title-menuview mb-3 text-white fs-2">Categories</h4>
                     <div className="row row-cols-2 row-cols-sm-4 g-3 card-menuviewjustify-content-center">
                         {categories.map(cat => (
                             <div key={cat.id} className="col ">
