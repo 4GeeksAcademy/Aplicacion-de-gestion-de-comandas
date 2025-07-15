@@ -1,4 +1,7 @@
 import CategorySection from "../components/CategorySection";
+import orderSvg from "../assets/img/order.svg";
+import tableSvg from "../assets/img/table.svg";
+import { Link } from "react-router-dom";
 
 export const Menu = () => {
     const categories = [
@@ -12,6 +15,19 @@ export const Menu = () => {
         <div className="container-menuview">
             <div className="content-menuview">
 
+                <header className="mb-5 text-center">
+                    <Link to="/table-order/:id" className="text-decoration-none">
+                        <div className="d-inline-block p-3 bg-white rounded shadow-sm me-3 mb-3">
+                            <img src={orderSvg} alt="Order Icon" style={{ height: '50px', width: 'auto' }} />
+                        </div>
+                    </Link>
+
+                    <Link to="/tables" className="text-decoration-none">
+                        <div className="d-inline-block p-3 bg-white rounded shadow-sm me-3 mb-3">
+                            <img src={tableSvg} alt="Table Icon" style={{ height: '50px', width: 'auto' }} />
+                        </div>
+                    </Link>
+                </header>
 
                 {/*  categorías */}
                 <section className="mb-5 text-center">
@@ -23,7 +39,6 @@ export const Menu = () => {
                                     href={`#${cat.id}`}
                                     className="d-flex flex-column align-items-center justify-content-center p-3 text-decoration-none h-100"
                                 >
-                                    <i className={`bi ${cat.icon} fs-2 text-white`}></i>
                                     <span className="card-menuview mt-2 fw-bold text-white">{cat.title}</span>
                                 </a>
                             </div>
@@ -49,9 +64,8 @@ export const Menu = () => {
                 ))}
 
             </div>
-        </div>
+        </div >
     );
 };
 
 export default Menu;
-
