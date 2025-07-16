@@ -4,6 +4,7 @@ import Swal from 'sweetalert2'
 const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 const TableOrder = () => {
   const [order, setOrder] = useState(null);
+  const [table, setTable] = useState([]);
   const { id } = useParams();
   const navigate = useNavigate();
   useEffect(() => {
@@ -94,7 +95,8 @@ const TableOrder = () => {
         plate_id: p.plato_id,
         cantidad: p.cantidad
       })),
-       guest_notes: order.guest_notes 
+       guest_notes: order.guest_notes,
+       date: order.date 
     };
     const response = await fetch(`${BASE_URL}/orders/${id}`, {
       method: 'PUT',
@@ -119,6 +121,7 @@ const TableOrder = () => {
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 className='text-light'>Mesa #{order.mesa_id}</h2>
         <div className="d-flex gap-2">
+          <label className="form-label text-light">{order.date}</label>
           <button className="on d-flex flex-column align-items-center justify-content-center text-decoration-none"
           onClick={() => navigate("/tables")}>
             Ver Mesas
