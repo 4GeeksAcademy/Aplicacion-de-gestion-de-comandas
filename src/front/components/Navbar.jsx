@@ -38,35 +38,30 @@ export const Navbar = () => {
 					<i className="fas fa-store"></i> <span>Japanese Restaurant</span>
 				</div>
 
-				<div className="ms-auto d-flex align-items-center">
+				<div className="ms-auto d-flex align-items-center fs-6">
 					{!token ? (
 						<>
 							{location.pathname === "/login" && (
-								<Link to="/register" className="btn btn-outline-light me-2">
+								<Link to="/register" className="btn btn-outline-light me-2 fs-6">
 									Sign Up
 								</Link>
 							)}
 							{location.pathname === "/register" && (
-								<Link to="/login" className="btn btn-outline-light me-2">
+								<Link to="/login" className="btn btn-outline-light me-2 fs-6">
 									Log in
 								</Link>
 							)}
 							{location.pathname === "/request-reset-password" && (
-								<Link to="/login" className="btn btn-outline-light me-2">
+								<Link to="/login" className="btn btn-outline-light me-2 fs-6">
 									Log in
 								</Link>
 							)}
 							{location.pathname === "/request-reset-password" && (
-								<Link to="/login" className="btn btn-outline-light me-2">
+								<Link to="/login" className="btn btn-outline-light me-2 fs-6">
 									Sign Up
 								</Link>
 							)}
-							{location.pathname === "/admin-bar" && (
-								<Link to="/login" className="btn btn-outline-light me-2">
-									Sign Up
-								</Link>
-							)}
-							
+														
 
 						</>
 					) : (
