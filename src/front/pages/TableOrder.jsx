@@ -6,7 +6,8 @@ const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 const TableOrder = () => {
   const [order, setOrder] = useState(null);
   const [table, setTable] = useState([]);
-  const { id, orderId } = useParams(); //podemos extraer orderId de la URL
+  const { id } = useParams(); //podemos extraer orderId de la URL
+  const params = useParams();
   const navigate = useNavigate();
   useEffect(() => {
     fetchOrder();
@@ -60,8 +61,9 @@ const TableOrder = () => {
       console.log("Respuesta de comanda:", data)
 
       if (res.ok) {
-        const order_ID = data.result.id;
+        const order_ID = data.order_id;
         console.log("el ID de la comanda:", order_ID)
+
         navigate(`/table-order/${order_ID}`);
         setOrder({ ...data.result, platos: [] });
 
@@ -144,7 +146,7 @@ const TableOrder = () => {
             Ver Mesas
           </button>
           <button className="category-icon d-flex flex-column align-items-center justify-content-center text-decoration-none"
-            onClick={() => navigate("/menu")}
+            onClick={() => navigate(`/menu/${params.id}`)}
           >
             Añadir Platos
           </button>
