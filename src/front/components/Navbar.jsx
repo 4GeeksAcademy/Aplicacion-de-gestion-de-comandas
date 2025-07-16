@@ -34,7 +34,7 @@ export const Navbar = () => {
 
 			<div className="container">
 
-				<div className="logo text-white fs-9">
+				<div className="logo text-white fs-6">
 					<i className="fas fa-store"></i> <span>Japanese Restaurant</span>
 				</div>
 
