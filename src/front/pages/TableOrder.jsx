@@ -58,6 +58,7 @@ const TableOrder = () => {
       if (res.ok) {
         const order_ID = data.order_id;
         console.log("el ID de la comanda:", order_ID)
+
         navigate(`/table-order/${order_ID}`);
         setOrder({ ...data.result, platos: [] });
       } else {
@@ -122,28 +123,33 @@ const TableOrder = () => {
   return (
     <div className="container py-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2 className='text-light'>Mesa #{order.mesa_id}</h2>
+        <h2 className='text-light'>Mesa🍽️#{order.mesa_id}</h2>
         <div className="d-flex gap-2">
-          <label className="form-label text-light">{order.date}</label>
-          <button className="on d-flex flex-column align-items-center justify-content-center text-decoration-none"
-            onClick={() => navigate("/tables")}>
+          <label className="form-label text-light" style={{ fontWeight: 'bold' }}>
+            {order.date}
+          </label>
+          <button
+            className="table-order-btn on d-flex flex-column align-items-center justify-content-center text-decoration-none rounded"
+            onClick={() => navigate("/tables")}
+          >
             Ver Mesas
           </button>
-          <button className="category-icon d-flex flex-column align-items-center justify-content-center text-decoration-none"
+          <button
+            className="table-order-btn d-flex flex-column align-items-center justify-content-center text-decoration-none rounded"
             onClick={() => navigate(`/menu/${params.id}`)}
           >
             Añadir Platos
           </button>
         </div>
       </div>
-      <ul className="list-group ">
+      <ul className="table-order-card ">
         {order.platos.map((plato) => (
           <li key={plato.id} className="list-group-item d-flex justify-content-between align-items-center mb-2">
             <div>
-              <strong>{plato.nombre_plato}</strong> <br />
+              <strong className="fs-4">{plato.nombre_plato}</strong><br />
               Cantidad: {plato.cantidad} <br />
               Subtotal: €{plato.subtotal.toFixed(2)} <br />
-              Estado: <span className="badge bg-secondary">{plato.status_plate}</span>
+              Estado: <span className="table-order-btn badge ">{plato.status_plate}</span>
             </div>
             <div className="d-flex gap-1">
               <button className="btn btn-sm btn-outline-danger" onClick={() => handleDeletePlato(plato.plato_id)}>Eliminar</button>
@@ -154,9 +160,10 @@ const TableOrder = () => {
         ))}
       </ul>
       <div className="mb-3" style={{ position: "relative" }}>
-        <label className="form-label text-light">Notas de la comanda:</label>
+        <label className=" form-label text-light fs-5">Notas de la comanda📋</label>
         <textarea
-          className="form-control pe-5"
+          className="table-order-note form-control pe-5 "
+          style={{ color: '#2f2531', fontWeight: 'bold' }}
           rows="3"
           placeholder="Ej: Sin sal, alergia al gluten, etc."
           value={order.guest_notes || ""}
@@ -165,7 +172,7 @@ const TableOrder = () => {
           }
         />
         <button
-          className="btn btn-sm btn-outline-success"
+          className="table-order-btn btn btn-sm btn-outline-success"
           style={{
             position: "absolute",
             bottom: "10px",
