@@ -115,7 +115,7 @@ class User(db.Model):
     name: Mapped[str] = mapped_column(nullable=False)
     rol: Mapped[EstadoRol] = mapped_column(Enum(EstadoRol), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean(), nullable=False)
-    
+    avatar_url: Mapped[str] = mapped_column(String, nullable=True)
    # Campos añadidos para reset de contraseña
    # reset_token: Mapped[str | None] = mapped_column(String(100), nullable=True)
    # token_expiration: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
@@ -135,6 +135,7 @@ class User(db.Model):
             "name": self.name,
             "email": self.email,
             "rol": self.rol.value,  # es un diccionario
+            "avatar_url": self.avatar_url,
             # do not serialize the password, its a security breach
             # "token_expiration": self.token_expiration
         }
