@@ -9,6 +9,7 @@ const Private = () => {
   }, []);
 
 
+  
   const getPrivateData = async () => {
     const token = localStorage.getItem("token");
     try {

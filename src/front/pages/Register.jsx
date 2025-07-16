@@ -107,7 +107,7 @@ const Register = () => {
       className="register-background d-flex align-items-start justify-content-start w-100 vh-100 p-4"
     >
       <div
-        className="w-100 p-4"
+        className="register-card w-100 p-4"
         style={{
           maxWidth: "320px",
           backgroundColor: "rgba(255, 255, 255, 0.8)",
@@ -120,11 +120,14 @@ const Register = () => {
 
         }}
       >
-        <h2 className="mb-3 fw-bold">Create an Account</h2>
+        <h2 className="mb-3 fw-bold">Create an Account🚀</h2>
 
         <div className="mb-2">
           <input
-            className="form-control"
+            className="form-control "
+            style={{
+              fontWeight: "bold",
+            }}
             type="email"
             placeholder="Email"
             value={email}
@@ -135,7 +138,10 @@ const Register = () => {
 
         <div className="mb-2">
           <input
-            className="form-control"
+            className="form-control "
+            style={{
+              fontWeight: "bold",
+            }}
             type="text"
             placeholder="Full Name"
             value={name}
@@ -147,14 +153,17 @@ const Register = () => {
 
         <div className="mb-2">
           <Select
-             options={options}
-             value={options.find((o) => o.value === rol)}
-             onChange={(selected) => setRol(selected.value)}
-             placeholder="Select a role"
-             styles={{
+            className="form-control "
+            options={options}
+            value={options.find((o) => o.value === rol)}
+            onChange={(selected) => setRol(selected.value)}
+            placeholder="Select a role"
+            styles={{
               control: (base) => ({
                 ...base,
-                backgroundColor: "rgba(255,255,255,0.6)",
+                background: "linear-gradient(to bottom, #e4a2b0, white)",
+                color: "white",
+                fontWeight: "bold",
                 borderRadius: "8px",
                 borderColor: "#ccc",
                 boxShadow: "none",
@@ -170,9 +179,13 @@ const Register = () => {
 
 
 
+
         <div className="mb-2">
           <input
-            className="form-control"
+            className="form-control "
+            style={{
+              fontWeight: "bold",
+            }}
             type="password"
             placeholder="Password"
             value={password}
@@ -183,7 +196,10 @@ const Register = () => {
 
         <div className="mb-2">
           <input
-            className="form-control"
+            className="form-control "
+            style={{
+              fontWeight: "bold",
+            }}
             type="password"
             placeholder="Repeat Password"
             value={confirmPassword}
@@ -194,17 +210,16 @@ const Register = () => {
 
         <button
           type="submit"
-          className="btn w-100"
+          className="register-button btn w-100"
           style={{
-            backgroundColor: "#fa8072",
+            background: "linear-gradient(to bottom, #e4a2b0, white)",
             color: "white",
             fontWeight: "bold",
             border: "none",
-            
-            transition: "background-color 0.3s"
+
           }}
-          onMouseOver={(e) => (e.target.style.backgroundColor = "#e76b60")}
-          onMouseOut={(e) => (e.target.style.backgroundColor = "#fa8072")}
+          onMouseOver={(e) => (e.target.style.backgroundColor = "#e4a2b0")}
+          onMouseOut={(e) => (e.target.style.backgroundColor = "#e4a2b0")}
         >
           Register
         </button>
