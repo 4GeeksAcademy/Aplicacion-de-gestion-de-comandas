@@ -4,6 +4,7 @@ import tableSvg from "../assets/img/table.svg";
 import { Link } from "react-router-dom";
 
 export const Menu = () => {
+
     const categories = [
         { id: 'starters', title: 'Starters', icon: 'bi-1-circle' },
         { id: 'main_dishes', title: 'Main Dishes', icon: 'bi-2-circle' },
