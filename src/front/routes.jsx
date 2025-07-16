@@ -55,4 +55,3 @@ export const router = createBrowserRouter(
     </Route>
   ),
 );
-ImageUploader
