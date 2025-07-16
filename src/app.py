@@ -43,7 +43,7 @@ bcrypt = Bcrypt(app)  # para encriptar
 
 CORS(app, supports_credentials=True, resources={
     r"/*": {
-        "origins": "https://fantastic-computing-machine-x5w7gj49jvx7fpvpx-3000.app.github.dev"
+        "origins": "https://glowing-sniffle-pjrr7gwxq5g524w-3000.app.github.dev"
     }
 })
 
@@ -153,10 +153,12 @@ def get_order_by_id(id):
 # -------------------------------GET DE UNA COMANDA POR MESA -----------------------------------
 # nos devuelve el order.id que necesitamos para modificar las comandas
 
+
 @app.route('/orders/by-table/<int:id>', methods=['GET'])
 @jwt_required()
 def get_active_order_by_table(id):
-    order = Orders.query.filter_by(mesa_id=id, state=EstadoComanda.pendiente).first()
+    order = Orders.query.filter_by(
+        mesa_id=id, state=EstadoComanda.pendiente).first()
 
     if order is None:
         return jsonify({'msg': 'No hay comanda activa para esta mesa'}), 404
@@ -229,8 +231,9 @@ def crear_comanda():
         db.session.commit()
 
         return jsonify({
-            'msg': 'Comanda creada exitosamente', 
-            'order_id': new_order.id, # añadido para recuperar id de la comanda para TablesOrder (lo usaremos en el front)
+            'msg': 'Comanda creada exitosamente',
+            # añadido para recuperar id de la comanda para TablesOrder (lo usaremos en el front)
+            'order_id': new_order.id,
             'result': new_order.serialize()}), 201
 
     except Exception as e:
@@ -692,7 +695,6 @@ def login():
                         'name': user.name,
                         'email': user.email,
                         'rol': user.rol.value}}), 200
-    
 
 
 # -------------------------------PROTECCIÓN ---OK--------------------------------

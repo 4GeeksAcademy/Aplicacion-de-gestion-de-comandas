@@ -6,13 +6,12 @@ const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 const TableOrder = () => {
   const [order, setOrder] = useState(null);
   const [table, setTable] = useState([]);
-  const { id, orderId } = useParams(); //podemos extraer orderId de la URL
+  const { id } = useParams(); //podemos extraer orderId de la URL
+  const params = useParams();
   const navigate = useNavigate();
   useEffect(() => {
     fetchOrder();
   }, []);
-
-
   const fetchOrder = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -41,7 +40,6 @@ const TableOrder = () => {
     try {
       const token = localStorage.getItem('token');
       const userId = localStorage.getItem('user_id'); // asegúrate de guardar el user_id al hacer login
-
       const res = await fetch(`${BASE_URL}/orders`, {
         method: "POST",
         headers: {
@@ -55,16 +53,13 @@ const TableOrder = () => {
           platos: []
         }),
       });
-
       const data = await res.json();
       console.log("Respuesta de comanda:", data)
-
       if (res.ok) {
-        const order_ID = data.result.id;
+        const order_ID = data.order_id;
         console.log("el ID de la comanda:", order_ID)
         navigate(`/table-order/${order_ID}`);
         setOrder({ ...data.result, platos: [] });
-
       } else {
         console.error("Error al crear comanda:", data.msg);
       }
@@ -87,8 +82,6 @@ const TableOrder = () => {
     });
     await updateOrderBackend(nuevosPlatos);
   };
-
-
   const handleDeletePlato = async (platoId) => {
     const nuevosPlatos = order.platos.map(plato => {
       if (plato.plato_id === platoId) {
@@ -98,9 +91,6 @@ const TableOrder = () => {
     });
     await updateOrderBackend(nuevosPlatos);
   };
-
-
-
   const updateOrderBackend = async (platosActualizados) => {
     const token = localStorage.getItem('token');
     const body = {
@@ -127,12 +117,8 @@ const TableOrder = () => {
       console.error(data.msg || data.error);
     }
   };
-
-
   if (!order) return <p className='text-center text-light mt-5'>Aún no hay ningún plato comandado!</p>;
   const totalPrice = order.platos.reduce((sum, plato) => sum + plato.subtotal, 0);
-
-
   return (
     <div className="container py-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
@@ -144,7 +130,7 @@ const TableOrder = () => {
             Ver Mesas
           </button>
           <button className="category-icon d-flex flex-column align-items-center justify-content-center text-decoration-none"
-            onClick={() => navigate("/menu")}
+            onClick={() => navigate(`/menu/${params.id}`)}
           >
             Añadir Platos
           </button>
@@ -167,12 +153,8 @@ const TableOrder = () => {
           </li>
         ))}
       </ul>
-
-
-
       <div className="mb-3" style={{ position: "relative" }}>
         <label className="form-label text-light">Notas de la comanda:</label>
-
         <textarea
           className="form-control pe-5"
           rows="3"
@@ -182,7 +164,6 @@ const TableOrder = () => {
             setOrder({ ...order, guest_notes: e.target.value })
           }
         />
-
         <button
           className="btn btn-sm btn-outline-success"
           style={{
@@ -202,11 +183,10 @@ const TableOrder = () => {
           Añadir
         </button>
       </div>
-
       <div className="mt-4 text-end text-light">
         <h4 btn btn-sm btn-outline-success>Total: €{totalPrice.toFixed(2)}</h4>
       </div>
     </div>
   );
 };
-export default TableOrder; 
+export default TableOrder;
