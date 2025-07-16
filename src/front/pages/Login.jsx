@@ -31,7 +31,8 @@ const Login = () => {
       console.log("Respuesta del backend:", data);
 
       if (res.ok) {
-        localStorage.setItem("token", data.Token); //guardo el token y el usuario en localStorage
+        localStorage.setItem("token", data.Token);
+        localStorage.setItem('user_id', data.user.id); //guardo el token y el usuario en localStorage
         localStorage.setItem("user", JSON.stringify(data.user));
 
         const userRol = data.user.rol; // extraigo el rol
