@@ -30,13 +30,15 @@ from werkzeug.security import generate_password_hash
 # from flask_bcrypt import Bcrypt
 
 from flask_cors import CORS
+import cloudinary.uploader
+from dotenv import load_dotenv
 
 
 ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
 static_file_dir = os.path.join(os.path.dirname(
     os.path.realpath(__file__)), '../dist/')
 
-
+load_dotenv()
 app = Flask(__name__)
 app.url_map.strict_slashes = False
 bcrypt = Bcrypt(app)  # para encriptar
@@ -54,6 +56,14 @@ app.config["JWT_SECRET_KEY"] = os.getenv('JWT_KEY')  # la llave esta en .env
 serializer = URLSafeTimedSerializer(os.getenv('JWT_KEY'))
 
 jwt = JWTManager(app)
+
+#configuracion Cloudinary
+cloudinary.config(
+    cloud_name=os.getenv("CLOUD_NAME"),
+    api_key=os.getenv("API_KEY"),
+    api_secret=os.getenv("API_SECRET")
+)
+
 
 
 # Configuración del correo. se pone antes de mail=Mail(app)
@@ -852,6 +862,23 @@ def update_plate_status(order_id):
     db.session.commit()
 
     return jsonify({'msg': 'Estado actualizado correctamente', 'result': relation.serialize()}), 200
+
+#------------------CLOUDINARY -----------------------------------------------------
+@app.route("/upload", methods=["POST"])
+def upload():
+    if "file" not in request.files:
+        return jsonify({"error": "No file part"}), 400
+
+    file_to_upload = request.files["file"]
+
+    if file_to_upload.filename == "":
+        return jsonify({"error": "No selected file"}), 400
+
+    try:
+        upload_result = cloudinary.uploader.upload(file_to_upload)
+        return jsonify({"url": upload_result["secure_url"]})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 if __name__ == '__main__':

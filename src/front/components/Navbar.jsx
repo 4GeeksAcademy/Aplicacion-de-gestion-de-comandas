@@ -30,37 +30,42 @@ export const Navbar = () => {
 	};
 
 	return (
-		<nav className="navbar" style={{ backgroundColor: "#fa8072" }}>
+		<nav className="navbar" style={{  backgroundColor: "#e4a2b0",
+			background: "linear-gradient(to bottom, #191823, #2f2531)", 
+			boxShadow: "0 6px 20px #e4a2b0"}}>
 
 			<div className="container">
 
-				<div className="logo text-white fs-9">
-					<i className="fas fa-store"></i> <span>Japanese Restaurant</span>
+
+				<div className="logo text-white fs-6">
+					<i className="fas fa-store"></i> <span>Hayashi Sushi Bar🍣🌸</span>
+
 				</div>
 
-				<div className="ms-auto d-flex align-items-center">
+				<div className="ms-auto d-flex align-items-center fs-6">
 					{!token ? (
 						<>
 							{location.pathname === "/login" && (
-								<Link to="/register" className="btn btn-outline-light me-2">
+								<Link to="/register" className="btn btn-outline-light me-2 fs-6">
 									Sign Up
 								</Link>
 							)}
 							{location.pathname === "/register" && (
-								<Link to="/login" className="btn btn-outline-light me-2">
+								<Link to="/login" className="btn btn-outline-light me-2 fs-6">
 									Log in
 								</Link>
 							)}
 							{location.pathname === "/request-reset-password" && (
-								<Link to="/login" className="btn btn-outline-light me-2">
+								<Link to="/login" className="btn btn-outline-light me-2 fs-6">
 									Log in
 								</Link>
 							)}
 							{location.pathname === "/request-reset-password" && (
-								<Link to="/login" className="btn btn-outline-light me-2">
+								<Link to="/login" className="btn btn-outline-light me-2 fs-6">
 									Sign Up
 								</Link>
 							)}
+														
 
 						</>
 					) : (
@@ -84,7 +89,7 @@ export const Navbar = () => {
 								confirmButtonText: "Close",
 								confirmButtonColor: "#fa8072",
 							}).then(() => {
-								window.location.href = 'about:blank';
+								
 								handleLogout();
 							});
 						}}
