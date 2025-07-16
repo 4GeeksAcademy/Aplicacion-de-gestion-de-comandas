@@ -616,6 +616,8 @@ bottom-login {
 
 /* ------------------ Marta-Edu {MenuView} {Start} ------------------ */
 
+/* ------------------ Marta-Edu {MenuView} {Start} ------------------ */
+
 .container-menuview {
   display: flex;
   flex-direction: column;
@@ -765,5 +767,8 @@ bottom-login {
   font-weight: bold;
   color: #e4a2b0;
 }
+
+/* ------------------Marta- edu {MenuView} {End} ------------------ */
+
 
 /* ------------------Marta- edu {MenuView} {End} ------------------ */

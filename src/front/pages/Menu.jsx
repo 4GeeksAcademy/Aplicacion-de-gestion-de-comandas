@@ -1,9 +1,11 @@
 import CategorySection from "../components/CategorySection";
 import orderSvg from "../assets/img/order.svg";
 import tableSvg from "../assets/img/table.svg";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+
 
 export const Menu = () => {
+    const params = useParams()
 
     const categories = [
         { id: 'starters', title: 'Starters', icon: 'bi-1-circle' },
@@ -17,7 +19,7 @@ export const Menu = () => {
             <div className="content-menuview">
 
                 <header className="mb-5 text-center">
-                    <Link to="/table-order/:id" className="text-decoration-none">
+                    <Link to={`/table-order/${params.order_id}`} className="text-decoration-none">
                         <div className="d-inline-block p-3 bg-white rounded shadow-sm me-3 mb-3">
                             <img src={orderSvg} alt="Order Icon" style={{ height: '50px', width: 'auto' }} />
                         </div>

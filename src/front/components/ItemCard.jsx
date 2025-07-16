@@ -1,32 +1,34 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
 
 function ItemCard({ item }) {
+
+  const params = useParams();
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
-  
   const BASE_URL = import.meta.env.VITE_BACKEND_URL;
   const token = localStorage.getItem('token');
 
   if (!item) return null;
 
-    const handleAddItemOrder = async () => {
-      if (!orderId || !token) {
-        setMessage('Error: orderId not disponible');
-        setMessageType ('error');
-        return;
-      }
+  const handleAddItemOrder = async () => {
+    if (!token) {
+      setMessage('Error: orderId not disponible');
+      setMessageType('error');
+      return;
+    }
 
-      const payload = {
-        platos: [
-          {
-            plate_id: item.id,
-            cantidad: 1,
-          },
-        ],
-      };
+    const payload = {
+      platos: [
+        {
+          plate_id: item.id,
+          cantidad: 1,
+        },
+      ],
+    };
 
-      try {
-        const response = await fetch(`${BASE_URL}/1`, {
+    try {
+      const response = await fetch(`${BASE_URL}/orders/${params.order_id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -57,10 +59,9 @@ function ItemCard({ item }) {
       setMessageType('');
     }, 3000);
   };
-    
 
   return (
-    <div className="product-card-menuview ">
+    <div className="product-card-menuview">
 
       <div>
         <h3 className="product-name-menuview d-flex flex-column justify-content-between">{item.name}</h3>
@@ -73,14 +74,15 @@ function ItemCard({ item }) {
       <div className='d-flex justify-content-between align-items-center'>
         <p className="product-price-menuview mb-0">{item.price} €</p>
         <button
+          style={{ backgroundColor: '#e4a2b0', fontWeight: 'bold' }}
           type="button"
-          className="btn btn-secondary"
-          /*onClick={}*/
+          className="btn"
+          onClick={handleAddItemOrder}
         >
           Add
         </button>
       </div>
-      
+
     </div>
 
   );
