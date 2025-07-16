@@ -14,6 +14,7 @@ from api.admin import setup_admin
 from api.commands import setup_commands
 from datetime import datetime, timedelta
 from sqlalchemy.orm import load_only
+from functools import wraps
 
 
 # from src.api.models import db
@@ -42,7 +43,7 @@ bcrypt = Bcrypt(app)  # para encriptar
 
 CORS(app, supports_credentials=True, resources={
     r"/*": {
-        "origins": "https://congenial-dollop-x5p6xqq6wq44hv76p-3000.app.github.dev"
+        "origins": "https://fantastic-computing-machine-x5w7gj49jvx7fpvpx-3000.app.github.dev"
     }
 })
 
@@ -149,6 +150,18 @@ def get_order_by_id(id):
         return jsonify({'msg': 'Comanda no encontrada'}), 404
     return jsonify({'msg': 'ok', 'result': order.serialize()}), 200
 
+# -------------------------------GET DE UNA COMANDA POR MESA -----------------------------------
+# nos devuelve el order.id que necesitamos para modificar las comandas
+
+@app.route('/orders/by-table/<int:id>', methods=['GET'])
+@jwt_required()
+def get_active_order_by_table(id):
+    order = Orders.query.filter_by(mesa_id=id, state=EstadoComanda.pendiente).first()
+
+    if order is None:
+        return jsonify({'msg': 'No hay comanda activa para esta mesa'}), 404
+
+    return jsonify({'order_id': order.id, 'order': order.serialize()}), 200
 
 # -------------------------------POST DE COMANDAS ---OK---OK---------------------------------
 
@@ -215,7 +228,10 @@ def crear_comanda():
         new_order.total_price = total
         db.session.commit()
 
-        return jsonify({'msg': 'Comanda creada exitosamente', 'result': new_order.serialize()}), 201
+        return jsonify({
+            'msg': 'Comanda creada exitosamente', 
+            'order_id': new_order.id, # añadido para recuperar id de la comanda para TablesOrder (lo usaremos en el front)
+            'result': new_order.serialize()}), 201
 
     except Exception as e:
         db.session.rollback()
@@ -672,9 +688,12 @@ def login():
     return jsonify({'msg': 'OK',
                     'Token': acces_token,
                     'user': {
+                        'id': user.id,
                         'name': user.name,
                         'email': user.email,
                         'rol': user.rol.value}}), 200
+    
+
 
 # -------------------------------PROTECCIÓN ---OK--------------------------------
 
