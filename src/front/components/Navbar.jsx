@@ -30,12 +30,14 @@ export const Navbar = () => {
 	};
 
 	return (
-		<nav className="navbar" style={{ backgroundColor: "#fa8072" }}>
+		<nav className="navbar" style={{  backgroundColor: "#e4a2b0",
+			background: "linear-gradient(to bottom, #191823, #2f2531)", 
+			boxShadow: "0 6px 20px #e4a2b0"}}>
 
 			<div className="container">
 
 				<div className="logo text-white fs-6">
-					<i className="fas fa-store"></i> <span>Japanese Restaurant</span>
+					<i className="fas fa-store"></i> <span>Hayashi Sushi Bar🍣🌸</span>
 				</div>
 
 				<div className="ms-auto d-flex align-items-center fs-6">
@@ -85,7 +87,7 @@ export const Navbar = () => {
 								confirmButtonText: "Close",
 								confirmButtonColor: "#fa8072",
 							}).then(() => {
-								window.location.href = 'about:blank';
+								
 								handleLogout();
 							});
 						}}
