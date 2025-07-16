@@ -767,3 +767,43 @@ bottom-login {
 }
 
 /* ------------------Marta- edu {MenuView} {End} ------------------ */
+
+
+
+/* ------------------Marta {Table-order View} {Start} ------------------ */
+.table-order-card {
+  background: linear-gradient(to bottom, #2f2531, #1e1a26);
+  border-radius: 12px;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  color: white;
+  font-size: 0.85rem;
+  border: 0.1px solid #e4a2b0;
+  box-shadow: 0 6px 18px rgba(228, 162, 176, 0.25);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.table-order-card:hover {
+  transform: scale(1);
+  box-shadow: 0 10px 24px rgba(228, 162, 176, 0.35);
+}
+.table-order-note {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 160px;
+  background: linear-gradient(to bottom, #ada0a0, #ffffff);
+  border-radius: 10px;
+  padding: 0.5rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  min-width: 250px;
+  border: 0.2px solid #e4a2b0;
+}
+.table-order-btn {
+  background-color: #e4a2b0;
+  font-weight: bold;
+  color: white;
+}
+.table-order-text {
+  color:#888
+}
+/* ------------------Marta {Table-order View} {End} ------------------ */
