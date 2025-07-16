@@ -5,17 +5,6 @@ import Swal from "sweetalert2";
 export const Navbar = () => {
 	const location = useLocation();
 	const navigate = useNavigate();
-
-	//const token = localStorage.getItem("token");
-	//const user = localStorage.getItem("user");
-	//localStorage.setItem("user", JSON.stringify(user));
-
-	//const rawUser = localStorage.getItem("user");
-
-	//const user = rawUser ? JSON.parse(rawUser) : null;
-	//const user = JSON.parse(localStorage.getItem("user"));
-
-
 	const token = localStorage.getItem("token");
 	const rawUser = localStorage.getItem("user");
 	const user = token && rawUser ? JSON.parse(rawUser) : null;
@@ -32,10 +21,11 @@ export const Navbar = () => {
 
 	const isAuthenticated = !!token;
 	const handleLogout = () => {
-		console.log("Token antes de borrar:", localStorage.getItem("token"));
-		localStorage.removeItem("token");
-		console.log("Token después de borrar:", localStorage.getItem("token"));
-		localStorage.removeItem("user"); // elimino del localStorage tanto el token como el user
+		//localStorage.removeItem("user"); //console.log("Token antes de borrar:", localStorage.getItem("token"));
+		//localStorage.removeItem("token");
+		//console.log("Token después de borrar:", localStorage.getItem("token"));
+		//elimino del localStorage tanto el token como el user
+		localStorage.clear()
 		navigate("/login");
 	};
 
