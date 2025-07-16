@@ -23,6 +23,8 @@ import UserProfile from "./pages/UserProfile";
 
 
 
+
+
 export const router = createBrowserRouter(
   createRoutesFromElements(
 
@@ -49,6 +51,8 @@ export const router = createBrowserRouter(
       <Route path="/table-order/:id" element={<TableOrder />} />
       <Route path="/menu" element={<Menu />} />
       <Route path="/profile" element={<UserProfile />} />
+   
     </Route>
   ),
 );
+ImageUploader

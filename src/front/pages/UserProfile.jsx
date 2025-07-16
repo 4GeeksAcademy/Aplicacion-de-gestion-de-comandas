@@ -8,6 +8,7 @@ const UserProfile = () => {
 
   const token = localStorage.getItem('token');
   const userId = localStorage.getItem('user_id'); // Asegúrate de guardar esto en login
+  const BASE_URL = import.meta.env.VITE_BACKEND_URL
 
   useEffect(() => {
     fetchUserProfile();
@@ -15,7 +16,7 @@ const UserProfile = () => {
 
   const fetchUserProfile = async () => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/users/${userId}`, {
+      const res = await fetch(`${BASE_URL}/users/${userId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
