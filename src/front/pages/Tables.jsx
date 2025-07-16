@@ -1,21 +1,19 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from 'sweetalert2';
-import Select from "react-select"; // e instalo en la terminal del front  npm install react-select
-
+import Select from "react-select";
 
 const Tables = () => {
   const [mesas, setMesas] = useState([]);
   const navigate = useNavigate();
 
   const BASE_URL = import.meta.env.VITE_BACKEND_URL;
-  //console.log("BASE_URL:", BASE_URL);
 
   useEffect(() => {
     const fetchMesas = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch(`${BASE_URL}/tables`, //hago get de todas las mesas
+        const res = await fetch(`${BASE_URL}/tables`,
         {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -63,13 +61,69 @@ const Tables = () => {
       alert("Error connecting to server.");
     }
   };
+  
+  const createNewOrder = async (mesaId) => {
+  try {
+    const token = localStorage.getItem('token');
+    const userId = localStorage.getItem('user_id'); // asegúrate de guardar el user_id al hacer login
+    
+    const res = await fetch(`${BASE_URL}/orders`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        mesa_id: parseInt(mesaId),  //parseInt(id)
+        usuario_id: parseInt(userId),
+        guest_notes: "",
+        platos: []
+      }),
+    });
+   
+    const data = await res.json();
+    console.log("Respuesta de comanda:", data) 
+
+    if (res.ok) {
+      const order_ID = data.result.id;
+      console.log("el ID de la comanda:", order_ID)
+      navigate(`/table-order/${order_ID}`);
+      setOrder({ ...data.result, platos: [] });
+      
+    } else {
+      console.error("Error al crear comanda:", data.msg);
+    }
+  } catch (error) {
+    console.error("Error al crear comanda:", error);
+  }
+};
 
 
+  
+  const handleClick = async (mesaId) => {
+  try {
+    const res = await fetch(`${BASE_URL}/orders/by-table/${mesaId}`, {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+    });
 
-  const handleClick = (mesa) => {
-    console.log("Mesa clickeada:", mesa);
-    navigate(`/table-order/${mesa.id}`)
-  };
+    const data = await res.json();
+
+    if (res.ok) {
+      const orderId = data.order_id;
+      navigate(`/table-order/${orderId}`); // ✅ navegas al ID de la comanda
+    } else if (res.status === 404) {
+      // Si no hay comanda, creas una nueva (opcional)
+      await createNewOrder(mesaId);
+    } else {
+      console.error("Error:", data.msg);
+    }
+  } catch (err) {
+    console.error("Error al buscar comanda por mesa:", err);
+  }
+};
+
 
 
   const stateOptions = [
@@ -78,11 +132,12 @@ const Tables = () => {
     { value: "reserved", label: "⏳ Reserved" },
     { value: "closed", label: "🔒 Closed" },
   ];
-
+  if (!mesas) return <p className='text-center text-light mt-5'>NO EXISTEN MESAS EN ESTE RESTAURANTE!</p>;
   return (
 
     <div className="container mt-3 px-10 py-10">
-      <h2 className="mb-4 mt-4">Tables</h2>
+      <h2 className="mb-4 mt-4 text-light">Tables</h2>
+
       <div className="row mb-3 g-4">
         {mesas.map((table) => (
           <div className="col-6 col-md-4 col-lg-3" key={table.id}>
@@ -108,7 +163,7 @@ const Tables = () => {
                 cursor: "pointer",
               }}
               onClick={() => {
-                if (table.state === "available" || table.state === "busy") { handleClick(table) }
+                if (table.state === "available" || table.state === "busy") { handleClick(table.id) }
                 else {
 
                   if (table.state === "closed")
@@ -213,5 +268,3 @@ const Tables = () => {
 };
 
 export default Tables;
-//https://tse3.mm.bing.net/th/id/OIP.8t5TFov2Q7P5rAGzwxohVwAAAA?pid=ImgDet&w=178&h=178&c=7&dpr=1,5&o=7&rm=3
-// <div className="container mt-3 px-10 py-10" style={{ border: ' 1px solid #e76b60', color: "#e76b60" }}> */}

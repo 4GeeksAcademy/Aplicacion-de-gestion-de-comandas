@@ -36,8 +36,10 @@ export const Navbar = () => {
 
 			<div className="container">
 
+
 				<div className="logo text-white fs-6">
 					<i className="fas fa-store"></i> <span>Hayashi Sushi Bar🍣🌸</span>
+
 				</div>
 
 				<div className="ms-auto d-flex align-items-center fs-6">

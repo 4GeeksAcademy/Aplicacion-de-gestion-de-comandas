@@ -50,8 +50,7 @@ export const router = createBrowserRouter(
       <Route path="/tables" element={<Tables />} />
       <Route path="/table-order/:id" element={<TableOrder />} />
       <Route path="/menu" element={<Menu />} />
-      <Route path="/profile" element={<UserProfile />} />
-   
+
     </Route>
   ),
 );
