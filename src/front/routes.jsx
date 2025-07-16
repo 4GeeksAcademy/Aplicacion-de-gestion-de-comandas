@@ -18,7 +18,6 @@ import Admin from "./pages/Admin";
 import Tables from "./pages/Tables";
 import TableOrder from "./pages/TableOrder";
 import Menu from "./pages/Menu";
-import UserProfile from "./pages/UserProfile";
 
 
 
