@@ -38,7 +38,7 @@ const CategorySection = ({ category, title }) => {
     return (
         <section id={category} className="mb-5">
             <h2 className="section-title mb-4">{title}</h2>
-            <div className="row g-4">
+            <div className="items-grid-menuview">
                 {items.map(item => (
                     <ItemCard key={item.id} item={item} />
                 ))}
