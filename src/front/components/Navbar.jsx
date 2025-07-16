@@ -61,6 +61,12 @@ export const Navbar = () => {
 									Sign Up
 								</Link>
 							)}
+							{location.pathname === "/admin-bar" && (
+								<Link to="/login" className="btn btn-outline-light me-2">
+									Sign Up
+								</Link>
+							)}
+							
 
 						</>
 					) : (
