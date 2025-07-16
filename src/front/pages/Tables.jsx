@@ -1,21 +1,19 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from 'sweetalert2';
-import Select from "react-select"; // e instalo en la terminal del front  npm install react-select
-
+import Select from "react-select";
 
 const Tables = () => {
   const [mesas, setMesas] = useState([]);
   const navigate = useNavigate();
 
   const BASE_URL = import.meta.env.VITE_BACKEND_URL;
-  //console.log("BASE_URL:", BASE_URL);
 
   useEffect(() => {
     const fetchMesas = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch(`${BASE_URL}/tables`, //hago get de todas las mesas
+        const res = await fetch(`${BASE_URL}/tables`,
         {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -82,7 +80,9 @@ const Tables = () => {
   return (
 
     <div className="container mt-3 px-10 py-10">
+      <div>
       <h2 className="mb-4 mt-4">Tables</h2>
+      </div>
       <div className="row mb-3 g-4">
         {mesas.map((table) => (
           <div className="col-6 col-md-4 col-lg-3" key={table.id}>
@@ -213,5 +213,3 @@ const Tables = () => {
 };
 
 export default Tables;
-//https://tse3.mm.bing.net/th/id/OIP.8t5TFov2Q7P5rAGzwxohVwAAAA?pid=ImgDet&w=178&h=178&c=7&dpr=1,5&o=7&rm=3
-// <div className="container mt-3 px-10 py-10" style={{ border: ' 1px solid #e76b60', color: "#e76b60" }}> */}
