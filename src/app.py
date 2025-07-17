@@ -43,11 +43,13 @@ app = Flask(__name__)
 app.url_map.strict_slashes = False
 bcrypt = Bcrypt(app)  # para encriptar
 
-CORS(app,
-     origins=["https://scaling-funicular-5g6r47pqpwv3vjqg-3000.app.github.dev"],
-     supports_credentials=True,
-     allow_headers=["Content-Type", "Authorization"],
-     methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
+CORS(app)
+
+
+ # origins=["https://scaling-funicular-5g6r47pqpwv3vjqg-3000.app.github.dev"],
+   #  supports_credentials=True,
+  #   allow_headers=["Content-Type", "Authorization"],
+  #   methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])   
 
 
 app.url_map.strict_slashes = False
