@@ -104,19 +104,21 @@ const Register = () => {
   return (
     <form
       onSubmit={Registrarse}
-      className="register-background d-flex align-items-start justify-content-start w-100 vh-100 p-4"
+      className="register-background d-flex align-items-start justify-content-center w-100 p-4"
+      style={{ paddingTop: "70px", minHeight: "80vh", paddingBottom: "100px" }}
     >
       <div
-        className="register-card w-100 p-4"
+        className="register-card pink-bordered-card w-100 p-4"
         style={{
-          maxWidth: "320px",
+          maxWidth: "420px",
           backgroundColor: "rgba(255, 255, 255, 0.8)",
           borderRadius: "16px",
-          boxShadow: "0 4px 15px rgba(0, 0, 0, 0.1)",
+
           backdropFilter: "blur(4px)", // Efecto glass suave
           width: "100%",
           zIndex: 1, // Asegura que quede por encima del filtro del fondo
           position: "relative",
+          marginTop: "20vh",
 
         }}
       >
@@ -235,7 +237,3 @@ const Register = () => {
 };
 
 export default Register;
-
-{
-  /* Imagen de este componente esta en css en la clase register-background*/
-}

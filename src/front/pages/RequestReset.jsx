@@ -59,19 +59,21 @@ const RequestReset = () => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="register-background d-flex align-items-start justify-content-start w-100 vh-100 p-4"
+      className="register-background d-flex align-items-start justify-content-center w-100 p-4"
+      style={{ paddingTop: "80px", minHeight: "80vh", paddingBottom: "100px" }}
     >
 
       <div
-        className="w-100 p-4"
+        className="pink-bordered-card w-100 p-4"
         style={{
 
-          maxWidth: "320px",
+          maxWidth: "400px",
           background: "linear-gradient(to bottom, #2f2531, #1e1a26)",
           backgroundColor: "rgba(255, 255, 255, 0.8)",
           borderRadius: "16px",
+
           border: "0.1px solid #e4a2b0",
-          boxShadow: "0 4px 15px rgba(231, 109, 150, 0.1)",
+          marginTop: "20vh",
           backdropFilter: "blur(4px)", // Efecto glass suave
           width: "100%",
           zIndex: 1, // Asegura que quede por encima del filtro del fondo
@@ -80,11 +82,13 @@ const RequestReset = () => {
 
         }}
       >
-        <h2>Recuperar contraseña</h2>
+        <h4 className="mb-4">Recuperar contraseña 🔐</h4>
+
         <div className="mb-2">
           <input
-            className="form-control text-white"
+            className="form-control mb-3"
             style={{
+              color: "#191823",
               fontWeight: "bold",
 
             }}

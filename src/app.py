@@ -43,11 +43,11 @@ app = Flask(__name__)
 app.url_map.strict_slashes = False
 bcrypt = Bcrypt(app)  # para encriptar
 
-CORS(app, supports_credentials=True, resources={
-    r"/*": {
-        "origins": "https://glowing-sniffle-pjrr7gwxq5g524w-3000.app.github.dev"
-    }
-})
+CORS(app,
+     origins=["https://scaling-funicular-5g6r47pqpwv3vjqg-3000.app.github.dev"],
+     supports_credentials=True,
+     allow_headers=["Content-Type", "Authorization"],
+     methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
 
 
 app.url_map.strict_slashes = False
@@ -57,13 +57,12 @@ serializer = URLSafeTimedSerializer(os.getenv('JWT_KEY'))
 
 jwt = JWTManager(app)
 
-#configuracion Cloudinary
+# configuracion Cloudinary
 cloudinary.config(
     cloud_name=os.getenv("CLOUD_NAME"),
     api_key=os.getenv("API_KEY"),
     api_secret=os.getenv("API_SECRET")
 )
-
 
 
 # Configuración del correo. se pone antes de mail=Mail(app)
@@ -865,7 +864,9 @@ def update_plate_status(order_id):
 
     return jsonify({'msg': 'Estado actualizado correctamente', 'result': relation.serialize()}), 200
 
-#------------------CLOUDINARY -----------------------------------------------------
+# ------------------CLOUDINARY -----------------------------------------------------
+
+
 @app.route("/upload", methods=["POST"])
 def upload():
     if "file" not in request.files:

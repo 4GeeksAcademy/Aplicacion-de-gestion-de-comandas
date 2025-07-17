@@ -191,7 +191,9 @@ const TableOrder = () => {
         </button>
       </div>
       <div className="mt-4 text-end text-light">
-        <h4 btn btn-sm btn-outline-success>Total: €{totalPrice.toFixed(2)}</h4>
+        <h4 className="btn btn-sm btn-outline-success">Total: €{totalPrice.toFixed(2)}</h4>
+        
+
       </div>
     </div>
   );

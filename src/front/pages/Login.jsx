@@ -109,7 +109,11 @@ const Login = () => {
 
       <form
         onSubmit={handleLogin}
-        className="login-background d-flex align-items-start justify-content-start w-70 vh-100 p-4"
+        className="login-background d-flex align-items-start justify-content-cente"
+        style={{
+          width: "100vw",
+          paddingTop: "30vh",
+        }}
       >
         <div
           className="login-card">

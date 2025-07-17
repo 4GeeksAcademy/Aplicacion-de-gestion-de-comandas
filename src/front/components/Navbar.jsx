@@ -30,14 +30,18 @@ export const Navbar = () => {
 	};
 
 	return (
-		<nav className="navbar" style={{  backgroundColor: "#e4a2b0",
-			background: "linear-gradient(to bottom, #191823, #2f2531)", 
-			boxShadow: "0 6px 20px #e4a2b0"}}>
+		<nav className="navbar" style={{
+			backgroundColor: "#e4a2b0",
+			background: "linear-gradient(to bottom, #191823, #2f2531)",
+			boxShadow: "0 6px 20px #e4a2b0",
+			position: "relative",
+			zIndex: 10
+		}}>
 
 			<div className="container">
 
 
-				<div className="logo text-white fs-6">
+				<div className="logo text-white fs-3">
 					<i className="fas fa-store"></i> <span>Hayashi Sushi Bar🍣🌸</span>
 
 				</div>
@@ -65,7 +69,7 @@ export const Navbar = () => {
 									Sign Up
 								</Link>
 							)}
-														
+
 
 						</>
 					) : (
@@ -84,12 +88,12 @@ export const Navbar = () => {
 						onClick={() => {
 							Swal.fire({
 								title: "¡See you soon!",
-								text: "Thank you for use the Hana Sushi Bar app😊",
+								text: "Thank you for use the Hayashi Sushi Bar app😊🍜",
 								icon: "info",
 								confirmButtonText: "Close",
-								confirmButtonColor: "#fa8072",
+								confirmButtonColor: "#e4a2b0",
 							}).then(() => {
-								
+
 								handleLogout();
 							});
 						}}
