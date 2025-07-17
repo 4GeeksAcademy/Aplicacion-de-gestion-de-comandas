@@ -105,7 +105,7 @@ const RequestReset = () => {
             className="btn w-100"
             style={{
               background: "linear-gradient(to bottom, #e4a2b0, white)",
-              color: "white",
+              color: "#2f2531",
               fontWeight: "bold",
               border: "none",
               transition: "background-color 0.3s"

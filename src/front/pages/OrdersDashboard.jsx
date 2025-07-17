@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from 'react-router-dom';
@@ -147,7 +148,7 @@ const OrdersDashboard = () => {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
             },
-            body: JSON.stringify({ state: "pending" }) // <-- ¡valor correcto del Enum!
+            body: JSON.stringify({ state: "pending" })
         })
             .then((res) => {
                 if (!res.ok) throw new Error("No se pudo actualizar la comanda");
@@ -192,7 +193,7 @@ const OrdersDashboard = () => {
     return (
         <div className="orders-dashboard container-fluid">
             <div className="header row align-items-center">
-                <div className="filters modern-filters col-md-12 d-flex justify-content-center mb-3">
+                <div className="filters modern-filters col-md-12 d-flex flex-wrap justify-content-center mb-3">
                     {filters.map((f) => (
                         <button
                             key={f}
@@ -205,9 +206,9 @@ const OrdersDashboard = () => {
                 </div>
             </div>
 
-            <div className="order-list-header">
+            <div className="order-list-header d-flex flex-wrap align-items-center">
                 <h3 className="order-list-title">Order list:</h3>
-                <div className="orders-buttons">
+                <div className="orders-buttons d-flex flex-wrap justify-content-start">
                     {orders.map((order) => (
                         <button
                             key={order.id}
@@ -230,7 +231,7 @@ const OrdersDashboard = () => {
                         key={order.id}
                         className={`order-card ${openOrderIds.includes(order.id) ? "" : "closed"}`}
                     >
-                        <div className="order-header" onClick={() => toggleOrder(order.id)}>
+                        <div className="order-header d-flex flex-wrap justify-content-between align-items-start" onClick={() => toggleOrder(order.id)}>
                             <div>
                                 <div>
                                     Order #{order.id} - Table #{order.mesa_id}
@@ -288,10 +289,7 @@ const OrdersDashboard = () => {
                                                 </span>
                                                 <div className="order-actions-bottom">
                                                     <button
-                                                        className={`status-btn completed ${item.status_plate === "completed"
-                                                            ? "selected"
-                                                            : ""
-                                                            }`}
+                                                        className={`status-btn completed ${item.status_plate === "completed" ? "selected" : ""}`}
                                                         onClick={() =>
                                                             updateItemStatus(
                                                                 order.id,
@@ -303,10 +301,7 @@ const OrdersDashboard = () => {
                                                         ✅ COMPLETED
                                                     </button>
                                                     <button
-                                                        className={`status-btn rejected ${item.status_plate === "rejected"
-                                                            ? "selected"
-                                                            : ""
-                                                            }`}
+                                                        className={`status-btn rejected ${item.status_plate === "rejected" ? "selected" : ""}`}
                                                         onClick={() =>
                                                             updateItemStatus(
                                                                 order.id,
@@ -318,10 +313,7 @@ const OrdersDashboard = () => {
                                                         ❌ REJECTED
                                                     </button>
                                                     <button
-                                                        className={`status-btn pending ${item.status_plate === "pending"
-                                                            ? "selected"
-                                                            : ""
-                                                            }`}
+                                                        className={`status-btn pending ${item.status_plate === "pending" ? "selected" : ""}`}
                                                         onClick={() =>
                                                             updateItemStatus(
                                                                 order.id,
@@ -340,7 +332,7 @@ const OrdersDashboard = () => {
                             })}
                         </div>
 
-                        <div className="order-footer">
+                        <div className="order-footer d-flex flex-wrap justify-content-end">
                             <button
                                 className="confirm-order-btn"
                                 onClick={() => confirmAllItems(order.id)}
@@ -362,4 +354,3 @@ const OrdersDashboard = () => {
 };
 
 export default OrdersDashboard;
-

@@ -13,12 +13,11 @@ const Tables = () => {
     const fetchMesas = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch(`${BASE_URL}/tables`,
-        {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+        const res = await fetch(`${BASE_URL}/tables`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         const data = await res.json();
         setMesas(data.result);
@@ -31,24 +30,22 @@ const Tables = () => {
     fetchMesas();
   }, []);
 
-
   const handleStateChange = async (tableId, newState) => {
     try {
-      const res = await fetch(`${BASE_URL}/tables/${tableId}`, { //el endpoint de PUt de una table por id tiene que estar en app.py
+      const res = await fetch(`${BASE_URL}/tables/${tableId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ state: newState }), // el state que entra como parametro
+        body: JSON.stringify({ state: newState }),
       });
 
-      const data = await res.json(); // traigo el data 
+      const data = await res.json();
       if (res.ok) {
-        // Actualiza el estado local para reflejar el cambio
         setMesas((mesasActuales) =>
           [...mesasActuales.map((mesa) =>
             mesa.id === tableId ? { ...mesa, state: newState } : mesa
-          )].sort((a, b) => a.id - b.id)  //para q las mesas siempre se me organicen por su id
+          )].sort((a, b) => a.id - b.id)
         );
       } else {
         console.error("Error updating state:", data);
@@ -61,70 +58,64 @@ const Tables = () => {
       alert("Error connecting to server.");
     }
   };
-  
+
   const createNewOrder = async (mesaId) => {
-  try {
-    const token = localStorage.getItem('token');
-    const userId = localStorage.getItem('user_id'); // asegúrate de guardar el user_id al hacer login
-    
-    const res = await fetch(`${BASE_URL}/orders`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        mesa_id: parseInt(mesaId),  //parseInt(id)
-        usuario_id: parseInt(userId),
-        guest_notes: "",
-        platos: []
-      }),
-    });
-   
-    const data = await res.json();
-    console.log("Respuesta de comanda:", data) 
+    try {
+      const token = localStorage.getItem('token');
+      const userId = localStorage.getItem('user_id');
 
-    if (res.ok) {
-      const order_ID = data.result.id;
-      console.log("el ID de la comanda:", order_ID)
-      navigate(`/table-order/${order_ID}`);
-      setOrder({ ...data.result, platos: [] });
-      
-    } else {
-      console.error("Error al crear comanda:", data.msg);
+      const res = await fetch(`${BASE_URL}/orders`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          mesa_id: parseInt(mesaId),
+          usuario_id: parseInt(userId),
+          guest_notes: "",
+          platos: []
+        }),
+      });
+
+      const data = await res.json();
+      console.log("Respuesta de comanda:", data);
+
+      if (res.ok) {
+        const order_ID = data.result.id;
+        console.log("el ID de la comanda:", order_ID);
+        navigate(`/table-order/${order_ID}`);
+        setOrder({ ...data.result, platos: [] });
+      } else {
+        console.error("Error al crear comanda:", data.msg);
+      }
+    } catch (error) {
+      console.error("Error al crear comanda:", error);
     }
-  } catch (error) {
-    console.error("Error al crear comanda:", error);
-  }
-};
+  };
 
-
-  
   const handleClick = async (mesaId) => {
-  try {
-    const res = await fetch(`${BASE_URL}/orders/by-table/${mesaId}`, {
-      headers: {
-        Authorization: "Bearer " + localStorage.getItem("token"),
-      },
-    });
+    try {
+      const res = await fetch(`${BASE_URL}/orders/by-table/${mesaId}`, {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (res.ok) {
-      const orderId = data.order_id;
-      navigate(`/table-order/${orderId}`); // ✅ navegas al ID de la comanda
-    } else if (res.status === 404) {
-      // Si no hay comanda, creas una nueva (opcional)
-      await createNewOrder(mesaId);
-    } else {
-      console.error("Error:", data.msg);
+      if (res.ok) {
+        const orderId = data.order_id;
+        navigate(`/table-order/${orderId}`);
+      } else if (res.status === 404) {
+        await createNewOrder(mesaId);
+      } else {
+        console.error("Error:", data.msg);
+      }
+    } catch (err) {
+      console.error("Error al buscar comanda por mesa:", err);
     }
-  } catch (err) {
-    console.error("Error al buscar comanda por mesa:", err);
-  }
-};
-
-
+  };
 
   const stateOptions = [
     { value: "available", label: "✅ Available" },
@@ -132,34 +123,35 @@ const Tables = () => {
     { value: "reserved", label: "⏳ Reserved" },
     { value: "closed", label: "🔒 Closed" },
   ];
+
   if (!mesas) return <p className='text-center text-light mt-5'>NO EXISTEN MESAS EN ESTE RESTAURANTE!</p>;
+
   return (
+    <div className="container mt-4 px-2 px-sm-4">
+      <h2 className="mb-4 text-light">Tables</h2>
 
-    <div className="container mt-3 px-10 py-10">
-      <h2 className="mb-4 mt-4 text-light">Tables</h2>
-
-      <div className="row mb-3 g-4">
+      <div className="row g-4">
         {mesas.map((table) => (
-          <div className="col-6 col-md-4 col-lg-3" key={table.id}>
+          <div className="col-12 col-sm-6 col-md-4 col-lg-3" key={table.id}>
             <div
-              className="card h-100"
+              className="card h-100 p-2"
               style={{
                 border:
                   table.state === "available"
                     ? "2px solid #28a745"
                     : table.state === "busy"
-                    ? "2px solid #dc3545"
-                    : table.state === "reserved"
-                    ? "2px solid #ffc107"
-                    : "2px solid #6c757d",
+                      ? "2px solid #dc3545"
+                      : table.state === "reserved"
+                        ? "2px solid #ffc107"
+                        : "2px solid #6c757d",
                 backgroundColor:
                   table.state === "available"
                     ? "#e8f5e9"
                     : table.state === "busy"
-                    ? "#f8d7da"
-                    : table.state === "reserved"
-                    ? "#fff3cd"
-                    : "#e2e3e5",
+                      ? "#f8d7da"
+                      : table.state === "reserved"
+                        ? "#fff3cd"
+                        : "#e2e3e5",
                 cursor: "pointer",
               }}
               onClick={() => {
@@ -199,13 +191,12 @@ const Tables = () => {
             >
               <img
                 src={"https://th.bing.com/th/id/OIP.mw32uZEpQETk42EZ_7BlUQHaEJ?w=318&h=180&c=7&r=0&o=5&dpr=1.5&pid=1.7"}
-                className="card-img-top"
+                className="card-img-top img-fluid"
                 alt={`Mesa ${table.id}`}
                 style={{ height: "150px", objectFit: "cover" }}
               />
               <div className="card-body text-center">
                 <h5 className="card-title">Table {table.id}</h5>
-
 
                 <div className="card-text">
                   🪑 Seats: {table.seats}
@@ -223,7 +214,6 @@ const Tables = () => {
                     <span className="text-secondary">🔒 Closed</span>
                   )}
                 </div>
-
 
                 <div className="mt-3" onClick={(e) => e.stopPropagation()}>
                   <Select
@@ -256,8 +246,6 @@ const Tables = () => {
                     }}
                   />
                 </div>
-
-
               </div>
             </div>
           </div>
