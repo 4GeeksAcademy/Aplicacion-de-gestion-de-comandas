@@ -1,11 +1,11 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "c1a8c63c3f0ae03b5601fc1e29b6468a6ea81f4e2973bf8c5de6e03f449d8fd0"
+            "sha256": "28ecc1f4054515c78e7931735b2794223733e3475312d485cc2bc8f2366371f6"
         },
         "pipfile-spec": 6,
         "requires": {
-            "python_version": "3.13"
+            "python_version": "3.11"
         },
         "sources": [
             {
@@ -23,12 +23,6 @@
             ],
             "markers": "python_version >= '3.9'",
             "version": "==1.16.4"
-        },
-        "antiorm": {
-            "hashes": [
-                "sha256:96eb1841ce5163db4cf1dc13f4499ec2d7cffc190cf724b78ffdd3e6b7c4ff93"
-            ],
-            "version": "==1.2.1"
         },
         "bcrypt": {
             "hashes": [
@@ -119,13 +113,6 @@
             ],
             "index": "pypi",
             "version": "==1.44.1"
-        },
-        "db": {
-            "hashes": [
-                "sha256:980e772f15c1161d3b287ffec4f144e40961b0b3e6d5102809577870bf6c5808"
-            ],
-            "index": "pypi",
-            "version": "==0.1.1"
         },
         "flask": {
             "hashes": [
