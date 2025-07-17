@@ -2,7 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import String, Boolean, Integer, ForeignKey, DateTime, Enum, Numeric
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from typing import List
-from datetime import datetime, timezone, UTC
+from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
 
