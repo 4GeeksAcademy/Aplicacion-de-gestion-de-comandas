@@ -201,7 +201,7 @@ class Orders_Plates(db.Model):
         back_populates='comanda_platos')
 
     def __str__(self):
-        return f'comanda {self.order_id} tiene {self.count_plat}   {self.plato.name if self.plato else 'Unknow Plate'}'
+        return f'comanda {self.order_id} tiene {self.count_plat}   {self.plato.name if self.plato else "Unknow Plate"}'
 
     def serialize(self):
         result = Plates.query.filter_by(id=self.plate_id).first()
