@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "3181e5ee2f4c47b36c8197d4f7db5ff075261ff68de38b56b440fd8f422f396c"
+            "sha256": "c1a8c63c3f0ae03b5601fc1e29b6468a6ea81f4e2973bf8c5de6e03f449d8fd0"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -18,11 +18,17 @@
     "default": {
         "alembic": {
             "hashes": [
-                "sha256:5f42e9bd0afdbd1d5e3ad856c01754530367debdebf21ed6894e34af52b3bb03",
-                "sha256:e53c38ff88dadb92eb22f8b150708367db731d58ad7e9d417c9168ab516cbed8"
+                "sha256:b05e51e8e82efc1abd14ba2af6392897e145930c3e0a2faf2b0da2f7f7fd660d",
+                "sha256:efab6ada0dd0fae2c92060800e0bf5c1dc26af15a10e02fb4babff164b4725e2"
             ],
             "markers": "python_version >= '3.9'",
-            "version": "==1.16.2"
+            "version": "==1.16.4"
+        },
+        "antiorm": {
+            "hashes": [
+                "sha256:96eb1841ce5163db4cf1dc13f4499ec2d7cffc190cf724b78ffdd3e6b7c4ff93"
+            ],
+            "version": "==1.2.1"
         },
         "bcrypt": {
             "hashes": [
@@ -92,11 +98,11 @@
         },
         "certifi": {
             "hashes": [
-                "sha256:2e0c7ce7cb5d8f8634ca55d2ba7e6ec2689a2fd6537d8dec1296a477a4910057",
-                "sha256:d747aa5a8b9bbbb1bb8c22bb13e22bd1f18e9796defa16bab421f7f7a317323b"
+                "sha256:6b31f564a415d79ee77df69d757bb49a5bb53bd9f756cbbe24394ffd6fc1f4b2",
+                "sha256:8ea99dbdfaaf2ba2f9bac77b9249ef62ec5218e7c2b2e903378ed5fccf765995"
             ],
             "markers": "python_version >= '3.7'",
-            "version": "==2025.6.15"
+            "version": "==2025.7.14"
         },
         "click": {
             "hashes": [
@@ -113,6 +119,13 @@
             ],
             "index": "pypi",
             "version": "==1.44.1"
+        },
+        "db": {
+            "hashes": [
+                "sha256:980e772f15c1161d3b287ffec4f144e40961b0b3e6d5102809577870bf6c5808"
+            ],
+            "index": "pypi",
+            "version": "==0.1.1"
         },
         "flask": {
             "hashes": [

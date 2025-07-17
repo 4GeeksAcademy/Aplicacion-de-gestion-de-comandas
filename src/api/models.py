@@ -2,7 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import String, Boolean, Integer, ForeignKey, DateTime, Enum, Numeric
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from typing import List
-from datetime import datetime, timezone, UTC
+from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
 
@@ -201,7 +201,7 @@ class Orders_Plates(db.Model):
         back_populates='comanda_platos')
 
     def __str__(self):
-        return f'comanda {self.order_id} tiene {self.count_plat}   {self.plato.name if self.plato else 'Unknow Plate'}'
+        return f'comanda {self.order_id} tiene {self.count_plat}   {self.plato.name if self.plato else "Unknow Plate"}'
 
     def serialize(self):
         result = Plates.query.filter_by(id=self.plate_id).first()
