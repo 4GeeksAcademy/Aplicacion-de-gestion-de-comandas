@@ -24,7 +24,7 @@ bcrypt = "*"
 itsdangerous = "*"
 python-dotenv = "*"
 flask-cors = "*"
-
+tomli = "*"
 
 [requires]
 python_version = "3.11"
